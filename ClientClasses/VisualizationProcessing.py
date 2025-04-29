@@ -130,6 +130,6 @@ cv2.waitKey(0)
 
 cv2.imshow("pic",c._picture)
 cv2.waitKey(0)
-
+#tsttst
 
 
