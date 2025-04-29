@@ -16,14 +16,14 @@ class VisualizeMatrix:
         #ждём текстуры для 81,82,83,84(робот на втором этаже) 91,92,93,94 - (робот на рампах)
         self._matrix = matrix
 
-        self._matrixMaxHeight, self._matrixMaxWeight = self.matrix_max_dimensions()
-        self._picture = self.image_by_matrix_size()
+        self._matrixMaxHeight, self._matrixMaxWeight = self._matrix_max_dimensions()
+        self._picture = self._image_by_matrix_size()
 
-        self._codesInMatrix = self.find_included_codes()
-        self._cached_images =  self.cache_images()
+        self._codesInMatrix = self._find_included_codes()
+        self._cached_images =  self._cache_images()
         self.visualize_matrix()
 
-    def find_included_codes(self):
+    def _find_included_codes(self):
         codes = []
         for i in range(len(self._matrix)):
             for j in range(len(self._matrix[i])):
@@ -36,7 +36,7 @@ class VisualizeMatrix:
                     raise ValueError("Impossible code found:",code)
         return codes
 
-    def image_by_matrix_size(self):
+    def _image_by_matrix_size(self):
         #создает картинку согласно максимальным измерениям матрицы
 
         if self._matrixMaxHeight > 0 and self._matrixMaxWeight > 0:
@@ -45,13 +45,13 @@ class VisualizeMatrix:
 
         return picture
 
-    def matrix_max_dimensions(self):
+    def _matrix_max_dimensions(self):
         #возвращает максимальные измерения матрицы переданной в класс в виде
         #[макс высота, макс ширина]
 
         return len(self._matrix), max(len(row) for row in self._matrix) if len(self._matrix) > 0 else 0
 
-    def cache_images(self):
+    def _cache_images(self):
         pic_dictionary = {}
         for i in self._codesInMatrix:
             pic_dictionary[i] = np.uint16(cv2.imread(f"{self.pathToPics}{i}.png") * (65535 / 255))
@@ -70,11 +70,11 @@ class VisualizeMatrix:
                 self._picture[y[0]:y[1],x[0]:x[1]] = self._cached_images[code]
 
         if max(self._picture.shape) > 600:
-            return self.smart_resize()
+            return self._smart_resize()
 
         return self._picture
 
-    def smart_resize(self, target_size=600, keep_aspect_ratio=True, interpolation=cv2.INTER_AREA):
+    def _smart_resize(self, target_size=600, keep_aspect_ratio=True, interpolation=cv2.INTER_AREA):
         """
         Улучшенный ресайз изображения с автоматическим подбором коэффициента масштабирования
         и сохранением качества.
@@ -130,6 +130,7 @@ pic = c.visualize_matrix()
 # print(pic)
 cv2.imshow("pic",pic)
 cv2.waitKey(0)
+c.__init__(mat)
 
 cv2.imshow("pic",c._picture)
 cv2.waitKey(0)
