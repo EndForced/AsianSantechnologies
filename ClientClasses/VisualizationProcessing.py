@@ -7,8 +7,10 @@ class VisualizeMatrix:
     from typing import List
     import numpy as np
 
-
     def __init__(self, matrix:list[list[int]]):
+        if np.array(matrix).ndim != 2:
+            raise ValueError("Matrix dimension error!11!!1! mat:", matrix)
+
         self.pathToPics = "field_pictures/"
         self._possibleCodes = [0, 10, 20, 31,32,33,34, 41,42, 51,52, 61,62,63,64, 71,72,73,74]
         #ждём текстуры для 81,82,83,84(робот на втором этаже) 91,92,93,94 - (робот на рампах)
@@ -67,8 +69,10 @@ class VisualizeMatrix:
                 # print(self._cached_images[code].dtype)
                 self._picture[y[0]:y[1],x[0]:x[1]] = self._cached_images[code]
 
+        if max(self._picture.shape) > 600:
+            return self.smart_resize()
 
-        return self.smart_resize()
+        return self._picture
 
     def smart_resize(self, target_size=600, keep_aspect_ratio=True, interpolation=cv2.INTER_AREA):
         """
@@ -118,13 +122,12 @@ class VisualizeMatrix:
 
 
 
-
-
 mat = [[10]*15]*15
-print(mat)
+       # print(mat)
 
 c = VisualizeMatrix(mat)
 pic = c.visualize_matrix()
+# print(pic)
 cv2.imshow("pic",pic)
 cv2.waitKey(0)
 
