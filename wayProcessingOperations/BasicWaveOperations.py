@@ -11,9 +11,10 @@ class WaveCreator:
         self._matrix = matrix_in
 
         if not self._matrix or max(self.matrix_max_dimensions(self._matrix)) == 1:
-            raise ValueError("Cant create neighbor dictionary with this matrix:" , self._matrix)
+            raise ValueError("Can't create neighbor dictionary with this matrix:" , self._matrix)
 
         self.Waves = []
+        self.Way = []
 
         self.cellsConnections = {10:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
                                  20:{"up":[33,20], "left":[32,20], "down":[31,20], "right":[34,20]},
@@ -38,6 +39,8 @@ class WaveCreator:
 
                                  51: {"up": [None], "left": [None], "down": [None], "right": [None]},
                                  52: {"up": [None], "left": [None], "down": [None], "right": [None]},
+
+                                 0: {"up": [None], "left": [None], "down": [None], "right": [None]},
                                  }
 
         self._matrixConnections = self._process_cells_connections()
@@ -85,7 +88,6 @@ class WaveCreator:
         #пример return [{"up":[], "right":[(0,1)], "down":[(1,0)], "left":[]}, (0,0)]
 
         mat = mat or self._matrix
-
         y, x = pos
 
         neighbors = {
@@ -122,16 +124,75 @@ class WaveCreator:
 
             waves.append(next_wave)
 
-        # waves = waves.pop(-1)
         self.Waves = waves[:-1]
-        # print(waves)
         return waves
+
+    def find_index_by_cord(self, cord):
+        #возвращает индекс волны по ее элементу
+        for i in self.Waves:
+            if cord in i:
+                return self.Waves.index(i)
+
+    def is_in_waves(self,cord):
+        for i in self.Waves:
+            for j in i:
+                if cord == j:
+                    return True
+        return False
+
+    def find_optimal_cells(self, cord):
+        optimal_cells = []
+        indexes = {}
+        neighbour_cells = self.get_relative_cells(cord)[0]
+
+        for key, value in neighbour_cells.items():
+            if value and (self.is_in_waves(value[0])):
+                indexes[value[0]] = self.find_index_by_cord(value[0])
+
+        for key, value in indexes.items():
+            if value == min(indexes.values()):
+                optimal_cells.append(key)
+
+        return optimal_cells
+
+    def create_way(self, start, finish):
+        self.Waves = self.create_wave(start)
+        ways = [[finish]]
+
+        if start == finish:
+            return [[]]
+
+        while ways[0][-1] != start:
+            new_ways = []
+            for way in ways:
+                if way:
+                    variants = self.find_optimal_cells(way[-1])
+                    if len(variants) == 1:
+                        new_way = way.copy()
+                        new_way.append(variants[0])
+                        new_ways.append(new_way)
+                    elif len(variants) > 1:
+                        for variant in variants:
+                            new_way = way.copy()
+                            new_way.append(variant)
+                            new_ways.append(new_way)
+            ways = new_ways
+            if not ways:
+                break
+
+        #переворачиваем все пути
+        for i in range(len(ways)):
+            ways[i] = ways[i][::-1]
+
+        self.Way = ways
+        return ways
 
 
 
 if __name__ == "__main__":
-    pass
-    # w = WaveCreator(mat)
-    # w.create_wave((0,0))
+    mat = [[10]*10]*10
+
+    w = WaveCreator(mat)
+    w.create_wave((0,0))
 
 
