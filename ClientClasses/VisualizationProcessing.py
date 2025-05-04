@@ -17,7 +17,11 @@ class VisualizeMatrix:
 
     def __init__(self, matrix:list[list[int]]):
         super().__init__(matrix)
-        self.pathToPics = "ClientClasses/field_pictures/"
+        if __name__ != "__main__":
+            self.pathToPics = "ClientClasses/field_pictures/"
+        else:
+            self.pathToPics = "field_pictures/"
+
         self._possibleCodes = possible_codes
         #ждём текстуры для 81,82,83,84(робот на втором этаже) 91,92,93,94 - (робот на рампах)
         self._matrix = matrix
