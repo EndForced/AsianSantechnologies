@@ -1,7 +1,12 @@
 import cv2
 import numpy as np
 from typing import List,Tuple
-import wayProcessingOperations.BasicWaveOperations as WaveProcessing
+
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from wayProcessingOperations import BasicWaveOperations as WaveProcessing
 from wayProcessingOperations.BasicWaveOperations import possible_codes
 import platform
 
