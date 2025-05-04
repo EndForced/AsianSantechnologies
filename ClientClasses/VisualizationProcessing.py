@@ -3,6 +3,7 @@ import numpy as np
 from typing import List,Tuple
 import wayProcessingOperations.BasicWaveOperations as WaveProcessing
 from wayProcessingOperations.BasicWaveOperations import possible_codes
+import platform
 
 class VisualizeMatrix:
     import cv2
@@ -15,6 +16,8 @@ class VisualizeMatrix:
         self._possibleCodes = possible_codes
         #ждём текстуры для 81,82,83,84(робот на втором этаже) 91,92,93,94 - (робот на рампах)
         self._matrix = matrix
+
+        self.OS = platform.system()
 
         self._matrixMaxHeight, self._matrixMaxWeight = WaveProcessing.WaveCreator.matrix_max_dimensions(self._matrix)
         self.picture = self.image_by_matrix_size()
@@ -106,10 +109,15 @@ class VisualizeMatrix:
         return resized
 
     def show(self):
-        self.resizedPicture = self.smart_resize()
-        cv2.imshow("map", self.resizedPicture)
-
-        cv2.waitKey(0)
+        print(self.OS)
+        if self.OS == "Windows":
+            self.resizedPicture = self.smart_resize()
+            cv2.imshow("map", self.resizedPicture)
+            cv2.waitKey(0)
+        else:
+            #smth for frame updating
+            print("Cant show on rp")
+            pass
 
 class VisualizeWaves(VisualizeMatrix, WaveProcessing.WaveCreator):
     def __init__(self, matrix:list[list[int]]):
