@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
-
-import wayProcessingOperations.BasicWaveOperations
+from typing import List,Tuple
+import wayProcessingOperations.BasicWaveOperations as WaveProcessing
 from wayProcessingOperations.BasicWaveOperations import possible_codes
-class VisualizeMatrix(wayProcessingOperations.BasicWaveOperations.WaveCreator):
+
+class VisualizeMatrix:
     import cv2
     from typing import List, AnyStr
     import numpy as np
@@ -15,7 +16,7 @@ class VisualizeMatrix(wayProcessingOperations.BasicWaveOperations.WaveCreator):
         #ждём текстуры для 81,82,83,84(робот на втором этаже) 91,92,93,94 - (робот на рампах)
         self._matrix = matrix
 
-        self._matrixMaxHeight, self._matrixMaxWeight = self.matrix_max_dimensions(self._matrix)
+        self._matrixMaxHeight, self._matrixMaxWeight = WaveProcessing.WaveCreator.matrix_max_dimensions(self._matrix)
         self.picture = self.image_by_matrix_size()
 
         self._codesInMatrix = self.find_included_codes()
@@ -110,12 +111,10 @@ class VisualizeMatrix(wayProcessingOperations.BasicWaveOperations.WaveCreator):
 
         cv2.waitKey(0)
 
-
-class VisualizeWaves(VisualizeMatrix):
-
+class VisualizeWaves(VisualizeMatrix, WaveProcessing.WaveCreator):
     def __init__(self, matrix:list[list[int]]):
         super().__init__(matrix)
-        self.frameWeight = 5
+        self.frameWeight = 7
         self.fontSize = 0.7
         self.fontThickness = 2
         self.maxWavesNum = 0
@@ -132,8 +131,8 @@ class VisualizeWaves(VisualizeMatrix):
         x_start, x_end = cords[1] * 100, (cords[1] + 1) * 100
 
         # Корректировка границ для крайних клеток
-        if cords[0] == 0: y_start += 5
-        if cords[1] == 0: x_start += 5
+        if cords[0] == 0: y_start += self.frameWeight
+        if cords[1] == 0: x_start += self.frameWeight
 
         # Получаем средний цвет клетки (BGR)
         cell_area = self.picture[y_start:y_end, x_start:x_end]
@@ -192,6 +191,8 @@ class VisualizeWaves(VisualizeMatrix):
     def visualize_wave(self,waves:dict = None):
         waves = waves or self.Waves
         self.maxWavesNum = len(waves)
+        self.visualize_matrix()
+
         for wave in waves:
             for cell in wave:
                 current_number = waves.index(wave)
@@ -227,25 +228,121 @@ class VisualizeWaves(VisualizeMatrix):
 
         return scaled_value
 
+class VisualizePaths(VisualizeWaves):
+    def __init__(self, matrix: List[List[int]]):
+        super().__init__(matrix)
+        # Цвета для путей (BGR в диапазоне 0-65535)
+        self.path_colors = [
+            (0, 65535, 0),  # Зеленый
+            (65535, 0, 0),  # Синий
+            (0, 0, 65535),  # Красный
+            (65535, 65535, 0),  # Голубой
+            (0, 65535, 65535),  # Желтый
+            (65535, 0, 65535)  # Пурпурный
+        ]
+        self.path_thickness = 15
+        self.arrow_thickness = 3
+        self.circle_radius = 20
+        self.start_color = (0, 32768, 0)  # Темно-зеленый
+        self.finish_color = (0, 0, 32768)  # Темно-красный
+        self.temp_canvas = None
+
+    def draw_path(self, path: List[Tuple[int, int]], color_index: int = 0):
+        """Рисует один путь на изображении"""
+        if not path:
+            return
+
+        # Создаем временный холст для композиции
+        if self.temp_canvas is None:
+            self.temp_canvas = np.zeros_like(self.picture)
+
+        color = self.path_colors[color_index % len(self.path_colors)]
+
+        # Рисуем линии между точками пути на временном холсте
+        for i in range(len(path) - 1):
+            start = self._get_center_coords(path[i])
+            end = self._get_center_coords(path[i + 1])
+
+            # Линия пути
+            cv2.line(self.temp_canvas, start, end, color, self.path_thickness)
+
+            # Стрелка направления
+            if i < len(path) - 2:
+                cv2.arrowedLine(self.temp_canvas, start, end, (0, 0, 0),
+                                self.arrow_thickness, tipLength=0.3)
+
+        # Копируем временный холст на основное изображение
+        self._merge_canvas()
+
+        # Рисуем начальную и конечную точки поверх всего
+        self._draw_point(path[0], self.start_color, "S")
+        self._draw_point(path[-1], self.finish_color, "F")
+
+    def _merge_canvas(self):
+        """Объединяет временный холст с основным изображением"""
+        if self.temp_canvas is not None:
+            # Применяем пути к основному изображению
+            mask = np.any(self.temp_canvas > 0, axis=2)
+            for c in range(3):
+                self.picture[:, :, c][mask] = self.temp_canvas[:, :, c][mask]
+            self.temp_canvas = None
+
+    def draw_multiple_paths(self, paths: List[List[Tuple[int, int]]]):
+        """Рисует несколько путей разными цветами"""
+        # Сначала рисуем все пути
+        for i, path in enumerate(paths):
+            self.draw_path(path, i)
+
+        # Убедимся, что все временные холсты объединены
+        self._merge_canvas()
+
+    def visualize(self, paths: List[List[Tuple[int, int]]], waves: List[List[Tuple[int, int]]] = None):
+        """Основной метод визуализации"""
+        # Сначала рисуем волны (если нужно)
+        if waves:
+            self.visualize_wave(waves)
+
+        # Затем рисуем пути (старт/финиш будут поверх)
+        self.draw_multiple_paths(paths)
+
+        # Возвращаем изображение в формате BGR
+        return cv2.cvtColor(self.picture, cv2.COLOR_RGB2BGR)
+
+    # Остальные методы остаются без изменений
+    def _get_center_coords(self, cell: Tuple[int, int]) -> Tuple[int, int]:
+        """Возвращает координаты центра клетки в пикселях"""
+        y, x = cell
+        center_x = x * 100 + 50
+        center_y = y * 100 + 50
+        return (center_x, center_y)
+
+    def _draw_point(self, cell: Tuple[int, int], color: Tuple[int, int, int], text: str = ""):
+        """Рисует круг в указанной клетке с текстом (поверх всего)"""
+        center = self._get_center_coords(cell)
+
+        # Рисуем круг
+        cv2.circle(self.picture, center, self.circle_radius, color, -1)
+
+        # Рисуем текст
+        if text:
+            text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+            text_x = center[0] - text_size[0] // 2
+            text_y = center[1] + text_size[1] // 2
+            cv2.putText(self.picture, text, (text_x, text_y),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (65535, 65535, 65535), 2)
+
 if __name__ == "__main__":
-    # mat = [[10]*2]*2
-    mat = [[10, 32, 20, 20, 20, 34, 10, 31],
-           [10, 32, 20, 10, 32, 20, 20, 33],
-           [10, 20, 20, 71, 10, 10, 20, 10],
-           [10, 20, 20, 34, 10, 10, 31, 10],
-           [10, 10, 20, 20, 20, 34, 10, 62],
-           [20, 10, 10, 10, 10, 10, 10, 62],
-           [10, 10, 10, 20, 10, 10, 10, 62],
-           [10, 41, 20, 20, 20, 34, 41, 10]]
+    mat = [[10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 20, 20, 20, 10, 10], [10, 10, 10, 10, 10, 10, 10, 10], [10, 10, 10, 10, 10, 10, 10, 10], [10, 10, 10, 10, 10, 10, 10, 10]]
 
-    obj = VisualizeWaves(mat)
-    obj.create_wave((2,3))
-    print(obj.Waves)
-
-    obj.visualize_wave()
-    obj.show()
-
-
+    obj = VisualizePaths(mat)
+    obj.create_way((0,7),(5,4))
+    for i in obj.Way:
+        obj.visualize_wave()
+        obj.draw_path(path=i)
+        obj.show()
+        # cv2.waitKey(0)
+    # obj.visualize_wave()
+    # test commit
 
 
 
