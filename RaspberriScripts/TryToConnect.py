@@ -72,6 +72,7 @@ def connect_to_wifi(ssid, password):
         )
 
         # Запрашиваем IP через DHCP
+        subprocess.run(["sudo" ,"reboot"])
         subprocess.run(["sudo", "dhclient", "wlan0"], check=True)
     except subprocess.CalledProcessError as e:
         print(e.stderr)
