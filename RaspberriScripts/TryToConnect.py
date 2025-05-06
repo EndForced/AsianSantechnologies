@@ -9,6 +9,12 @@ if res in networks.keys():
     exit()
 else:
     pass
-res = subprocess.run(["sudo", "iwlist", "wlan0", "scan", "|", "grep", "ESSID"], capture_output=True)
+res = subprocess.run(
+    "sudo iwlist wlan0 scan | grep ESSID",
+    shell=True,
+    check=True,
+    text=True,
+    capture_output=True
+)
 res = res.stdout.strip()
 print("possible networks:", res)
