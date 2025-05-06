@@ -90,7 +90,7 @@ def main():
         possible_network = find_possible_networks(networks)
         connect_to_wifi(possible_network, networks[possible_network])
 
-
+main()
 
 
 
