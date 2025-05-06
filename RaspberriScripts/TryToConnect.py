@@ -21,7 +21,7 @@ res = str(res).replace("ESSID:", "")
 res = res.replace(r'"','')
 
 print("res", res)
-for key, val in networks:
+for key, val in networks.items():
     if key in res:
         print("found!!!",key)
 
