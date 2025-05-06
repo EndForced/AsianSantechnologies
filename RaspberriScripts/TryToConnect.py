@@ -1,7 +1,5 @@
 import subprocess
 
-from wayProcessingOperations.BasicWaveOperations import possible_codes
-
 networks = {"Pro":"87658765", "TP-Link_26A0":"96472569"}
 favourite_network = "Pro"
 
