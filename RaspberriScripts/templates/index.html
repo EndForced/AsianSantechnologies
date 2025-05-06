@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multi-Camera Stream</title>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .camera-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 45%;
+        }
+        .user-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .user-image {
+            max-width: 200px;
+            max-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multi-Camera Streaming</h1>
+
+    <div class="container">
+        {% for cam_id in cameras %}
+        <div class="camera-box">
+            <h2>Camera {{ cam_id }}</h2>
+            <img src="{{ url_for('video_feed', cam_id=cam_id) }}" width="640" height="480">
+            <p><a href="{{ url_for('single_camera', cam_id=cam_id) }}">View full screen</a></p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2>Upload Images</h2>
+    <form method="post" enctype="multipart/form-data" action="/upload">
+        <input type="file" name="file" accept="image/*">
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>User Images</h2>
+    <div class="user-images">
+        {% for img in user_images %}
+        <img src="{{ img }}" class="user-image">
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -1,8 +1,13 @@
 from flask import Flask, Response, jsonify, request
+import sys
+import os
 import cv2
 import threading
 import time
 from collections import defaultdict
+from ClientClasses.VisualizationProcessing import VisualizeMatrix
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 app = Flask(__name__)
 
@@ -150,8 +155,7 @@ def disable_camera():
     return jsonify({'message': f'Camera {camera_id} disabled'})
 
 
-@app.route('/api/set_manual_image', methods=['POST'])
-def set_manual_image():
+def set_manual_image(img):
     global manual_image
     if 'image' not in request.files:
         return jsonify({'error': 'No image provided'}), 400
@@ -219,3 +223,7 @@ if __name__ == '__main__':
     main_camera_id = 0
 
     app.run(host='0.0.0.0', port=5000, threaded=True)
+
+
+
+
