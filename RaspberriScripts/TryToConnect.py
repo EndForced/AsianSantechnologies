@@ -17,7 +17,9 @@ res = subprocess.run(
     capture_output=True
 )
 res = res.stdout.strip()
-res = str(res).replace("ESSID", "")
+res = str(res).replace("ESSID:", "")
+res = res.replace(r'"','')
+
 print("res", res)
 for key, val in networks:
     if key in res:
