@@ -5,8 +5,9 @@ import cv2
 import threading
 import time
 from collections import defaultdict
-from ClientClasses.VisualizationProcessing import VisualizeMatrix
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from ClientClasses.VisualizationProcessing import VisualizeMatrix
+
 
 
 app = Flask(__name__)
