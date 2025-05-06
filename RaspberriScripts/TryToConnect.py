@@ -17,4 +17,5 @@ res = subprocess.run(
     capture_output=True
 )
 res = res.stdout.strip()
-print("possible networks:", res)
+print(type(res))
+
