@@ -1,230 +1,116 @@
-from flask import Flask, Response, jsonify, request
-import sys
 import os
 import cv2
+from flask import Flask, Response, render_template
 import threading
 import time
-from collections import defaultdict
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ClientClasses.VisualizationProcessing import VisualizeMatrix
-
-
 
 app = Flask(__name__)
 
-# Глобальные переменные для управления камерами
-cameras = defaultdict(dict)
-active_cameras = set()
-main_camera_id = None
-manual_image = None
 
+class CameraStreamer:
+    def __init__(self):
+        self.cameras = {
+            0: None,  # Первая камера
+            1: None  # Вторая камера
+        }
+        self.lock = threading.Lock()
+        self.stop_event = threading.Event()
 
-class CameraStream:
-    def __init__(self, camera_id, src=0):
-        self.camera_id = camera_id
-        self.src = src
-        self.frame = None
-        self.running = False
-        self.thread = None
+        # Инициализация камер
+        for cam_id in self.cameras.keys():
+            self.start_camera(cam_id)
 
-    def start(self):
-        if self.running:
-            return
+        # Запуск потока для обновления кадров
+        self.update_thread = threading.Thread(target=self.update_frames)
+        self.update_thread.daemon = True
+        self.update_thread.start()
 
-        self.running = True
-        self.thread = threading.Thread(target=self.update, args=())
-        self.thread.daemon = True
-        self.thread.start()
-
-    def update(self):
-        cap = cv2.VideoCapture(self.src)
-        while self.running:
-            ret, frame = cap.read()
-            if ret:
-                self.frame = frame
-            time.sleep(0.01)
-        cap.release()
-
-    def stop(self):
-        self.running = False
-        if self.thread:
-            self.thread.join()
-
-    def get_frame(self):
-        return self.frame
-
-
-def generate_frames(camera_id):
-    while True:
-        frame = None
-
-        # Проверяем ручное изображение
-        if manual_image is not None and camera_id == main_camera_id:
-            frame = manual_image
-        # Проверяем активные камеры
-        elif camera_id in active_cameras and camera_id in cameras:
-            frame = cameras[camera_id]['stream'].get_frame()
-
-        if frame is not None:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    def start_camera(self, cam_id):
+        """Инициализирует камеру"""
+        cap = cv2.VideoCapture(cam_id)
+        if cap.isOpened():
+            self.cameras[cam_id] = cap
+            print(f"Camera {cam_id} started successfully")
         else:
-            # Черный кадр если камера не активна
-            black_frame = np.zeros((480, 640, 3), np.uint8)
-            ret, buffer = cv2.imencode('.jpg', black_frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            print(f"Failed to start camera {cam_id}")
+
+    def stop_cameras(self):
+        """Останавливает все камеры"""
+        self.stop_event.set()
+        for cam_id, cap in self.cameras.items():
+            if cap is not None:
+                cap.release()
+        self.cameras = {}
+
+    def get_frame(self, cam_id):
+        """Возвращает текущий кадр с указанной камеры"""
+        with self.lock:
+            if cam_id in self.cameras and self.cameras[cam_id] is not None:
+                ret, frame = self.cameras[cam_id].read()
+                if ret:
+                    _, jpeg = cv2.imencode('.jpg', frame)
+                    return jpeg.tobytes()
+        return None
+
+    def update_frames(self):
+        """Обновляет кадры в отдельном потоке"""
+        while not self.stop_event.is_set():
+            with self.lock:
+                for cam_id, cap in self.cameras.items():
+                    if cap is not None:
+                        cap.grab()  # Захватываем кадр, но не декодируем его здесь
+            time.sleep(0.03)  # Небольшая задержка для уменьшения нагрузки на CPU
 
 
-@app.route('/video_feed/<int:camera_id>')
-def video_feed(camera_id):
-    return Response(generate_frames(camera_id),
+# Создаем экземпляр стримера
+streamer = CameraStreamer()
+
+
+@app.route('/')
+def index():
+    """Главная страница со всеми камерами"""
+    return render_template('index.html', cameras=streamer.cameras.keys())
+
+
+@app.route('/camera/<int:cam_id>')
+def single_camera(cam_id):
+    """Страница с одной камерой"""
+    if cam_id in streamer.cameras:
+        return render_template('single_camera.html', cam_id=cam_id)
+    return "Camera not found", 404
+
+
+@app.route('/video_feed/<int:cam_id>')
+def video_feed(cam_id):
+    """Генератор видеопотока для указанной камеры"""
+
+    def generate():
+        while True:
+            frame = streamer.get_frame(cam_id)
+            if frame is not None:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            else:
+                # Если кадр не получен, отправляем черное изображение
+                black_frame = cv2.imencode('.jpg', cv2.imread('static/black.jpg') if os.path.exists(
+                    'static/black.jpg') else cv2.imread('black.jpg'))[1].tobytes()
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + black_frame + b'\r\n')
+
+    return Response(generate(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-# API методы
-@app.route('/api/add_camera', methods=['POST'])
-def add_camera():
-    data = request.json
-    camera_id = data.get('camera_id')
-    src = data.get('src', 0)
-
-    if camera_id in cameras:
-        return jsonify({'error': 'Camera already exists'}), 400
-
-    stream = CameraStream(camera_id, src)
-    stream.start()
-    cameras[camera_id] = {'stream': stream, 'src': src}
-    return jsonify({'message': f'Camera {camera_id} added'})
-
-
-@app.route('/api/remove_camera', methods=['POST'])
-def remove_camera():
-    data = request.json
-    camera_id = data.get('camera_id')
-
-    if camera_id not in cameras:
-        return jsonify({'error': 'Camera not found'}), 404
-
-    cameras[camera_id]['stream'].stop()
-    del cameras[camera_id]
-    if camera_id in active_cameras:
-        active_cameras.remove(camera_id)
-    if camera_id == main_camera_id:
-        main_camera_id = None
-    return jsonify({'message': f'Camera {camera_id} removed'})
-
-
-@app.route('/api/set_main_camera', methods=['POST'])
-def set_main_camera():
-    global main_camera_id
-    data = request.json
-    camera_id = data.get('camera_id')
-
-    if camera_id not in cameras:
-        return jsonify({'error': 'Camera not found'}), 404
-
-    main_camera_id = camera_id
-    return jsonify({'message': f'Camera {camera_id} set as main'})
-
-
-@app.route('/api/enable_camera', methods=['POST'])
-def enable_camera():
-    data = request.json
-    camera_id = data.get('camera_id')
-
-    if camera_id not in cameras:
-        return jsonify({'error': 'Camera not found'}), 404
-
-    active_cameras.add(camera_id)
-    return jsonify({'message': f'Camera {camera_id} enabled'})
-
-
-@app.route('/api/disable_camera', methods=['POST'])
-def disable_camera():
-    data = request.json
-    camera_id = data.get('camera_id')
-
-    if camera_id not in cameras:
-        return jsonify({'error': 'Camera not found'}), 404
-
-    if camera_id in active_cameras:
-        active_cameras.remove(camera_id)
-    return jsonify({'message': f'Camera {camera_id} disabled'})
-
-
-def set_manual_image(img):
-    global manual_image
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image provided'}), 400
-
-    file = request.files['image']
-    img_bytes = file.read()
-    nparr = np.frombuffer(img_bytes, np.uint8)
-    manual_image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    return jsonify({'message': 'Manual image set'})
-
-
-@app.route('/api/clear_manual_image', methods=['POST'])
-def clear_manual_image():
-    global manual_image
-    manual_image = None
-    return jsonify({'message': 'Manual image cleared'})
-
-
-@app.route('/api/status')
-def get_status():
-    return jsonify({
-        'active_cameras': list(active_cameras),
-        'main_camera': main_camera_id,
-        'all_cameras': list(cameras.keys()),
-        'manual_image_set': manual_image is not None
-    })
-
-
-# HTML страница для просмотра
-@app.route('/')
-def index():
-    return """
-    <html>
-    <head>
-        <title>Multi-Camera Streaming</title>
-    </head>
-    <body>
-        <h1>Multi-Camera Streaming</h1>
-        <div id="streams"></div>
-        <script>
-            function loadStream(cameraId) {
-                const div = document.createElement('div');
-                div.innerHTML = `<h2>Camera ${cameraId}</h2>
-                                <img src="/video_feed/${cameraId}">`;
-                document.getElementById('streams').appendChild(div);
-            }
-
-            // Загружаем список камер и создаем потоки
-            fetch('/api/status')
-                .then(response => response.json())
-                .then(data => {
-                    data.all_cameras.forEach(camId => loadStream(camId));
-                });
-        </script>
-    </body>
-    </html>
-    """
-
-
 if __name__ == '__main__':
-    # Пример добавления камер по умолчанию
-    cameras[0] = {'stream': CameraStream(0, 0), 'src': 0}
-    cameras[0]['stream'].start()
-    active_cameras.add(0)
-    main_camera_id = 0
+    try:
+        # Создаем черное изображение, если его нет
+        if not os.path.exists('static/black.jpg'):
+            os.makedirs('static', exist_ok=True)
+            cv2.imwrite('static/black.jpg',
+                        cv2.imread('black.jpg') if os.path.exists('black.jpg') else cv2.imread('black.jpg',
+                                                                                               cv2.IMREAD_COLOR))
 
-    app.run(host='0.0.0.0', port=5000, threaded=True)
-
-
-
-
+        # Запускаем Flask с поддержкой многопоточности
+        app.run(host='0.0.0.0', port=5000, threaded=True)
+    finally:
+        streamer.stop_cameras()

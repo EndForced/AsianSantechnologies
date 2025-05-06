@@ -1,23 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Camera {{ cam_id }} Stream</title>
+    <title>Camera {{ cam_id + 1 }} Stream</title>
     <style>
         body {
-            text-align: center;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background: #f0f0f0;
         }
-        .back-link {
-            display: block;
-            margin-bottom: 20px;
-            font-size: 18px;
+        .header {
+            background: #333;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-button {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 15px;
+            background: #4CAF50;
+            border-radius: 4px;
+        }
+        .back-button:hover {
+            background: #45a049;
+        }
+        .camera-title {
+            margin: 0;
+        }
+        .camera-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        .camera-feed {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
-    <a href="/" class="back-link">Back to all cameras</a>
-    <h1>Camera {{ cam_id }} Stream</h1>
-    <img src="{{ url_for('video_feed', cam_id=cam_id) }}" width="1280" height="960">
+    <div class="header">
+        <h1 class="camera-title">Camera {{ cam_id + 1 }} Live View</h1>
+        <a href="/" class="back-button">Back to All Cameras</a>
+    </div>
+
+    <div class="camera-container">
+        <img src="{{ url_for('video_feed', cam_id=cam_id) }}" class="camera-feed">
+    </div>
 </body>
 </html>
