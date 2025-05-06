@@ -1,7 +1,7 @@
 import subprocess
 
 networks = {"Pro":"87658765", "TP-Link_26A0":"96472569"}
-favourite_network = "Pro"
+favourite_network = "TP-Link_26A0"
 
 def am_i_connected(nets):
     res = subprocess.run(["iwgetid","-r"], capture_output = True)
@@ -40,7 +40,7 @@ def find_possible_networks(nets, find_favourite = 0):
     return False
 
 def connect_to_wifi(ssid, password):
-    print("connecting to", ssid)
+    print("connecting to", ssid, password)
     # Создаём временный конфиг для wpa_supplicant
     config = f"""
     network={{
