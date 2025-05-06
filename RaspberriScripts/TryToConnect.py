@@ -17,5 +17,9 @@ res = subprocess.run(
     capture_output=True
 )
 res = res.stdout.strip()
-print(type(res))
+res = str(res).replace("ESSID", "")
+print("res", res)
+for key, val in networks:
+    if key in res:
+        print("found!!!",key)
 
