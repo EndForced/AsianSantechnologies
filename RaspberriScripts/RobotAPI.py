@@ -3,7 +3,7 @@ import time
 
 class RobotAPI:
     def __init__(self, position, orientation):
-        self.ser = serial.Serial('/dev/ttyS0', 9600)
+        self.ser = serial.Serial('/dev/AMA0', 9600)
         self.ser.flush()  # очищаем буфер
 
         if max(position) > 15:
