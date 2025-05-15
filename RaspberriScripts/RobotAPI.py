@@ -48,7 +48,7 @@ class RobotAPI:
 
 robot = RobotAPI((1,1), 1)
 while 1:
-    print(robot.read())
+    robot.read()
     robot.send("hehehaha")
     time.sleep(1)
 
