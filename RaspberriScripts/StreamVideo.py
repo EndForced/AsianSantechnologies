@@ -12,6 +12,7 @@ class CameraStreamer:
         self.cameras = {
             0: None,  # Первая камера
             1: None  # Вторая камера
+            2: None #user input
         }
         self.lock = threading.Lock()
         self.stop_event = threading.Event()

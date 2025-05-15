@@ -16,18 +16,18 @@ class WaveCreator:
         self.Waves = []
         self.Way = []
 
-        self.cellsConnections = {10:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
-                                 20:{"up":[33,20], "left":[32,20], "down":[31,20], "right":[34,20]},
+        self.cellsConnections = {10:{"up":[31,10, 41], "left":[34,10, 42], "down":[33,10, 41], "right":[32,10, 42]},
+                                 20:{"up":[33,20, 51], "left":[32,20, 52], "down":[31,20, 51], "right":[34,20, 52]},
 
-                                 31:{"up":[33,20], "left":[None], "down":[33,10], "right":[None]},
-                                 32:{"up":[None], "left":[10,34], "down":[None], "right":[20]},
-                                 33:{"up":[31], "left":[None], "down":[31,20], "right":[None]},
-                                 34:{"up":[None], "left":[20,32], "down":[None], "right":[10]},
+                                 31:{"up":[33,20, 51], "left":[None], "down":[33,10, 41], "right":[None]},
+                                 32:{"up":[None], "left":[10,34, 42], "down":[None], "right":[20, 51]},
+                                 33:{"up":[31, 41], "left":[None], "down":[31,20, 51], "right":[None]},
+                                 34:{"up":[None], "left":[20,32, 52], "down":[None], "right":[10, 42]},
 
-                                 71:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
-                                 72: {"up": [31,10], "left": [34,10], "down": [33,10], "right": [32,10]},
-                                 73: {"up": [31,10], "left": [34,10], "down": [33,10], "right": [32,10]},
-                                 74: {"up": [31,10], "left": [34,10], "down": [33,10], "right": [32,10]},
+                                 71:{"up":[31,10, 41], "left":[34,10, 42], "down":[33,10, 41], "right":[32,10, 42]},
+                                 72:{"up":[31,10, 41], "left":[34,10, 42], "down":[33,10, 41], "right":[32,10, 42]},
+                                 73:{"up":[31,10, 41], "left":[34,10, 42], "down":[33,10, 41], "right":[32,10, 42]},
+                                 74:{"up":[31,10, 41], "left":[34,10, 42], "down":[33,10, 41], "right":[32,10, 42]},
 
                                  61: {"up": [None], "left": [None], "down": [None], "right": [None]},
                                  62: {"up": [None], "left": [None], "down": [None], "right": [None]},
@@ -183,16 +183,40 @@ class WaveCreator:
         #переворачиваем все пути
         for i in range(len(ways)):
             ways[i] = ways[i][::-1]
+            last_cell = np.array(self._matrix)[ways[i][-1]]
+
+            if last_cell in [41,42, 51,52]:
+                ways[i].pop(-1)
 
         self.Way = ways
         return ways
 
+class PattersSolver(WaveCreator):
+    def __init__(self, matrix_for_solving):
+        self.matrix = matrix_for_solving
+        super().__init__(self.matrix)
+        tubes = self.find_tubes()
+        print(tubes)
+
+
+    def find_tubes(self):
+        #возвращает словарь вида {(yt, xt): []}
+        tubes = []
+
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
+                if str(self.matrix[i][j])[0] in ["4", "5"]:
+                    tubes.append((i,j))
+
+        return tubes
 
 
 if __name__ == "__main__":
-    mat = [[10]*10]*10
+    mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
 
-    w = WaveCreator(mat)
-    w.create_wave((0,0))
+    # w = WaveCreator(mat)
+    # w.create_wave((0,0))
+
+    w = PattersSolver(mat)
 
 
