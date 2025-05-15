@@ -26,7 +26,7 @@ class RobotAPI:
         line = self.ser.readline().decode('utf-8').strip()
 
         if line is not None:
-            lines = line.strip("*")
+            lines = line.split("*")
             self.ESPMessage = lines
             self.process_esp_responses()
 
