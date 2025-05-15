@@ -1,5 +1,6 @@
 import serial
 import time
+import threading
 
 class RobotAPI:
     def __init__(self, position, orientation):
@@ -14,7 +15,8 @@ class RobotAPI:
             raise  ValueError("Unknown orientation!", orientation)
         self.RobotOrientation = orientation
 
-        self.ArduinoMessage = self.read()
+        self.ESPMessage = self.read()
+        self.IsDoingAction = 0
 
     def send(self, data):
         data_to_send = data + "\n"  # Data to send (must be bytes)
@@ -22,7 +24,25 @@ class RobotAPI:
 
     def read(self):
         line = self.ser.readline().decode('utf-8').strip()
-        return line
+
+        if line is not None:
+            lines = line.strip("*")
+            self.ESPMessage = lines
+            self.process_esp_responses()
+
+    def process_esp_responses(self):
+        if self.ESPMessage[0] == "Doing":
+            self.IsDoingAction = 1
+            return
+
+        elif self.ESPMessage[0] == "Done":
+            self.IsDoingAction = 0
+
+        else:
+            print(self.ESPMessage)
+
+
+
 
 
 
