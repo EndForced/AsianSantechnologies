@@ -29,7 +29,7 @@ import cv2
 class CameraAPI:
     def __init__(self, max_cameras_to_check=3):
         self.cameras = self._find_available_cameras(max_cameras_to_check)
-        self.pathToPhotos = "/photos/"
+        self.pathToPhotos = "/home/pi/AsianSantechnologies/RaspberriScripts/photos"
 
     @staticmethod
     def _find_available_cameras(max_to_check):
