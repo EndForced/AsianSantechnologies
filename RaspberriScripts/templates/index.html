@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Мониторинг камер</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .cameras { display: flex; flex-wrap: wrap; gap: 20px; }
-        .camera { border: 1px solid #ddd; padding: 10px; width: 300px; }
-        img { max-width: 100%; }
-    </style>
-</head>
-<body>
-    <h1>Система мониторинга</h1>
-    <p>Доступно камер: {{ cameras|length }}</p>
-    <a href="/cameras"><button>Просмотр всех камер</button></a>
-</body>
-</html>
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Video Streaming</title>
+   </head>
+   <body>
+       <h1>Welcome to Video Streaming</h1>
+       <video width="640" height="480" controls>
+           <source src="{{ url_for('static', filename='videos/your_video.mp4') }}" type="video/mp4">
+           Your browser does not support the video tag.
+       </video>
+   </body>
+   </html>
+   

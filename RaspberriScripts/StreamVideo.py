@@ -4,6 +4,7 @@ import os
 import cv2
 import threading
 import time
+from flask import Flask, render_template, send_file
 
 class CameraAPI:
     def __init__(self, max_cameras_to_check=3):
@@ -83,6 +84,24 @@ class CameraAPI:
 
         else: print("No photo cause no frame((")
 
-cam = CameraAPI(2)
+cam = CameraAPI(1)
+
+
+app = Flask(__name__)
+
+
+@app.route('/image')
+def get_image():
+    return send_file(cam.get_frame(0), mimetype='image/jpeg')
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 print(cam.get_available_cameras_info())
 cam.capture_picture(0)
