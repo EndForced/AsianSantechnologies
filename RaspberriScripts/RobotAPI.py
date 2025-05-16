@@ -27,19 +27,10 @@ class RobotAPI:
 
         if line is not None:
             lines = line.split("*")
-            self.ESPMessage = lines
-            self.process_esp_responses()
+            return lines
 
-    def process_esp_responses(self):
-        if self.ESPMessage[0] == "Doing":
-            self.IsDoingAction = 1
-            return
-
-        elif self.ESPMessage[0] == "Done":
-            self.IsDoingAction = 0
-
-        else:
-            print(self.ESPMessage)
+    def drive_through_roadmap(self, roadmap):
+        pass
 
 
 

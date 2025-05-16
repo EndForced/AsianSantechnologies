@@ -1,10 +1,12 @@
-const String commands[] = {"Beep", "Reset"};
-const int commandsCount = 2;
+const String commands[] = {"Beep", "Reset", "Turn"};
+const int commandsCount = 3;
 String parameters[10];
-
+int paramCount = 0;
+//Beep optional: millis, freq
+//Reset - resetting
+// Turn - Left/Right, optional - int num, int speed
 
 void uartProcessing() {
-  //тут все +- понятно
   if (Serial1.available()) {
     String uart_data = Serial1.readStringUntil('\n');
     uart_data.trim();
@@ -15,15 +17,41 @@ void uartProcessing() {
     Serial.print("\nCommand: ");
     Serial.println(command);
 
-    int num = find(command, commands, commandsCount); // индекс команды для свитчкейса (умно)
+    int num = find(command, commands, commandsCount); // индекс команды для свитчкейса
+    splitIntoParameters(uart_data, parameters, paramCount);
+
     switch (num) {
       case 0: // "Beep"
+        switch (paramCount) {
+          
+          case 0:
+            beep(G4, 500);
+            break;
+          case 1:
+            beep(G4, parameters[0].toInt());
+          case 2:
+            beep(parameters[0].toInt(), parameters[1].toInt());
+            break;
+          default :
+            beep(G4, 500);
+        }
+        Serial1.println("Done")
         break;
+        
       case 1: // "Reset"
         Serial1.println("Resetting...");
         delay(100);
         esp_restart();
         break;
+
+      case 2: //turn
+      switch (paramCount){
+        case 0:
+        Serial1.println("No parameters in turn"
+      }
+      Serial1.println("Done")
+      break;
+      
       case -1:
         Serial1.println("Unknown command");
         break;
@@ -49,10 +77,9 @@ int find(const String& item, const String list[], int size) {
   return -1;
 }
 
-void splitIntoParameters(const String &data, String* parameters) {
+void splitIntoParameters(const String &data, String* parameters, int count) {
   // вот сюда точно лучше не лезть
   int space_positions[10];
-  int count = 0;
   int count_parameters = 0;
 
   for (int i = 0; i < data.length(); i++) {

@@ -18,15 +18,6 @@ void myTone(float per, int dur) {
 }
 
 
-#define D4 293
-#define D5 587
-#define A4 440
-#define GH4 415
-#define G4 391
-#define F4 350
-#define C4 261
-#define C5 523
-
 
 void do_megalovania() {
 

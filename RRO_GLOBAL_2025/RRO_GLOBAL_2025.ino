@@ -12,6 +12,14 @@ float errors[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 float dat1, dat2;
 int count = 0;
 
+#define D4 293
+#define D5 587
+#define A4 440
+#define GH4 415
+#define G4 391
+#define F4 350
+#define C4 261
+#define C5 523
 
 
 String data = "MEGA_PID 228 1336 -993";
@@ -23,7 +31,7 @@ void setup() {
 void loop() {
 //   put your main code here, to run repeatedly:
   String parameters[10];
-  splitIntoParameters(data, parameters);
+//  splitIntoParameters(data, parameters);
 
    while (parameters[count] != "end") {
     Serial.println(parameters[count]);
