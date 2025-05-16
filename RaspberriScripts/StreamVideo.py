@@ -122,7 +122,7 @@ def start_camera(camera_id):
 
 if __name__ == '__main__':
     # Запуск потоков для каждой камеры
-    for i in range(4):  # для 4 камер
+    for i in range(1):  # для 4 камер
         threading.Thread(target=start_camera, args=(i,)).start()
 
     app.run(host='0.0.0.0', threaded=True)
