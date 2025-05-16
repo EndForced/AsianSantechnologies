@@ -1,13 +1,21 @@
-   <!DOCTYPE html>
-   <html lang="en">
-   <head>
-       <meta charset="UTF-8">
-       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-       <title>Video Streaming</title>
-   </head>
-   <body>
-       <h1>Non changed cameras</h1>
-       <img src="{{ url_for('video_feed') }}">
-   </body>
-   </html>
-   
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Многокамерный стриминг</title>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <img id="cam0" width="640" height="480">
+    <img id="cam1" width="640" height="480">
+    <script>
+        const sockets = [];
+        for (let i = 0; i < 2; i++) {
+            const socket = io();
+            socket.on('video_frame_' + i, (data) => {
+                document.getElementById('cam' + i).src = 'data:image/jpeg;base64,' + data;
+            });
+            sockets.push(socket);
+        }
+    </script>
+</body>
+</html>

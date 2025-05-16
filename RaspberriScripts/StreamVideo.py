@@ -86,43 +86,30 @@ class CameraAPI:
         else: print("No photo cause no frame((")
 
 
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
 import cv2
-from flask import Flask, Response
+import base64
 import threading
 
 app = Flask(__name__)
+socketio = SocketIO(app, async_mode='eventlet')
 
-# Словарь для хранения потоков с камер
-camera_streams = {}
-
-
-def generate_frames(camera_id):
+def capture_and_emit(camera_id):
     cap = cv2.VideoCapture(camera_id)
     while True:
-        success, frame = cap.read()
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        ret, frame = cap.read()
+        if not ret:
+            continue
+        _, buffer = cv2.imencode('.jpg', frame)
+        img_str = base64.b64encode(buffer).decode('utf-8')
+        socketio.emit(f'video_frame_{camera_id}', img_str)
 
-
-@app.route('/video_feed/<int:camera_id>')
-def video_feed(camera_id):
-    return Response(generate_frames(camera_id),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-def start_camera(camera_id):
-    cap = cv2.VideoCapture(camera_id)
-    camera_streams[camera_id] = cap
-
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 if __name__ == '__main__':
-    # Запуск потоков для каждой камеры
-    for i in range(1):  # для 4 камер
-        threading.Thread(target=start_camera, args=(i,)).start()
-
-    app.run(host='0.0.0.0', threaded=True)
+    for i in [0, 1]:  # Запуск потоков для двух камер
+        threading.Thread(target=capture_and_emit, args=(i,), daemon=True).start()
+    socketio.run(app, host='0.0.0.0', port=5000)
