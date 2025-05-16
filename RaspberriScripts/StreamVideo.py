@@ -26,6 +26,7 @@ class CameraAPI:
     def __init__(self):
         self.MaxPossibleCamNum = 10
         self.Cameras = self.find_cameras()
+        print(self.Cameras)
 
     def find_cameras(self):
         cameras = []
@@ -38,3 +39,4 @@ class CameraAPI:
 
         return cameras
 
+cam = CameraAPI
