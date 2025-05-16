@@ -1,7 +1,6 @@
 import cv2
 import os
 
-from flask import Flask, Response, render_template
 import cv2
 import threading
 import time
@@ -83,93 +82,6 @@ class CameraAPI:
             print("Saved photo!", filename)
 
         else: print("No photo cause no frame((")
-
-app = Flask(__name__)
-camera_api = CameraAPI()
-
-class CameraStream:
-    def __init__(self):
-        self.frames = {}
-        self.running = False
-
-    def start(self):
-        self.running = True
-        thread = threading.Thread(target=self.update_frames)
-        thread.daemon = True
-        thread.start()
-
-    def update_frames(self):
-        while self.running:
-            for cam_idx in range(camera_api.get_camera_count()):
-                frame = camera_api.get_frame(cam_idx)
-                ret, jpeg = cv2.imencode('.jpg', frame)
-                if ret:
-                    self.frames[cam_idx] = jpeg.tobytes()
-            time.sleep(0.1)
-
-    def get_frame(self, cam_idx):
-        return self.frames.get(cam_idx, None)
-
-    def stop(self):
-        self.running = False
-
-
-stream = CameraStream()
-stream.start()
-
-
-@app.route('/')
-def index():
-    cameras = camera_api.get_available_cameras_info()
-    return render_template('index.html', cameras=cameras)
-
-
-@app.route('/cameras')
-def cameras():
-    cameras = camera_api.get_available_cameras_info()
-    return render_template('cameras.html', cameras=cameras)
-
-
-def gen(cam_idx):
-    while True:
-        frame = stream.get_frame(cam_idx)
-        if frame:
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-        else:
-            time.sleep(0.1)
-
-
-@app.route('/video_feed/<int:cam_idx>')
-def video_feed(cam_idx):
-    return Response(gen(cam_idx),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-@app.route('/capture/<int:cam_idx>')
-def capture(cam_idx):
-    try:
-        camera_api.capture_picture(cam_idx)
-        return "Фото сохранено!", 200
-    except Exception as e:
-        return f"Ошибка: {str(e)}", 500
-
-
-if __name__ == '__main__':
-    try:
-        app.run(host='0.0.0.0', port=5000, threaded=True)
-    finally:
-        stream.stop()
-
-import cv2
-
-
-
-
-
-
-
-
 
 cam = CameraAPI(2)
 print(cam.get_available_cameras_info())
