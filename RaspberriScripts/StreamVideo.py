@@ -1,26 +1,26 @@
 import cv2
 
-class WebsiteHolder:
-    def __init__(self):
-        pass
-
-    def set_frame(self, cam_num):
-        pass
-
-    def get_frame(self,cam_num):
-        pass
-
-    def start_hosting(self):
-        pass
-
-    def show_in_chat(self, name, message):
-        pass
-
-    def get_current_website_requests(self):
-        pass
-
-    def stop_hosting(self):
-        pass
+# class WebsiteHolder:
+#     def __init__(self):
+#         pass
+#
+#     def set_frame(self, cam_num):
+#         pass
+#
+#     def get_frame(self,cam_num):
+#         pass
+#
+#     def start_hosting(self):
+#         pass
+#
+#     def show_in_chat(self, name, message):
+#         pass
+#
+#     def get_current_website_requests(self):
+#         pass
+#
+#     def stop_hosting(self):
+#         pass
 
 class CameraAPI:
     def __init__(self):
