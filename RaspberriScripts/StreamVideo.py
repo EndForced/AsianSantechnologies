@@ -85,64 +85,44 @@ class CameraAPI:
 
         else: print("No photo cause no frame((")
 
-from flask import Flask, Response, render_template
+
 import cv2
+from flask import Flask, Response
 import threading
-import time
 
 app = Flask(__name__)
 
-class VideoCamera:
-    def __init__(self, camera_index=0):
-        self.camera_index = camera_index
-        self.video = cv2.VideoCapture(camera_index)
-        self.success, self.frame = self.video.read()
-        self.running = True
-        self.thread = threading.Thread(target=self.update)
-        self.thread.daemon = True
-        self.thread.start()
+# Словарь для хранения потоков с камер
+camera_streams = {}
 
-    def update(self):
-        while self.running:
-            self.success, self.frame = self.video.read()
-            if not self.success:
-                break
-            time.sleep(0.05)
 
-    def get_frame(self):
-        if self.success and self.frame is not None:
-            ret, jpeg = cv2.imencode('.jpg', self.frame)
-            if ret:
-                return jpeg.tobytes()
-        return None
-
-    def __del__(self):
-        self.running = False
-        if hasattr(self, 'thread'):
-            self.thread.join()
-        self.video.release()
-
-def gen(camera):
+def generate_frames(camera_id):
+    cap = cv2.VideoCapture(camera_id)
     while True:
-        frame = camera.get_frame()
-        if frame:
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-        else:
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' +
-                   cv2.imencode('.jpg', cv2.imread('error.jpg'))[1].tobytes() +
-                   b'\r\n\r\n')
+        success, frame = cap.read()
+        if not success:
             break
+        else:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-@app.route('/video_feed')
-def video_feed():
-    return Response(gen(VideoCamera()),
-                   mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/video_feed/<int:camera_id>')
+def video_feed(camera_id):
+    return Response(generate_frames(camera_id),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+def start_camera(camera_id):
+    cap = cv2.VideoCapture(camera_id)
+    camera_streams[camera_id] = cap
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, threaded=True)
+    # Запуск потоков для каждой камеры
+    for i in range(4):  # для 4 камер
+        threading.Thread(target=start_camera, args=(i,)).start()
+
+    app.run(host='0.0.0.0', threaded=True)
