@@ -1,4 +1,5 @@
 import cv2
+import os
 
 # class WebsiteHolder:
 #     def __init__(self):
@@ -28,6 +29,7 @@ import cv2
 class CameraAPI:
     def __init__(self, max_cameras_to_check=3):
         self.cameras = self._find_available_cameras(max_cameras_to_check)
+        self.pathToPhotos = "/photos/"
 
     @staticmethod
     def _find_available_cameras(max_to_check):
@@ -83,6 +85,32 @@ class CameraAPI:
                 cap.release()
         return info
 
+    def capture_picture(self, camera_index, format = "jpg"):
+        frame = self.get_frame_encoded(camera_index, format)
+
+        if frame:
+
+            if format not in ["png", "jpg", "jpeg", "bmp"]:
+                format = "jpg"
+
+            if not os.path.exists(self.pathToPhotos):
+                os.makedirs(self.pathToPhotos)
+
+            photos_count = len(os.listdir(self.pathToPhotos))
+            filename = os.path.join(self.pathToPhotos, f'photo_{photos_count+1}.jpg')
+
+            cv2.imwrite(filename, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+            print("Saved photo!", filename)
+
+        else: print("No photo cause no frame((")
+
+
+
+
+
+
+
 
 cam = CameraAPI(2)
 print(cam.get_available_cameras_info())
+cam.capture_picture(0)
