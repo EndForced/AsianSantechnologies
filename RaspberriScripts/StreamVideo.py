@@ -40,5 +40,5 @@ class CameraAPI:
 
         return cameras
 
-cam = CameraAPI
+cam = CameraAPI()
 print(cam.Cameras)
