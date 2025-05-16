@@ -85,19 +85,19 @@ class CameraAPI:
                 cap.release()
         return info
 
-    def capture_picture(self, camera_index):
-        frame = self.get_frame(camera_index, format)
+    def capture_picture(self, camera_index, ext):
+        frame = self.get_frame(camera_index)
 
         if frame:
 
-            if format not in ["png", "jpg", "jpeg", "bmp"]:
-                format = "jpg"
+            if ext not in ["png", "jpg", "jpeg", "bmp"]:
+                ext = "jpg"
 
             if not os.path.exists(self.pathToPhotos):
                 os.makedirs(self.pathToPhotos)
 
             photos_count = len(os.listdir(self.pathToPhotos))
-            filename = os.path.join(self.pathToPhotos, f'photo_{photos_count+1}.jpg')
+            filename = os.path.join(self.pathToPhotos, f'photo_{photos_count+1}.{ext}')
 
             cv2.imwrite(filename, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
             print("Saved photo!", filename)
