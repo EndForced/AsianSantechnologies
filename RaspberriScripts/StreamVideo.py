@@ -22,36 +22,67 @@ import cv2
 #     def stop_hosting(self):
 #         pass
 
+import cv2
+
+
 class CameraAPI:
-    def __init__(self):
-        self.MaxPossibleCamNum = 3
-        self.Cameras = self.find_cameras()
+    def __init__(self, max_cameras_to_check=3):
+        self.cameras = self._find_available_cameras(max_cameras_to_check)
 
-        for i in range(len(self.Cameras)):
-            self.Cameras[i] = cv2.VideoCapture(self.Cameras[i])
-            
+    @staticmethod
+    def _find_available_cameras(max_to_check):
 
-    def find_cameras(self):
-        cameras = []
-
-        for i in range(self.MaxPossibleCamNum):
+        available = []
+        for i in range(max_to_check):
             cap = cv2.VideoCapture(i)
-            if cap.read()[0]:
-                cameras.append(i)
+            if cap.isOpened():
+                available.append(i)
                 cap.release()
+        return available
 
-        return cameras
+    def get_camera_count(self):
+        return len(self.cameras)
 
-    def get_frame(self, cam_num):
-        frame = self.Cameras[cam_num].read()
+    def get_frame(self, camera_index):
+        if camera_index >= len(self.cameras):
+            raise ValueError(f"Camera index {camera_index} is out of range")
+
+        cap = cv2.VideoCapture(self.cameras[camera_index])
+        if not cap.isOpened():
+            raise RuntimeError(f"Failed to open camera {camera_index}")
+
+        ret, frame = cap.read()
+        cap.release()
+
+        if not ret:
+            raise RuntimeError(f"Failed to capture frame from camera {camera_index}")
+
         return frame
 
-    def get_frame_encoded(self, cam_num):
-        frame = self.Cameras[cam_num].read()
-        return frame
+    def get_frame_encoded(self, camera_index, format='.jpg', quality=95):
+        frame = self.get_frame(camera_index)
+        params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
+        success, encoded = cv2.imencode(format, frame, params)
+
+        if not success:
+            raise RuntimeError("Failed to encode frame")
+
+        return encoded
+
+    def get_available_cameras_info(self):
+        info = []
+        for idx, cam_idx in enumerate(self.cameras):
+            cap = cv2.VideoCapture(cam_idx)
+            if cap.isOpened():
+                info.append({
+                    'system_index': cam_idx,
+                    'width': int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                    'height': int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+                    'fps': cap.get(cv2.CAP_PROP_FPS)
+                })
+                cap.release()
+        return info
 
 
-cam = CameraAPI()
-print(cam.Cameras)
-frame = cam.get_frame(0)
-print(frame)
+cam = CameraAPI(2)
+print(cam.get_available_cameras_info())
