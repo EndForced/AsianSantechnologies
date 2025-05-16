@@ -96,5 +96,7 @@ def video_feed():
     return Response(cam.get_frame_encoded(0),
                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
+app.run(host='0.0.0.0', port=5000, threaded=True)
 print(cam.get_available_cameras_info())
 cam.capture_picture(0)
