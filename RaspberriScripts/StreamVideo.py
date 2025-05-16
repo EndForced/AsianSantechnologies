@@ -88,7 +88,7 @@ class CameraAPI:
     def capture_picture(self, camera_index, ext = "jpg"):
         frame = self.get_frame(camera_index)
 
-        if frame:
+        if list(frame):
 
             if ext not in ["png", "jpg", "jpeg", "bmp"]:
                 ext = "jpg"
