@@ -1,9 +1,11 @@
 import cv2
 import os
+
+import cv2
 import threading
 import time
 from flask import Flask, render_template, send_file, Response
-import numpy as np
+import cv2
 
 class CameraAPI:
     def __init__(self, max_cameras_to_check=3):
@@ -12,6 +14,7 @@ class CameraAPI:
 
     @staticmethod
     def _find_available_cameras(max_to_check):
+
         available = []
         for i in range(max_to_check):
             cap = cv2.VideoCapture(i)
@@ -63,10 +66,11 @@ class CameraAPI:
                 cap.release()
         return info
 
-    def capture_picture(self, camera_index, ext="jpg"):
+    def capture_picture(self, camera_index, ext = "jpg"):
         frame = self.get_frame(camera_index)
 
-        if frame is not None:
+        if list(frame):
+
             if ext not in ["png", "jpg", "jpeg", "bmp"]:
                 ext = "jpg"
 
@@ -74,28 +78,23 @@ class CameraAPI:
                 os.makedirs(self.pathToPhotos)
 
             photos_count = len(os.listdir(self.pathToPhotos))
-            filename = os.path.join(self.pathToPhotos, f'photo_{photos_count + 1}.{ext}')
+            filename = os.path.join(self.pathToPhotos, f'photo_{photos_count+1}.{ext}')
 
             cv2.imwrite(filename, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
             print("Saved photo!", filename)
-        else:
-            print("No photo cause no frame((")
 
-cam = CameraAPI()
+        else: print("No photo cause no frame((")
 
+cam = CameraAPI(1)
 app = Flask(__name__)
 
-@app.route('/image')
-def get_image():
-    frame = cam.get_frame(0)
-    _, buffer = cv2.imencode('.jpg', frame)
-    return Response(buffer.tobytes(), mimetype='image/jpeg')
 
-@app.route('/')
-def index():
-    return "Welcome to the Camera API!"
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(cam.get_frame_encoded(0),
+                   mimetype='multipart/x-mixed-replace; boundary=frame')
 
 print(cam.get_available_cameras_info())
+cam.capture_picture(0)
