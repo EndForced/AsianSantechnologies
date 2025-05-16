@@ -4,7 +4,7 @@ import os
 import cv2
 import threading
 import time
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, send_file, Response
 
 class CameraAPI:
     def __init__(self, max_cameras_to_check=3):
@@ -96,8 +96,9 @@ def get_image():
 
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def get_frame():
+    frame = cam.get_frame(0)
+    return Response(frame, mimetype="image/jpeg")
 
 
 if __name__ == '__main__':
