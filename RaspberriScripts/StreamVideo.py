@@ -85,18 +85,64 @@ class CameraAPI:
 
         else: print("No photo cause no frame((")
 
-cam = CameraAPI(1)
+from flask import Flask, Response, render_template
+import cv2
+import threading
+import time
+
 app = Flask(__name__)
 
+class VideoCamera:
+    def __init__(self, camera_index=0):
+        self.camera_index = camera_index
+        self.video = cv2.VideoCapture(camera_index)
+        self.success, self.frame = self.video.read()
+        self.running = True
+        self.thread = threading.Thread(target=self.update)
+        self.thread.daemon = True
+        self.thread.start()
 
+    def update(self):
+        while self.running:
+            self.success, self.frame = self.video.read()
+            if not self.success:
+                break
+            time.sleep(0.05)
 
+    def get_frame(self):
+        if self.success and self.frame is not None:
+            ret, jpeg = cv2.imencode('.jpg', self.frame)
+            if ret:
+                return jpeg.tobytes()
+        return None
+
+    def __del__(self):
+        self.running = False
+        if hasattr(self, 'thread'):
+            self.thread.join()
+        self.video.release()
+
+def gen(camera):
+    while True:
+        frame = camera.get_frame()
+        if frame:
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        else:
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' +
+                   cv2.imencode('.jpg', cv2.imread('error.jpg'))[1].tobytes() +
+                   b'\r\n\r\n')
+            break
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(cam.get_frame_encoded(0),
+    return Response(gen(VideoCamera()),
                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-app.run(host='0.0.0.0', port=5000, threaded=True)
-print(cam.get_available_cameras_info())
-cam.capture_picture(0)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, threaded=True)
