@@ -24,10 +24,12 @@ import cv2
 
 class CameraAPI:
     def __init__(self):
-        self.MaxPossibleCamNum = 10
+        self.MaxPossibleCamNum = 3
         self.Cameras = self.find_cameras()
-        print("cams:")
-        print(self.Cameras)
+
+        for i in range(len(self.Cameras)):
+            self.Cameras[i] = cv2.VideoCapture(self.Cameras[i])
+            
 
     def find_cameras(self):
         cameras = []
@@ -40,5 +42,16 @@ class CameraAPI:
 
         return cameras
 
+    def get_frame(self, cam_num):
+        frame = self.Cameras[cam_num].read()
+        return frame
+
+    def get_frame_encoded(self, cam_num):
+        frame = self.Cameras[cam_num].read()
+        return frame
+
+
 cam = CameraAPI()
 print(cam.Cameras)
+frame = cam.get_frame(0)
+print(frame)
