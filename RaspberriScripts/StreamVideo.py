@@ -85,7 +85,7 @@ class CameraAPI:
                 cap.release()
         return info
 
-    def capture_picture(self, camera_index, ext):
+    def capture_picture(self, camera_index, ext = "jpg"):
         frame = self.get_frame(camera_index)
 
         if frame:
