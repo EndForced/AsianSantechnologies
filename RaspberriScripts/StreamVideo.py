@@ -86,7 +86,7 @@ class CameraAPI:
         return info
 
     def capture_picture(self, camera_index, format = "jpg"):
-        frame = self.get_frame_encoded(camera_index, format)
+        frame = self.get_frame(camera_index, format)
 
         if frame:
 
