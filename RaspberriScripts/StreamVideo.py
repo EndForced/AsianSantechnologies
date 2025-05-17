@@ -134,6 +134,7 @@ import socket
 import pickle
 import threading
 import logging
+import base64
 
 app = Flask(__name__)
 socketio = SocketIO(app, async_mode='threading')
@@ -146,11 +147,13 @@ class CameraClient:
     def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.stream_active = False
+        self.lock = threading.Lock()
 
     def connect(self):
         try:
             self.client_socket.connect(('localhost', 65432))
-            self.stream_active = True
+            with self.lock:
+                self.stream_active = True
             logger.info("Connected to camera server")
 
             while self.stream_active:
@@ -171,7 +174,10 @@ class CameraClient:
                         data += packet
 
                     if data:
-                        socketio.emit('video_frame', {'data': data.hex()})
+                        # Декодируем и отправляем в base64
+                        frame = pickle.loads(data)
+                        encoded = base64.b64encode(frame.tobytes()).decode('utf-8')
+                        socketio.emit('video_frame', {'data': encoded})
 
                 except (ConnectionResetError, BrokenPipeError) as e:
                     logger.error(f"Connection error: {str(e)}")
@@ -181,7 +187,8 @@ class CameraClient:
             logger.error(f"Error: {str(e)}")
         finally:
             self.client_socket.close()
-            self.stream_active = False
+            with self.lock:
+                self.stream_active = False
 
 
 camera_client = CameraClient()
@@ -190,20 +197,22 @@ camera_client = CameraClient()
 @app.route('/')
 def index():
     return render_template('raw_cameras.html',
-                           qualities=['low', 'medium', 'high', 'max'])
+                         qualities=['low', 'medium', 'high', 'max'])
 
 
 @socketio.on('start_stream')
 def handle_start_stream(quality):
-    if not camera_client.stream_active:
-        client_thread = threading.Thread(target=camera_client.connect)
-        client_thread.daemon = True
-        client_thread.start()
+    with camera_client.lock:
+        if not camera_client.stream_active:
+            client_thread = threading.Thread(target=camera_client.connect)
+            client_thread.daemon = True
+            client_thread.start()
 
 
 @socketio.on('stop_stream')
 def handle_stop_stream():
-    camera_client.stream_active = False
+    with camera_client.lock:
+        camera_client.stream_active = False
 
 
 if __name__ == "__main__":
