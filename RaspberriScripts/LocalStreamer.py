@@ -23,7 +23,7 @@ def camera_service():
                 frame = picam2.capture_array("main")
                 _, buffer = cv2.imencode('.jpg', frame)
                 data = pickle.dumps(buffer)
-                conn.sendall(len(data).to_bytes(4, 'big')  # Отправляем длину
+                conn.sendall(len(data).to_bytes(4, 'big'))  # Отправляем длину
                 conn.sendall(data)  # Отправляем данные
         finally:
             picam2.stop()
