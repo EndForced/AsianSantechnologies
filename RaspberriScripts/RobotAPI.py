@@ -1,7 +1,7 @@
 import serial
 import time
 import threading
-# from StreamVideo import send_msg_to_website
+from StreamVideo import send_msg_to_website
 
 class RobotAPI():
     def __init__(self, position, orientation):
@@ -42,7 +42,8 @@ class RobotAPI():
 
             while not res:
                 res = robot.read()
-            # send_msg_to_website(res)
+            return res
+            send_msg_to_website(res)
 
 
 

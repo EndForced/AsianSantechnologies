@@ -5,70 +5,42 @@ import time
 from RobotAPI import RobotAPI
 import serial
 
-class Server:
-    def __init__(self, robot):
-        self.app = Flask(__name__)
-        self.app.config['SECRET_KEY'] = 'your_secret_key'
-        self.socketio = SocketIO(self.app)
-        self.robot = robot
-        self.running = False
-        self.thread = None
+print("started!")
 
-        # Регистрация маршрутов и обработчиков событий
-        self.app.route('/')(self.index)
-        self.socketio.on('uart_command')(self.handle_uart_command)
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your_secret_key'
+socketio = SocketIO(app)
 
-    def index(self):
-        return render_template('index.html')
+def send_msg_to_website(message):
+    while True:
+        # time.sleep(5)
+        # Автоматическая отправка сообщения от "устройства"
+        socketio.emit('uart_message', {
+            'message': message,
+            'type': 'received'
+        })
 
-    def handle_uart_command(self, data):
-        command = data.get('command', '')
-        print(f"Received UART command: {command}")
-        self.robot.handle_website_commands(command)
 
-    def send_msg_to_website(self, message):
-        while self.running:
-            time.sleep(5)  # Отправка сообщения каждые 5 секунд (можно настроить)
-            self.socketio.emit('uart_message', {
-                'message': message,
-                'type': 'received'
-            })
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-    def start(self):
-        if not self.running:
-            self.running = True
-            # Запуск Flask-SocketIO в отдельном потоке
-            self.thread = threading.Thread(
-                target=self.socketio.run,
-                kwargs={
-                    'app': self.app,
-                    'host': '0.0.0.0',
-                    'port': 5000,
-                    'debug': True,
-                    'allow_unsafe_werkzeug': True
-                },
-                daemon=True
-            )
-            self.thread.start()
-            print("Server started!")
 
-    def stop(self):
-        if self.running:
-            self.running = False
-            # Остановка SocketIO (может потребоваться дополнительная логика)
-            # В реальном проекте лучше использовать event для корректного завершения
-            if self.thread:
-                self.thread.join(timeout=1)
-            print("Server stopped!")
+@socketio.on('uart_command')
+def handle_uart_command(data):
+    command = data.get('command', '')
+    print(f"Received UART command: {command}")
+    robot = RobotAPI((0, 0), 1)
+    robot.handle_website_commands(command)
+
+    # # Отправляем подтверждение обратно клиенту
+    # emit('uart_message', {
+    #     'message': f"Processed: {command}",
+    #     'type': 'received'
+    # })
 
 
 if __name__ == '__main__':
-    robot = RobotAPI((0, 0), 1)  # Инициализация робота
-    server = Server(robot)
-    server.start()
+    pass
 
-    try:
-        while True:  # Бесконечный цикл (можно заменить на что-то полезное)
-            time.sleep(1)
-    except KeyboardInterrupt:
-        server.stop()
+socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
