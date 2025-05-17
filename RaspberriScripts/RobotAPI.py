@@ -48,18 +48,18 @@ class RobotAPI:
 
 
 
+if __name__ == "__main__":
+    robot = RobotAPI((1,1), 1)
+    while 1:
+        result = ""
+        command = input()
+        robot.send(command)
 
-robot = RobotAPI((1,1), 1)
-while 1:
-    result = ""
-    command = input()
-    robot.send(command)
 
-
-    while not result:
-        result = robot.read()
-        print("res", result)
-    # send_msg_to_website(result)
+        while not result:
+            result = robot.read()
+            print("res", result)
+        # send_msg_to_website(result)
 
 
 
