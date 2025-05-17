@@ -37,7 +37,7 @@ void loop() {
   //   while (parameters[count] != "end") {
   //    Serial.println(parameters[count]);
   //    count++;
-//  uartProcessing();
-Serial1.println("123");
+  uartProcessing();
+//Serial1.println("123");
 //delay(10000000);
 }

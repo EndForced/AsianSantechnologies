@@ -2,6 +2,7 @@ import serial
 import time
 import threading
 # from StreamVideo import send_msg_to_website
+
 class RobotAPI:
     def __init__(self, position, orientation):
         self.ser = serial.Serial('/dev/ttyAMA0', 115200, timeout = 1)

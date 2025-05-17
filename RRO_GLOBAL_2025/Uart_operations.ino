@@ -70,8 +70,10 @@ String readUntilSpace(const String& input) {
 
 int find(const String& item, const String list[], int size) {
   for (int i = 0; i < size; i++) {
+    Serial.println(list[i]); Serial.println(item);
     if (list[i] == item) {
       int num = i;
+      return num;
       break;
     }
   }
