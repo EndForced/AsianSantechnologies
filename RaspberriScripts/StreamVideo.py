@@ -1,7 +1,11 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import serial
-
+import threading
+from picamera2 import Picamera2
+import base64
+import time
+import cv2
 
 class RobotAPI:
     def __init__(self, position, orientation):
@@ -55,6 +59,35 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
 robot = RobotAPI((0, 0), 1)
 
+picam2 = Picamera2()
+camera_configs = {
+    'low': {'size': (640, 480), 'fps': 30},
+    'medium': {'size': (1296, 972), 'fps': 20},
+    'high': {'size': (1920, 1080), 'fps': 15},
+    'max': {'size': (2592, 1944), 'fps': 10}
+}
+current_quality = 'medium'
+stream_active = False
+
+
+def generate_frames():
+    global stream_active
+    config = picam2.create_video_configuration(
+        main={"size": camera_configs[current_quality]['size']},
+        buffer_count=4
+    )
+    picam2.configure(config)
+    picam2.start()
+
+    while stream_active:
+        frame = picam2.capture_array("main")
+        # Конвертируем в JPEG
+        _, buffer = cv2.imencode('.jpg', frame)
+        frame_bytes = base64.b64encode(buffer).decode('utf-8')
+        socketio.emit('video_frame', {'data': frame_bytes})
+        time.sleep(1 / camera_configs[current_quality]['fps'])
+
+    picam2.stop()
 
 @app.route('/')
 def index():
@@ -72,6 +105,19 @@ def handle_uart_command(data):
     command = data.get('command', '')
     print(f"Received UART command: {command}")
     robot.handle_website_commands(command)
+
+@socketio.on('start_stream')
+def handle_start_stream(quality):
+    global stream_active, current_quality
+    if not stream_active:
+        current_quality = quality
+        stream_active = True
+        threading.Thread(target=generate_frames).start()
+
+@socketio.on('stop_stream')
+def handle_stop_stream():
+    global stream_active
+    stream_active = False
 
 
 if __name__ == '__main__':
