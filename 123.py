@@ -16,7 +16,7 @@ def test_client_save_frames(save_dir="test_frames", max_frames=10, frame_interva
     # Создаем директорию для теста
     os.makedirs(save_dir, exist_ok=True)
     print(f"Сохранение тестовых кадров в директорию: {save_dir}")
-
+    frame_count = 0
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(('localhost', 65432))  # Подключаемся к серверу
