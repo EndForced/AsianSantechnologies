@@ -50,7 +50,6 @@ class RobotAPI:
             })
 
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
@@ -73,12 +72,6 @@ def handle_uart_command(data):
     command = data.get('command', '')
     print(f"Received UART command: {command}")
     robot.handle_website_commands(command)
-
-    # # Отправляем подтверждение обратно клиенту
-    # emit('uart_message', {
-    #     'message': f"Processed: {command}",
-    #     'type': 'received'
-    # })
 
 
 if __name__ == '__main__':
