@@ -36,9 +36,11 @@ class CameraServer:
         )
         self.quality = 85
         self.color_correction_matrix = np.array([
-            [1, 1, 1],  # Коррекция красного
-            [1, 1, 1],  # Коррекция зеленого
-            [1, 1, 1]  # Коррекция синего
+
+        [1.2, -0.2, -0.1],  # Уменьшили красное усиление
+        [-0.3, 1.3, -0.1],  # Уменьшили зеленое усиление
+        [0.1, -0.1, 1.2]  # Увеличили синий
+
         ], dtype=np.float32)
 
     def apply_color_correction(self, frame):
