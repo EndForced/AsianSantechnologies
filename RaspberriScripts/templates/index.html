@@ -166,8 +166,10 @@
         const socket = io();
 
         // Обработчики для основных кнопок
-        document.getElementById('btn1').addEventListener('click', function() {
-            window.location.href = '/restart';
+        // Обработчик клика по кнопке
+        document.getElementById('btn1').addEventListener('click', () => {
+            console.log("Button clicked: Restart ESP");
+            socket.emit('uart_command', { command: 'Reset' });  // Отправка команды
         });
 
         document.getElementById('btn2').addEventListener('click', function() {
