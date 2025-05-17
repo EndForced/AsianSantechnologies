@@ -69,25 +69,42 @@ camera_configs = {
 current_quality = 'medium'
 stream_active = False
 
+import os
+import cv2
+import base64
+import time
+from picamera2 import Picamera2
+
 
 def generate_frames():
     global stream_active
-    config = picam2.create_video_configuration(
-        main={"size": camera_configs[current_quality]['size']},
-        buffer_count=4
-    )
-    picam2.configure(config)
-    picam2.start()
 
-    while stream_active:
-        frame = picam2.capture_array("main")
-        # Конвертируем в JPEG
-        _, buffer = cv2.imencode('.jpg', frame)
-        frame_bytes = base64.b64encode(buffer).decode('utf-8')
-        socketio.emit('video_frame', {'data': frame_bytes})
-        time.sleep(1 / camera_configs[current_quality]['fps'])
+    # Явно указываем пути к системным библиотекам libcamera
+    os.environ['LD_LIBRARY_PATH'] = '/usr/lib/aarch64-linux-gnu:' + os.environ.get('LD_LIBRARY_PATH', '')
 
-    picam2.stop()
+    try:
+        picam2 = Picamera2()
+        config = picam2.create_video_configuration(
+            main={"size": camera_configs[current_quality]['size']},
+            buffer_count=4
+        )
+        picam2.configure(config)
+        picam2.start()
+
+        while stream_active:
+            frame = picam2.capture_array("main")
+            # Конвертируем в JPEG
+            _, buffer = cv2.imencode('.jpg', frame)
+            frame_bytes = base64.b64encode(buffer).decode('utf-8')
+            socketio.emit('video_frame', {'data': frame_bytes})
+            time.sleep(1 / camera_configs[current_quality]['fps'])
+
+    except Exception as e:
+        print(f"Camera error: {str(e)}")
+        socketio.emit('camera_error', {'message': str(e)})
+    finally:
+        if 'picam2' in locals():
+            picam2.stop()
 
 @app.route('/')
 def index():
