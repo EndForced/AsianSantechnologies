@@ -189,7 +189,7 @@ camera_client = CameraClient()
 
 @app.route('/')
 def index():
-    return render_template('index.html',
+    return render_template('raw_cameras.html',
                            qualities=['low', 'medium', 'high', 'max'])
 
 
