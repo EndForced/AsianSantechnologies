@@ -5,7 +5,7 @@ import time
 import cv2
 import threading
 import logging
-import numpy as np
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -17,11 +17,6 @@ class CameraServer:
         self.conn = None
         self.lock = threading.Lock()
         self.quality = 80
-        self.optimal_matrix = np.array([
-            [1.25, 0.05, -0.05],  # Усиливаем синий (B), слабо влияем на другие
-            [-0.1, 0.95, -0.05],  # Слегка ослабляем зеленый (G)
-            [-0.15, -0.1, 0.9]  # Ослабляем красный (R)
-        ], dtype=np.float32)
 
         # Правильные настройки для цветного изображения
         self.config = self.picam2.create_video_configuration(
@@ -44,8 +39,6 @@ class CameraServer:
         """Конвертация из RGB в BGR для OpenCV"""
         # Picamera2 возвращает RGB, OpenCV ожидает BGR
         bgr_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        frame_float = frame.astype(np.float32) / 255.0
-        frame = cv2.transform(frame_float, self.optimal_matrix)
 
         _, buffer = cv2.imencode(
             '.jpg',
