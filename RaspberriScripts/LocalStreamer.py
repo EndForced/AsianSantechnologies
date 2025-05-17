@@ -16,34 +16,36 @@ class CameraServer:
         self.stream_active = False
         self.conn = None
         self.lock = threading.Lock()
-        self.quality = 80  # Качество JPEG (0-100)
+        self.quality = 80
 
-        # Оптимизированные настройки
+        # Правильные настройки для цветного изображения
         self.config = self.picam2.create_video_configuration(
             main={
-                "size": (1280, 720),  # 720p баланс качества/производительности
-                "format": "YUV420"  # Более эффективный формат
+                "size": (1280, 720),
+                "format": "RGB888",  # Используем RGB вместо YUV
             },
             controls={
-                "FrameRate": 30,  # Число, не строка!
+                "FrameRate": 30,
                 "AwbMode": "auto",  # Автобаланс белого
-                "ExposureTime": 10000,  # Фиксированная экспозиция (микросекунды)
-                "AnalogueGain": 1.0,  # Фиксированное усиление
-                # "NoiseReductionMode": "Fast"  # Ускоренное шумоподавление
+                "ExposureTime": 10000,
+                "AnalogueGain": 1.0,
+                # "NoiseReductionMode": "Fast"
             },
-            buffer_count=6  # Больше буферов для плавности
+            buffer_count=6
         )
         self.picam2.configure(self.config)
 
     def process_frame(self, frame):
-        """Оптимизированное кодирование JPEG"""
+        """Конвертация из RGB в BGR для OpenCV"""
+        # Picamera2 возвращает RGB, OpenCV ожидает BGR
+        bgr_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
         _, buffer = cv2.imencode(
             '.jpg',
-            frame,
+            bgr_frame,
             [
                 int(cv2.IMWRITE_JPEG_QUALITY), self.quality,
-                int(cv2.IMWRITE_JPEG_OPTIMIZE), 1,
-                int(cv2.IMWRITE_JPEG_PROGRESSIVE), 1
+                int(cv2.IMWRITE_JPEG_OPTIMIZE), 1
             ]
         )
         return buffer
