@@ -1,7 +1,7 @@
-import serial
+# import serial
 import time
 import threading
-from StreamVideo import send_msg_to_website
+# from StreamVideo import send_msg_to_website
 import cv2
 import os
 
