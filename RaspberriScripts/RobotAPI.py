@@ -125,7 +125,7 @@
 import cv2
 cap = cv2.VideoCapture(0)  # 0 — индекс камеры
 ret, frame = cap.read()
-if ret:
-    cv2.imwrite("photo.jpg_test", frame)
-    print("written")
+
+cv2.imwrite("photo.jpg_test", frame)
+print("written")
 cap.release()
