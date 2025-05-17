@@ -5,6 +5,8 @@ import time
 from RobotAPI import RobotAPI
 import serial
 
+print("started!")
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
