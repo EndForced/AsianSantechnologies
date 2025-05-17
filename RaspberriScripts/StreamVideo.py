@@ -138,7 +138,7 @@ import base64
 
 app = Flask(__name__)
 socketio = SocketIO(app,
-                  async_mode='gevent',
+                  async_mode='threading',
                   engineio_logger=False,
                   ping_timeout=60,
                   max_http_buffer_size=50*1024*1024)
