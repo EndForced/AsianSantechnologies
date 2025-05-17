@@ -2,11 +2,10 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import serial
 import threading
-from picamera2 import Picamera2
 import base64
 import time
 import cv2
-
+import os
 class RobotAPI:
     def __init__(self, position, orientation):
         self.ser = serial.Serial('/dev/ttyAMA0', 115200, timeout = 1)
@@ -59,7 +58,6 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
 robot = RobotAPI((0, 0), 1)
 
-picam2 = Picamera2()
 camera_configs = {
     'low': {'size': (640, 480), 'fps': 30},
     'medium': {'size': (1296, 972), 'fps': 20},
@@ -69,10 +67,12 @@ camera_configs = {
 current_quality = 'medium'
 stream_active = False
 
+os.environ['LD_LIBRARY_PATH'] = '/usr/lib/aarch64-linux-gnu:' + os.environ.get('LD_LIBRARY_PATH', '')
 import os
 import cv2
 import base64
 import time
+
 from picamera2 import Picamera2
 
 
@@ -80,7 +80,7 @@ def generate_frames():
     global stream_active
 
     # Явно указываем пути к системным библиотекам libcamera
-    os.environ['LD_LIBRARY_PATH'] = '/usr/lib/aarch64-linux-gnu:' + os.environ.get('LD_LIBRARY_PATH', '')
+
 
     try:
         picam2 = Picamera2()
