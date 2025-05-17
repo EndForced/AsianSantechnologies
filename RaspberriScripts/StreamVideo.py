@@ -64,7 +64,7 @@ def index():
 @app.route('/raw_cameras')
 def get_raw():
     robot.handle_website_commands("Reset")
-    return render_template('raw_cameras')
+    return render_template('raw_cameras.html')
 
 
 
