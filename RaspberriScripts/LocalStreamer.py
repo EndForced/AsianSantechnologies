@@ -29,7 +29,7 @@ class CameraServer:
                 # "AwbMode": "auto",  # Автобаланс белого
                 "ExposureTime": 10000,
                 "AnalogueGain": 1.0,
-                "NoiseReductionMode": "Fast"
+                # "NoiseReductionMode": "Fast"
             },
             buffer_count=6
         )
