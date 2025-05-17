@@ -35,11 +35,11 @@ void uartProcessing() {
           default :
             beep(G4, 500);
         }
-        Serial1.println("Beeping done");
+        SendData("Beeping done");
         break;
 
       case 1: // "Reset"
-        Serial1.println("Resetting...");
+        SendData("Resetting...");
         Serial.println("Resetting...");
         delay(100);
         esp_restart();
@@ -48,28 +48,33 @@ void uartProcessing() {
       case 2: //turn
         switch (paramCount) {
           case 0:
-            Serial1.println("No parameters in turn");
+            SendData("No parameters in turn");
+          case 1:
+            SendData("Turning...");
+            break;
         }
-//        Serial1.println("Done");
-        break;
+
 
       case 3: //button skip
+      //need isParams func (bool)
         switch (paramCount) {
           case 0:
-            Serial1.println("Button Activated!");
+            SendData("Button Activated!");
+            break;
           //btn flag change
-          default:
-            Serial1.println("Cant process parameters in Button_skip");
-
+          case 1:
+            SendData("Cant process parameters in Button_skip");
+            break;
         }
-        Serial1.println("Button Activated");
-        break;
+
 
       case -1:
-        Serial1.println("Unknown command");
+        SendData("Unknown command");
         break;
     }
   }
+  Serial.read();
+  delay(150);
 }
 
 String readUntilSpace(const String& input) {
@@ -119,4 +124,9 @@ void splitIntoParameters(const String &data, String* parameters, int count) {
   }
 
   parameters[count_parameters] = "end";
+}
+
+void SendData(String message) {
+  Serial1.flush();         // Ждём отправки предыдущих данных
+  Serial1.println(message);
 }

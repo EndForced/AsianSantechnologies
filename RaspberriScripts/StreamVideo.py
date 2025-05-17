@@ -35,6 +35,8 @@ class RobotAPI:
         pass
 
     def handle_website_commands(self, args):
+        self.ser.reset_input_buffer()  # Для pyserial
+
         if args:
             res = ""
             self.send(args)

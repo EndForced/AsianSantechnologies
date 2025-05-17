@@ -38,6 +38,7 @@ void loop() {
   //    Serial.println(parameters[count]);
   //    count++;
   uartProcessing();
+  delay(50);
 //Serial1.println("123");
 //delay(10000000);
 }

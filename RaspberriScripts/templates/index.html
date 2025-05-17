@@ -197,14 +197,31 @@
 
         // Функция для добавления сообщения в чат
         function addUartMessage(message, type = 'received') {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            const messageElement = document.createElement('div');
-            messageElement.className = `uart-message ${type}`;
-            messageElement.innerHTML = `<span class="uart-time">[${timeString}]</span> ${message}`;
-            uartChat.appendChild(messageElement);
-            uartChat.scrollTop = uartChat.scrollHeight;
-        }
+    const MAX_MESSAGES = 100; // Лимит сообщений
+    const now = new Date();
+    const timeString = now.toLocaleTimeString();
+
+    // Удаляем старые сообщения, если превышен лимит
+    if (uartChat.children.length >= MAX_MESSAGES) {
+        uartChat.removeChild(uartChat.children[0]);
+    }
+
+    // Создаём элемент (без innerHTML для безопасности)
+    const messageElement = document.createElement('div');
+    messageElement.className = `uart-message ${type}`;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'uart-time';
+    timeSpan.textContent = `[${timeString}]`;
+
+    const textNode = document.createTextNode(` ${message}`);
+
+    messageElement.appendChild(timeSpan);
+    messageElement.appendChild(textNode);
+    uartChat.appendChild(messageElement);
+
+    uartChat.scrollTop = uartChat.scrollHeight; // Автопрокрутка
+}
 
         // Обработка входящих сообщений от сервера
         socket.on('uart_message', function(data) {
