@@ -17,11 +17,21 @@ class CameraServer:
         self.conn = None
         self.lock = threading.Lock()
 
-        # Настройки камеры
+        # Оптимизированные настройки
         self.config = self.picam2.create_video_configuration(
-            main={"size": (640, 480)},
-            buffer_count=4
+            main={
+                "size": (1280, 720),  # 720p - хороший баланс
+                "format": "YUV420"  # Более эффективный формат
+            },
+            controls={
+                "FrameRate": 30,
+                "AwbMode": "auto",
+                "ExposureTime": 10000,  # Фиксированная экспозиция
+                "AnalogueGain": 1.0  # Фиксированное усиление
+            },
+            buffer_count=6  # Больше буферов
         )
+        self.quality = 80  # Качество JPEG (0-100)
 
     def start(self):
         try:
