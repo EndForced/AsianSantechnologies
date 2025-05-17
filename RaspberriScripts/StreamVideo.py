@@ -134,7 +134,6 @@ import socket
 import pickle
 import threading
 import logging
-from threading import Lock
 
 app = Flask(__name__)
 socketio = SocketIO(app, async_mode='threading')
@@ -147,14 +146,12 @@ class CameraClient:
     def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.stream_active = False
-        self.lock = Lock()
 
     def connect(self):
         try:
-            with self.lock:
-                self.client_socket.connect(('localhost', 65432))
-                self.stream_active = True
-                logger.info("Connected to camera server")
+            self.client_socket.connect(('localhost', 65432))
+            self.stream_active = True
+            logger.info("Connected to camera server")
 
             while self.stream_active:
                 try:
