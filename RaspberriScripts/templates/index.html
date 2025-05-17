@@ -1,21 +1,241 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Многокамерный стриминг</title>
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Control Panel</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #d81b60;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #d81b60;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #b71751;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* Стили для UART чата */
+        .uart-chat {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .uart-message {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+            word-wrap: break-word;
+        }
+
+        .sent {
+            color: #d81b60;
+        }
+
+        .received {
+            color: #388e3c;
+        }
+
+        .system {
+            color: #1976d2;
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        .uart-time {
+            color: #888;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+
+        .uart-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .uart-controls input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .uart-controls button {
+            width: auto;
+            padding: 8px 15px;
+        }
+    </style>
 </head>
 <body>
-    <img id="cam0" width="640" height="480">
-    <img id="cam1" width="640" height="480">
+    <div class="panel">
+        <h1>Raspberry Control Panel</h1>
+
+        <div class="button-container">
+            <button id="btn1">Restart</button>
+            <button id="btn2">Skip wait button</button>
+            <button id="btn3">Telemetry cameras</button>
+            <button id="btn4">Raw cameras</button>
+            <button id="btn5">Manual control</button>
+        </div>
+
+        <div class="uart-container">
+            <h3>UART Communication</h3>
+            <div class="uart-chat" id="uartChat">
+                <!-- Сообщения будут добавляться здесь -->
+            </div>
+            <div class="uart-controls">
+                <input type="text" id="uartInput" placeholder="Enter UART command..." autocomplete="off">
+                <button id="sendUart">Send</button>
+                <button id="clearUart">Clear</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            Designed by EndForced © 2025
+        </div>
+    </div>
+
     <script>
-        const sockets = [];
-        for (let i = 0; i < 2; i++) {
-            const socket = io();
-            socket.on('video_frame_' + i, (data) => {
-                document.getElementById('cam' + i).src = 'data:image/jpeg;base64,' + data;
-            });
-            sockets.push(socket);
+        // Инициализация SocketIO
+        const socket = io();
+
+        // Обработчики для основных кнопок
+        document.getElementById('btn1').addEventListener('click', function() {
+            window.location.href = '/restart';
+        });
+
+        document.getElementById('btn2').addEventListener('click', function() {
+            window.location.href = '/skip_wait';
+        });
+
+        document.getElementById('btn3').addEventListener('click', function() {
+            window.location.href = '/telemetry_cameras';
+        });
+
+        document.getElementById('btn4').addEventListener('click', function() {
+            window.location.href = '/raw_cameras';
+        });
+
+        document.getElementById('btn5').addEventListener('click', function() {
+            window.location.href = '/manual_control';
+        });
+
+        // Элементы UART чата
+        const uartChat = document.getElementById('uartChat');
+        const uartInput = document.getElementById('uartInput');
+        const sendUartBtn = document.getElementById('sendUart');
+        const clearUartBtn = document.getElementById('clearUart');
+
+        // Функция для добавления сообщения в чат
+        function addUartMessage(message, type = 'received') {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            const messageElement = document.createElement('div');
+            messageElement.className = `uart-message ${type}`;
+            messageElement.innerHTML = `<span class="uart-time">[${timeString}]</span> ${message}`;
+            uartChat.appendChild(messageElement);
+            uartChat.scrollTop = uartChat.scrollHeight;
         }
+
+        // Обработка входящих сообщений от сервера
+        socket.on('uart_message', function(data) {
+            addUartMessage(data.message, data.type || 'received');
+        });
+
+        // Отправка сообщения на сервер
+        sendUartBtn.addEventListener('click', sendUartMessage);
+        uartInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendUartMessage();
+        });
+
+        function sendUartMessage() {
+            const message = uartInput.value.trim();
+            if (message) {
+                addUartMessage(message, 'sent');
+                socket.emit('uart_command', { command: message });
+                uartInput.value = '';
+            }
+        }
+
+        // Очистка чата
+        clearUartBtn.addEventListener('click', function() {
+            uartChat.innerHTML = '';
+        });
+
+        // Инициализационные сообщения
+        socket.on('connect', function() {
+            addUartMessage('Connected to server', 'system');
+        });
+
+        socket.on('disconnect', function() {
+            addUartMessage('Disconnected from server', 'system');
+        });
     </script>
 </body>
 </html>

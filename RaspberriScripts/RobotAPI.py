@@ -1,7 +1,7 @@
 import serial
 import time
 import threading
-
+from StreamVideo import send_msg_to_website
 class RobotAPI:
     def __init__(self, position, orientation):
         self.ser = serial.Serial('/dev/ttyAMA0', 115200, timeout = 1)
@@ -32,6 +32,16 @@ class RobotAPI:
     def drive_through_roadmap(self, roadmap):
         pass
 
+    @staticmethod
+    def handle_website_commands(args):
+        if args:
+            res = ""
+            robot.send(args)
+
+            while not res:
+                res = robot.read()
+            send_msg_to_website(res)
+
 
 
 
@@ -39,10 +49,14 @@ class RobotAPI:
 
 robot = RobotAPI((1,1), 1)
 while 1:
+    result = ""
     command = input()
     robot.send(command)
-    robot.read()
-    time.sleep(1)
+
+    while not result:
+        response = robot.read()
+        print("res")
+    # send_msg_to_website(result)
 
 
 
