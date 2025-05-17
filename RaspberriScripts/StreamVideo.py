@@ -62,13 +62,10 @@ def index():
     return render_template('index.html')
 
 @app.route('/raw_cameras')
-def restart():
+def get_raw():
     robot.handle_website_commands("Reset")
     return render_template('raw_cameras')
 
-@app.route('/restart')
-def restart():
-    return render_template('cameras')
 
 
 @socketio.on('uart_command')
