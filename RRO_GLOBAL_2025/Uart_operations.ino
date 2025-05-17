@@ -2,131 +2,146 @@ const String commands[] = {"Beep", "Reset", "Turn", "Button_skip"};
 const int commandsCount = 4;
 String parameters[10];
 int paramCount = 0;
-//Beep optional: millis, freq
-//Reset - resetting
-// Turn - Left/Right, optional - int num, int speed
 
 void uartProcessing() {
   if (Serial1.available()) {
     String uart_data = Serial1.readStringUntil('\n');
     uart_data.trim();
+    
+    if (uart_data.length() == 0) return;
+
     String command = readUntilSpace(uart_data);
-
+    int commandIndex = findCommandIndex(command, commands, commandsCount);
+    
     Serial.print("Received: ");
-    Serial.print(uart_data);
-    Serial.print("\nCommand: ");
+    Serial.println(uart_data);
+    Serial.print("Command: ");
     Serial.println(command);
+    Serial.print("Command index: ");
+    Serial.println(commandIndex);
 
-    int num = find(command, commands, commandsCount); // индекс команды для свитчкейса
     splitIntoParameters(uart_data, parameters, paramCount);
 
-    switch (num) {
+    switch (commandIndex) {
       case 0: // "Beep"
-        switch (paramCount) {
-
-          case 0:
-            beep(G4, 500);
-            break;
-          case 1:
-            beep(G4, parameters[0].toInt());
-          case 2:
-            beep(parameters[0].toInt(), parameters[1].toInt());
-            break;
-          default :
-            beep(G4, 500);
-        }
-        SendData("Beeping done");
+        handleBeepCommand();
         break;
-
+        
       case 1: // "Reset"
-        SendData("Resetting...");
-        Serial.println("Resetting...");
-        delay(100);
-        esp_restart();
+        handleResetCommand();
         break;
-
-      case 2: //turn
-        switch (paramCount) {
-          case 0:
-            SendData("No parameters in turn");
-          case 1:
-            SendData("Turning...");
-            break;
-        }
-
-
-      case 3: //button skip
-      //need isParams func (bool)
-        switch (paramCount) {
-          case 0:
-            SendData("Button Activated!");
-            break;
-          //btn flag change
-          case 1:
-            SendData("Cant process parameters in Button_skip");
-            break;
-        }
-
-
-      case -1:
-        SendData("Unknown command");
+        
+      case 2: // "Turn"
+        handleTurnCommand();
+        break;
+        
+      case 3: // "Button_skip"
+        handleButtonSkipCommand();
+        break;
+        
+      default: // we fucking dont know whut is it
+        SendData("Unknown command: " + command);
         break;
     }
   }
-  Serial.read();
   delay(150);
 }
 
-String readUntilSpace(const String& input) {
-  int spaceIndex = input.indexOf(' ');
-  if (spaceIndex == -1) {
-    return input;
+// command holders
+
+void handleBeepCommand() {
+  switch (paramCount) {
+    case 0:
+      beep(G4, 500);
+      break;
+    case 1:
+      beep(G4, parameters[0].toInt());
+      break;
+    case 2:
+      beep(parameters[0].toInt(), parameters[1].toInt());
+      break;
+    default:
+      beep(G4, 500);
   }
-  return input.substring(0, spaceIndex);
+  SendData("Beeping done");
 }
 
-int find(const String& item, const String list[], int size) {
+void handleResetCommand() {
+  SendData("Resetting...");
+  Serial.println("Resetting...");
+  delay(100);
+  esp_restart();
+}
+
+void handleTurnCommand() {
+  if (paramCount == 0) {
+    SendData("Error: No direction specified");
+    return;
+  }
+  
+  String direction = parameters[0];
+  int speed = (paramCount > 1) ? parameters[1].toInt() : 100; 
+  int steps = (paramCount > 2) ? parameters[2].toInt() : 90;
+  
+  // Andrew's Job
+  SendData("Turning " + direction + " speed " + String(speed));
+}
+
+void handleButtonSkipCommand() {
+  if (paramCount > 0) {
+    SendData("Warning: Button_skip doesn't accept parameters");
+  }
+  //btn flag change
+  SendData("Button activated");
+}
+
+// dont touch bro!!
+String readUntilSpace(const String& input) {
+  int spaceIndex = input.indexOf(' ');
+  return (spaceIndex == -1) ? input : input.substring(0, spaceIndex);
+}
+
+int findCommandIndex(const String& command, const String commands[], int size) {
   for (int i = 0; i < size; i++) {
-    Serial.println(list[i]); Serial.println(item);
-    if (list[i] == item) {
-      int num = i;
-      return num;
-      break;
+    if (commands[i] == command) {
+      return i;
     }
   }
   return -1;
 }
 
-void splitIntoParameters(const String &data, String* parameters, int count) {
-  // вот сюда точно лучше не лезть
-  int space_positions[10];
-  int count_parameters = 0;
-
-  for (int i = 0; i < data.length(); i++) {
-    if (data.charAt(i) == ' ') {
-      space_positions[count] = i;
-      count++;
-    }
-  }
-
-  if (count == 0) {
-    parameters[0] = "end";
+void splitIntoParameters(const String &data, String* parameters, int &count) {
+  count = 0;
+  int startPos = data.indexOf(' ');
+  
+  if (startPos == -1) {
     return;
   }
+  
+  startPos++;
+  int spacePos = startPos;
 
-  space_positions[count] = data.length();
-  count++;
 
-
-  for (int i = 0; i < count - 1; i++) {
-    parameters[count_parameters] = data.substring(space_positions[i] + 1, space_positions[i + 1]);
-    count_parameters++;
+  while (spacePos < data.length() && count < 10) {
+    spacePos = data.indexOf(' ', startPos);
+    
+    if (spacePos == -1) {
+      parameters[count++] = data.substring(startPos);
+      break;
+    }
+    
+    parameters[count++] = data.substring(startPos, spacePos);
+    startPos = spacePos + 1;
   }
 
-  parameters[count_parameters] = "end";
+  //resetting remains of massive
+  for (int i = count; i < 10; i++) {
+    parameters[i] = "";
+  }
 }
 
 void SendData(String message) {
-  Serial1.flush();         // Ждём отправки предыдущих данных
+  //for uarts stability
+  Serial1.flush();
   Serial1.println(message);
 }
