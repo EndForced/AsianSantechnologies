@@ -61,10 +61,14 @@ robot = RobotAPI((0, 0), 1)
 def index():
     return render_template('index.html')
 
-@app.route('/restart')
+@app.route('/raw_cameras')
 def restart():
     robot.handle_website_commands("Reset")
-    return render_template('index.html')
+    return render_template('raw_cameras')
+
+@app.route('/restart')
+def restart():
+    return render_template('cameras')
 
 
 @socketio.on('uart_command')
