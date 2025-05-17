@@ -122,10 +122,47 @@
 #
 #
 
-import cv2
-cap = cv2.VideoCapture(0)  # 0 — индекс камеры
-ret, frame = cap.read()
+from picamera2 import Picamera2
+import time
+import os
 
-cv2.imwrite("photo.jpg_test", frame)
-print("written")
-cap.release()
+# Настройки
+CAMERA_MODEL = "ov5647"
+OUTPUT_DIR = "photos"
+MODE = "1920x1080"  # Выберите: 640x480, 1296x972, 1920x1080, 2592x1944
+DELAY_SEC = 3  # Задержка перед съёмкой (для стабилизации)
+
+
+def main():
+    # Создаём папку для фото, если её нет
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    # Инициализация камеры
+    picam2 = Picamera2()
+
+    # Конфигурация в зависимости от выбранного режима
+    config = picam2.create_still_configuration(
+        main={"size": tuple(map(int, MODE.split('x')))},
+        buffer_count=3
+    )
+    picam2.configure(config)
+
+    # Запуск камеры
+    picam2.start()
+    print(f"Камера {CAMERA_MODEL} запущена. Режим: {MODE}")
+
+    # Даём камере время на стабилизацию
+    time.sleep(DELAY_SEC)
+
+    # Захват фото
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    output_file = os.path.join(OUTPUT_DIR, f"photo_{timestamp}.jpg")
+    picam2.capture_file(output_file)
+    print(f"Фото сохранено: {output_file}")
+
+    # Остановка камеры
+    picam2.stop()
+
+
+if __name__ == "__main__":
+    main()
