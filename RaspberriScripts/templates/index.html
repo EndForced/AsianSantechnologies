@@ -172,8 +172,9 @@
             socket.emit('uart_command', { command: 'Reset' });  // Отправка команды
         });
 
-        document.getElementById('btn2').addEventListener('click', function() {
-            window.location.href = '/skip_wait';
+        document.getElementById('btn2').addEventListener('click', () => {
+            console.log("Button clicked: Restart ESP");
+            socket.emit('uart_command', { command: 'Button_skip' });  // Отправка команды
         });
 
         document.getElementById('btn3').addEventListener('click', function() {

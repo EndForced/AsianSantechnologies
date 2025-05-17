@@ -1,5 +1,5 @@
-const String commands[] = {"Beep", "Reset", "Turn"};
-const int commandsCount = 3;
+const String commands[] = {"Beep", "Reset", "Turn", "Button_skip"};
+const int commandsCount = 4;
 String parameters[10];
 int paramCount = 0;
 //Beep optional: millis, freq
@@ -35,7 +35,7 @@ void uartProcessing() {
           default :
             beep(G4, 500);
         }
-        Serial1.println("Done");
+        Serial1.println("Beeping done");
         break;
 
       case 1: // "Reset"
@@ -50,7 +50,19 @@ void uartProcessing() {
           case 0:
             Serial1.println("No parameters in turn");
         }
-        Serial1.println("Done");
+//        Serial1.println("Done");
+        break;
+
+      case 3: //button skip
+        switch (paramCount) {
+          case 0:
+            Serial1.println("Button Activated!");
+          //btn flag change
+          default:
+            Serial1.println("Cant process parameters in Button_skip");
+
+        }
+        Serial1.println("Button Activated");
         break;
 
       case -1:
