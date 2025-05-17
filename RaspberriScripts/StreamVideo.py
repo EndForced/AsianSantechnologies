@@ -73,38 +73,27 @@ import cv2
 import base64
 import time
 
-from picamera2 import Picamera2
 
+def get_frame_from_service():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect(('localhost', 65432))
+        while True:
+            # Получаем длину данных
+            length_bytes = s.recv(4)
+            if not length_bytes:
+                break
+            length = int.from_bytes(length_bytes, 'big')
 
-def generate_frames():
-    global stream_active
+            # Получаем сами данные
+            data = b''
+            while len(data) < length:
+                packet = s.recv(length - len(data))
+                if not packet:
+                    break
+                data += packet
 
-    # Явно указываем пути к системным библиотекам libcamera
-
-
-    try:
-        picam2 = Picamera2()
-        config = picam2.create_video_configuration(
-            main={"size": camera_configs[current_quality]['size']},
-            buffer_count=4
-        )
-        picam2.configure(config)
-        picam2.start()
-
-        while stream_active:
-            frame = picam2.capture_array("main")
-            # Конвертируем в JPEG
-            _, buffer = cv2.imencode('.jpg', frame)
-            frame_bytes = base64.b64encode(buffer).decode('utf-8')
-            socketio.emit('video_frame', {'data': frame_bytes})
-            time.sleep(1 / camera_configs[current_quality]['fps'])
-
-    except Exception as e:
-        print(f"Camera error: {str(e)}")
-        socketio.emit('camera_error', {'message': str(e)})
-    finally:
-        if 'picam2' in locals():
-            picam2.stop()
+            frame = pickle.loads(data)
+            yield base64.b64encode(frame).decode('utf-8')
 
 @app.route('/')
 def index():
@@ -124,12 +113,9 @@ def handle_uart_command(data):
     robot.handle_website_commands(command)
 
 @socketio.on('start_stream')
-def handle_start_stream(quality):
-    global stream_active, current_quality
-    if not stream_active:
-        current_quality = quality
-        stream_active = True
-        threading.Thread(target=generate_frames).start()
+def handle_connect():
+    for frame in get_frame_from_service():
+        socketio.emit('video_frame', {'data': frame})
 
 @socketio.on('stop_stream')
 def handle_stop_stream():
