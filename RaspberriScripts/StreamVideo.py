@@ -1,16 +1,9 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
-import threading
-import time
-# from RobotAPI import RobotAPI
 import serial
 
-import serial
-import time
-import threading
-# from StreamVideo import send_msg_to_website
 
-class RobotAPI():
+class RobotAPI:
     def __init__(self, position, orientation):
         self.ser = serial.Serial('/dev/ttyAMA0', 115200, timeout = 1)
         self.ser.flush()  # очищаем буфер
@@ -56,34 +49,10 @@ class RobotAPI():
 
 
 
-# if __name__ == "__main__":
-#     robot = RobotAPI((1,1), 1)
-#     while 1:
-#         result = ""
-#         command = input()
-#         robot.send(command)
-#
-#
-#         while not result:
-#             result = robot.read()
-#             print("res", result)
-#         # send_msg_to_website(result)
-
-
-print("started!")
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
-#
-# def send_msg_to_website(message):
-#     while True:
-#         # time.sleep(5)
-#         # Автоматическая отправка сообщения от "устройства"
-#         socketio.emit('uart_message', {
-#             'message': message,
-#             'type': 'received'
-#         })
+robot = RobotAPI((0, 0), 1)
 
 
 @app.route('/')
@@ -95,7 +64,6 @@ def index():
 def handle_uart_command(data):
     command = data.get('command', '')
     print(f"Received UART command: {command}")
-    robot = RobotAPI((0, 0), 1)
     robot.handle_website_commands(command)
 
     # # Отправляем подтверждение обратно клиенту
