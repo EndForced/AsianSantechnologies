@@ -60,7 +60,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/reset')
-def index():
+def resetting():
     robot.handle_website_commands("Reset")
     return render_template('index.html')
 
