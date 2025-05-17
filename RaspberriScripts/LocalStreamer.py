@@ -45,10 +45,12 @@ class CameraServer:
 
     def apply_color_correction(self, frame):
         """Применяем матрицу коррекции цвета"""
-        frame_float = frame.astype(np.float32) / 255.0
-        corrected = cv2.transform(frame_float, self.color_correction_matrix)
-        corrected = np.clip(corrected * 255, 0, 255).astype(np.uint8)
-        return corrected
+        # frame_float = frame.astype(np.float32) / 255.0
+        # corrected = cv2.transform(frame_float, self.color_correction_matrix)
+        # corrected = np.clip(corrected * 255, 0, 255).astype(np.uint8)
+        # return corrected
+        return frame
+
 
     def process_frame(self, frame):
         """Обработка кадра с коррекцией цвета"""
