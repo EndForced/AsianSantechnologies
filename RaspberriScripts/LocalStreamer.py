@@ -26,10 +26,10 @@ class CameraServer:
             },
             controls={
                 "FrameRate": 30,  # Число, не строка!
-                "AwbMode": "auto",  # Автобаланс белого
+                # "AwbMode": "auto",  # Автобаланс белого
                 "ExposureTime": 10000,  # Фиксированная экспозиция (микросекунды)
                 "AnalogueGain": 1.0,  # Фиксированное усиление
-                "NoiseReductionMode": "Fast"  # Ускоренное шумоподавление
+                # "NoiseReductionMode": "Fast"  # Ускоренное шумоподавление
             },
             buffer_count=6  # Больше буферов для плавности
         )
