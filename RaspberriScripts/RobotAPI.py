@@ -25,6 +25,7 @@ class RobotAPI:
     def read(self):
         line = self.ser.readline().decode('utf-8').strip()
 
+        print(line)
         if line is not None:
             lines = line.split("*")
             return lines

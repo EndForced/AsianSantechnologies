@@ -23,7 +23,7 @@ void uartProcessing() {
     switch (num) {
       case 0: // "Beep"
         switch (paramCount) {
-          
+
           case 0:
             beep(G4, 500);
             break;
@@ -35,23 +35,24 @@ void uartProcessing() {
           default :
             beep(G4, 500);
         }
-        Serial1.println("Done")
+        Serial1.println("Done");
         break;
-        
+
       case 1: // "Reset"
         Serial1.println("Resetting...");
+        Serial.println("Resetting...");
         delay(100);
         esp_restart();
         break;
 
       case 2: //turn
-      switch (paramCount){
-        case 0:
-        Serial1.println("No parameters in turn"
-      }
-      Serial1.println("Done")
-      break;
-      
+        switch (paramCount) {
+          case 0:
+            Serial1.println("No parameters in turn");
+        }
+        Serial1.println("Done");
+        break;
+
       case -1:
         Serial1.println("Unknown command");
         break;

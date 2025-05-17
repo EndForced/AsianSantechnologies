@@ -26,19 +26,18 @@ String data = "MEGA_PID 228 1336 -993";
 void setup() {
   Serial.begin(115200);
   Serial1.begin(115200, SERIAL_8N1, 16, 17);
+  Serial.println("Started!");
 }
 
 void loop() {
-//   put your main code here, to run repeatedly:
-  String parameters[10];
-//  splitIntoParameters(data, parameters);
+  //   put your main code here, to run repeatedly:
+//  String parameters[10];
+  //  splitIntoParameters(data, parameters);
 
-   while (parameters[count] != "end") {
-    Serial.println(parameters[count]);
-    count++;
-  }
-
-  
-  
-  delay(10000000);
+  //   while (parameters[count] != "end") {
+  //    Serial.println(parameters[count]);
+  //    count++;
+//  uartProcessing();
+Serial1.println("123");
+//delay(10000000);
 }
