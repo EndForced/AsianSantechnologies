@@ -26,10 +26,10 @@ class CameraServer:
             },
             controls={
                 "FrameRate": 30,
-                "AwbMode": "auto",  # Автобаланс белого
+                # "AwbMode": "auto",  # Автобаланс белого
                 "ExposureTime": 10000,
                 "AnalogueGain": 1.0,
-                # "NoiseReductionMode": "Fast"
+                "NoiseReductionMode": "Fast"
             },
             buffer_count=6
         )
