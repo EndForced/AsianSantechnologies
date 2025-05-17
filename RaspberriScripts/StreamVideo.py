@@ -10,7 +10,7 @@ print("started!")
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 socketio = SocketIO(app)
-robot = RobotAPI((0,0), 0)
+robot = RobotAPI((0,0), 1)
 
 def send_msg_to_website(message):
     while True:
