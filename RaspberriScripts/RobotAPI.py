@@ -53,9 +53,10 @@ while 1:
     command = input()
     robot.send(command)
 
+
     while not result:
-        response = robot.read()
-        print("res")
+        result = robot.read()
+        print("res", result)
     # send_msg_to_website(result)
 
 
