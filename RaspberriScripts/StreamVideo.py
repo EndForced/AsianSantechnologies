@@ -130,7 +130,7 @@
 
 
 from flask import Flask, render_template
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 import socket
 import pickle
 import threading
@@ -138,10 +138,19 @@ import logging
 import base64
 import cv2
 import numpy as np
+import sys
+import os
 import time
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from ClientClasses.VisualizationProcessing import VisualizePaths
+
 app = Flask(__name__)
-socketio = SocketIO(app, async_mode='threading', cors_allowed_origins="*")
+socketio = SocketIO(app,
+                  async_mode='threading',
+                  engineio_logger=False,
+                  ping_timeout=60,
+                  max_http_buffer_size=50*1024*1024)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -152,14 +161,14 @@ class CameraClient:
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.stream_active = False
         self.lock = threading.Lock()
-        self.map_image = None
+        self.map_image = None  # Для хранения изображения карты
 
     def connect(self):
         try:
             self.client_socket.connect(('localhost', 65432))
             with self.lock:
                 self.stream_active = True
-            logger.info("Connected to camera server")
+            logger.info("Connected to dual camera server")
 
             while self.stream_active:
                 try:
@@ -169,6 +178,8 @@ class CameraClient:
                         break
 
                     length = int.from_bytes(length_bytes, 'big')
+
+                    # Получаем данные
                     data = b''
                     while len(data) < length:
                         packet = self.client_socket.recv(length - len(data))
@@ -177,34 +188,47 @@ class CameraClient:
                         data += packet
 
                     if data:
+                        # Декодируем данные с сервера (словарь с двумя камерами)
                         frames = pickle.loads(data)
 
-                        # Отправляем кадры через SocketIO
+                        # Отправляем кадры на клиент с указанием номера камеры
                         if 'camera1' in frames:
-                            emit('video_frame', {
+                            encoded1 = base64.b64encode(frames['camera1']).decode('utf-8')
+                            socketio.emit('video_frame', {
                                 'camera': 1,
-                                'frame': base64.b64encode(frames['camera1']).decode('utf-8')
-                            }, broadcast=True)
+                                'frame': encoded1
+                            })
 
                         if 'camera2' in frames:
-                            emit('video_frame', {
+                            encoded2 = base64.b64encode(frames['camera2']).decode('utf-8')
+                            socketio.emit('video_frame', {
                                 'camera': 2,
-                                'frame': base64.b64encode(frames['camera2']).decode('utf-8')
-                            }, broadcast=True)
+                                'frame': encoded2
+                            })
+
+                        # Отправляем карту если есть (камера 3)
+                        if self.map_image is not None:
+                            _, buffer = cv2.imencode('.jpg', self.map_image)
+                            map_encoded = base64.b64encode(buffer).decode('utf-8')
+                            socketio.emit('video_frame', {
+                                'camera': 3,
+                                'frame': map_encoded
+                            })
 
                 except (ConnectionResetError, BrokenPipeError) as e:
                     logger.error(f"Connection error: {str(e)}")
                     break
-                except Exception as e:
-                    logger.error(f"Error processing frame: {str(e)}")
+                except pickle.UnpicklingError as e:
+                    logger.error(f"Data unpacking error: {str(e)}")
                     continue
 
         except Exception as e:
-            logger.error(f"Error: {str(e)}")
+            logger.error(f"Error: {str(e)}", exc_info=True)
         finally:
             self.client_socket.close()
             with self.lock:
                 self.stream_active = False
+
 
 
 camera_client = CameraClient()
@@ -216,51 +240,43 @@ def index():
                            qualities=['low', 'medium', 'high', 'max'])
 
 
-@socketio.on('connect')
-def handle_connect():
-    logger.info("Client connected")
-
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    logger.info("Client disconnected")
-
-
 @socketio.on('start_stream')
 def handle_start_stream(data):
     camera = data.get('camera', 1)
-    logger.info(f"Starting stream for camera {camera}")
+    quality = data.get('quality', 'medium')
 
-    if camera in [1, 2]:
+    if camera == 3:
+        # Для камеры 3 (карты) просто активируем поток
+        socketio.emit('video_frame', {
+            'camera': 3,
+            'frame': ''  # Пустой кадр, если нет изображения
+        })
+    else:
         with camera_client.lock:
             if not camera_client.stream_active:
                 client_thread = threading.Thread(target=camera_client.connect)
                 client_thread.daemon = True
                 client_thread.start()
-    elif camera == 3:
-        if camera_client.map_image is not None:
-            _, buffer = cv2.imencode('.jpg', camera_client.map_image)
-            emit('video_frame', {
-                'camera': 3,
-                'frame': base64.b64encode(buffer).decode('utf-8')
-            })
 
 
 @socketio.on('stop_stream')
 def handle_stop_stream(data):
     camera = data.get('camera', 1)
-    logger.info(f"Stopping stream for camera {camera}")
-
-    if camera in [1, 2]:
+    if camera == 3:
+        # Для камеры 3 просто отправляем черный кадр
+        black_img = np.zeros((480, 640, 3), dtype=np.uint8)
+        encoded = base64.b64encode(black_img.tobytes()).decode('utf-8')
+        socketio.emit('video_frame', {
+            'camera': 3,
+            'frame': encoded
+        })
+    else:
         with camera_client.lock:
             camera_client.stream_active = False
-    elif camera == 3:
-        emit('video_frame', {
-            'camera': 3,
-            'frame': ''
-        })
 
 
 if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+
+    time.sleep(1)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
 
