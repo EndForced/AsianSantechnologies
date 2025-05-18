@@ -81,8 +81,16 @@ class DualCameraServer:
                     self.conn, addr = s.accept()
                     self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
-                    command = self.conn.recv(1024).decode('utf-8').strip()
-                    print("command:",command)
+
+                    data = self.conn.recv(1024)
+                    if not data:
+                        break  # Соединение закрыто
+                    try:
+                        command = data.decode('utf-8').strip()
+                        print("command:", command)
+                    except UnicodeDecodeError:
+                        continue  # Пропустить бинарные данные
+
                     self.stream_active = True
 
                     try:
