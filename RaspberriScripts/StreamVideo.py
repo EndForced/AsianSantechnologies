@@ -292,7 +292,12 @@ def main():
     mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
     obj = VisualizePaths(mat)
     obj.show()
-    cv2.imwrite('debug_map.jpg', obj.resizedPicture)  # Сохраните для проверки
+    img = obj.resizedPicture
+
+    if img.dtype != np.uint8:
+        img = (img * 255).astype(np.uint8)  # Для float [0,1] -> [0,255]
+
+    cv2.imwrite('debug_map.jpg', img)  # Сохраните для проверки
     while True:
         time.sleep(3)
         obj.show()
