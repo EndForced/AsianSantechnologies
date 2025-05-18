@@ -5,6 +5,8 @@ import time
 import cv2
 import threading
 import logging
+import numpy as np
+import base64
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,48 +14,47 @@ logger = logging.getLogger(__name__)
 
 class DualCameraServer:
     def __init__(self):
-        # Инициализация двух камер
-        self.picam2_primary = Picamera2(0)  # Основная камера
-        self.picam2_secondary = Picamera2(1)  # Вторая камера
+        # Инициализация камер (остаётся без изменений)
+        self.picam2_primary = Picamera2(0)
+        self.picam2_secondary = Picamera2(1)
         self.stream_active = False
         self.conn = None
         self.lock = threading.Lock()
         self.quality = 30
 
-        # Конфигурация для основной камеры
+        # Конфигурация камер (без изменений)
         self.primary_config = self.picam2_primary.create_video_configuration(
-            main={
-                "size": (640, 480),
-                "format": "RGB888",
-            },
-            controls={
-                "FrameRate": 15,
-                "ExposureTime": 10000,
-                "AnalogueGain": 1.0,
-            },
+            main={"size": (640, 480), "format": "RGB888"},
+            controls={"FrameRate": 15, "ExposureTime": 10000, "AnalogueGain": 1.0},
             buffer_count=6
         )
-
-        # Конфигурация для второй камеры (может отличаться)
         self.secondary_config = self.picam2_secondary.create_video_configuration(
-            main={
-                "size": (640, 480),
-                "format": "RGB888",
-            },
-            controls={
-                "FrameRate": 15,
-                "ExposureTime": 10000,
-                "AnalogueGain": 1.0,
-            },
+            main={"size": (640, 480), "format": "RGB888"},
+            controls={"FrameRate": 15, "ExposureTime": 10000, "AnalogueGain": 1.0},
             buffer_count=6
         )
 
         self.picam2_primary.configure(self.primary_config)
         self.picam2_secondary.configure(self.secondary_config)
 
+    def get_uncompressed(self, camera_id):
+        """
+        Получает одно несжатое изображение с указанной камеры
+        :param camera_id: 1 (primary) или 2 (secondary)
+        :return: несжатое изображение в формате RGB numpy array
+        """
+        camera = self.picam2_primary if camera_id == 1 else self.picam2_secondary
+        try:
+            # Получаем кадр с камеры
+            frame = camera.capture_array("main")
+            logger.info(f"Captured uncompressed frame from camera {camera_id}")
+            return frame
+        except Exception as e:
+            logger.error(f"Error capturing uncompressed frame: {str(e)}")
+            return None
+
     def process_frame(self, frame, camera_id):
-        """Обработка кадра с указанием камеры"""
-        # Здесь можно добавить специфичную обработку для каждой камеры
+        """Обработка кадра с указанием камеры (сжатие в JPEG)"""
         _, buffer = cv2.imencode(
             '.jpg',
             frame,
@@ -64,9 +65,73 @@ class DualCameraServer:
         )
         return buffer, camera_id
 
+    def handle_client(self, conn, addr):
+        """Обработка подключения клиента"""
+        try:
+            while True:
+                # Получаем команду от клиента
+                command = conn.recv(1024).decode('utf-8').strip()
+
+                if command == "GET_UNCOMPRESSED":
+                    # Клиент запрашивает одно несжатое изображение
+                    camera_id = int(conn.recv(1).decode('utf-8'))
+                    frame = self.get_uncompressed(camera_id)
+
+                    if frame is not None:
+                        # Конвертируем в base64 без сжатия
+                        _, buffer = cv2.imencode('.png', frame)
+                        frame_data = {
+                            'camera': camera_id,
+                            'frame': base64.b64encode(buffer).decode('utf-8'),
+                            'type': 'uncompressed_single'
+                        }
+                        serialized = pickle.dumps(frame_data)
+                        conn.sendall(len(serialized).to_bytes(4, 'big'))
+                        conn.sendall(serialized)
+
+                elif command == "START_STREAM":
+                    # Обычный поток сжатых изображений
+                    with self.lock:
+                        self.stream_active = True
+
+                    try:
+                        while self.stream_active:
+                            primary_frame = self.picam2_primary.capture_array("main")
+                            secondary_frame = self.picam2_secondary.capture_array("main")
+
+                            primary_buffer, _ = self.process_frame(primary_frame, 1)
+                            secondary_buffer, _ = self.process_frame(secondary_frame, 2)
+
+                            data = {
+                                'camera1': primary_buffer,
+                                'camera2': secondary_buffer,
+                                'type': 'compressed'
+                            }
+
+                            serialized_data = pickle.dumps(data)
+                            try:
+                                conn.sendall(len(serialized_data).to_bytes(4, 'big'))
+                                conn.sendall(serialized_data)
+                            except (ConnectionResetError, BrokenPipeError):
+                                logger.warning("Client disconnected")
+                                break
+
+                    finally:
+                        with self.lock:
+                            self.stream_active = False
+
+                elif command == "STOP_STREAM":
+                    with self.lock:
+                        self.stream_active = False
+                    break
+
+        except Exception as e:
+            logger.error(f"Client handling error: {str(e)}")
+        finally:
+            conn.close()
+
     def start(self):
         try:
-            # Запускаем обе камеры
             self.picam2_primary.start()
             self.picam2_secondary.start()
             logger.info("Both cameras initialized")
@@ -78,39 +143,17 @@ class DualCameraServer:
                 logger.info("Socket server ready on port 65432")
 
                 while True:
-                    self.conn, addr = s.accept()
-                    self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+                    conn, addr = s.accept()
+                    conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
-                    self.stream_active = True
 
-                    try:
-                        while self.stream_active:
-                            # Получаем кадры с обеих камер
-                            primary_frame = self.picam2_primary.capture_array("main")
-                            secondary_frame = self.picam2_secondary.capture_array("main")
-
-                            # Обрабатываем кадры
-                            primary_buffer, _ = self.process_frame(primary_frame, 1)
-                            secondary_buffer, _ = self.process_frame(secondary_frame, 2)
-
-                            # Упаковываем данные в словарь
-                            data = {
-                                'camera1': primary_buffer,
-                                'camera2': secondary_buffer
-                            }
-
-                            # Сериализуем и отправляем
-                            serialized_data = pickle.dumps(data)
-                            try:
-                                self.conn.sendall(len(serialized_data).to_bytes(4, 'big'))
-                                self.conn.sendall(serialized_data)
-                            except (ConnectionResetError, BrokenPipeError):
-                                logger.warning("Client disconnected")
-                                break
-
-                    finally:
-                        self.conn.close()
-                        self.stream_active = False
+                    # Запускаем обработчик клиента в отдельном потоке
+                    client_thread = threading.Thread(
+                        target=self.handle_client,
+                        args=(conn, addr)
+                    )
+                    client_thread.daemon = True
+                    client_thread.start()
 
         except Exception as e:
             logger.error(f"Error: {str(e)}", exc_info=True)
