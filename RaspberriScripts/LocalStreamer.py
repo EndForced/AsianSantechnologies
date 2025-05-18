@@ -71,6 +71,7 @@ class DualCameraServer:
         :param client_socket: сокет клиента
         :param camera_id: 1 или 2 - какая камера
         """
+        print("Getting uncompressed")
         try:
             camera = self.picam2_primary if camera_id == 1 else self.picam2_secondary
             while self.stream_active:
