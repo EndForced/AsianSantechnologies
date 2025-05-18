@@ -140,6 +140,7 @@ import cv2
 import numpy as np
 import sys
 import os
+import time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ClientClasses.VisualizationProcessing import VisualizeMatrix
@@ -287,9 +288,17 @@ def handle_set_map_image(data):
         logger.error(f"Error setting map image: {str(e)}")
 
 
-if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+def main():
     mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
     obj = VisualizeMatrix(mat)
-    print(123)
-    CameraClient.set_map_image(obj.resizedPicture)
+    while 1:
+        time.sleep(3)
+        print(123)
+        CameraClient.set_map_image(obj.resizedPicture)
+
+if __name__ == "__main__":
+    main_code = threading.Thread(target = main)
+    main_code.start()
+
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+
