@@ -168,7 +168,7 @@ class CameraClient:
             self.client_socket.connect(('localhost', 65432))
             with self.lock:
                 self.stream_active = True
-            logger.info("Connected to camera server")
+            logger.info("Connected to dual camera server")
 
             while self.stream_active:
                 try:
@@ -188,19 +188,28 @@ class CameraClient:
                         data += packet
 
                     if data:
-                        # Декодируем и отправляем в base64
-                        frame = pickle.loads(data)
-                        encoded = base64.b64encode(frame.tobytes()).decode('utf-8')
+                        # Декодируем данные с сервера (словарь с двумя камерами)
+                        frames = pickle.loads(data)
 
-                        # Отправляем основной кадр для камер 1 и 2
-                        socketio.emit('video_frame', {
-                            'camera': 1,  # Или 2, в зависимости от источника
-                            'frame': encoded
-                        })
+                        # Отправляем кадры на клиент с указанием номера камеры
+                        if 'camera1' in frames:
+                            encoded1 = base64.b64encode(frames['camera1']).decode('utf-8')
+                            socketio.emit('video_frame', {
+                                'camera': 1,
+                                'frame': encoded1
+                            })
 
-                        # Если есть изображение карты, отправляем его для камеры 3
+                        if 'camera2' in frames:
+                            encoded2 = base64.b64encode(frames['camera2']).decode('utf-8')
+                            socketio.emit('video_frame', {
+                                'camera': 2,
+                                'frame': encoded2
+                            })
+
+                        # Отправляем карту если есть (камера 3)
                         if self.map_image is not None:
-                            map_encoded = base64.b64encode(self.map_image.tobytes()).decode('utf-8')
+                            _, buffer = cv2.imencode('.jpg', self.map_image)
+                            map_encoded = base64.b64encode(buffer).decode('utf-8')
                             socketio.emit('video_frame', {
                                 'camera': 3,
                                 'frame': map_encoded
@@ -209,9 +218,12 @@ class CameraClient:
                 except (ConnectionResetError, BrokenPipeError) as e:
                     logger.error(f"Connection error: {str(e)}")
                     break
+                except pickle.UnpicklingError as e:
+                    logger.error(f"Data unpacking error: {str(e)}")
+                    continue
 
         except Exception as e:
-            logger.error(f"Error: {str(e)}")
+            logger.error(f"Error: {str(e)}", exc_info=True)
         finally:
             self.client_socket.close()
             with self.lock:
