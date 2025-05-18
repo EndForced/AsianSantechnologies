@@ -18,13 +18,13 @@ class DualCameraServer:
         self.stream_active = False
         self.conn = None
         self.lock = threading.Lock()
-        self.quality = 70
+        self.quality = 30
 
         # Конфигурация для основной камеры
         self.primary_config = self.picam2_primary.create_video_configuration(
             main={
-                "size": (1280, 720),
-                "format": "RGB232",
+                "size": (640, 480),
+                "format": "RGB888",
             },
             controls={
                 "FrameRate": 15,
@@ -37,8 +37,8 @@ class DualCameraServer:
         # Конфигурация для второй камеры (может отличаться)
         self.secondary_config = self.picam2_secondary.create_video_configuration(
             main={
-                "size": (1280, 720),
-                "format": "RGB232",
+                "size": (640, 480),
+                "format": "RGB888",
             },
             controls={
                 "FrameRate": 15,
