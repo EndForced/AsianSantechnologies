@@ -217,36 +217,6 @@ class CameraClient:
             with self.lock:
                 self.stream_active = False
 
-    def set_map_image(self, img):
-        """Устанавливает изображение для третьей камеры (карты)"""
-        with self.lock:
-            if img is not None:
-                try:
-                    # Проверяем изображение перед отправкой
-                    if len(img.shape) == 2:  # Если черно-белое
-                        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-
-                    if img.dtype != np.uint8:
-                        img = img.astype(np.uint8)
-
-                    # Кодируем в JPEG
-                    _, buffer = cv2.imencode('.jpg', img)
-                    map_encoded = base64.b64encode(buffer).decode('utf-8')
-
-                    socketio.emit('video_frame', {
-                        'camera': 3,
-                        'frame': map_encoded
-                    })
-                except Exception as e:
-                    logger.error(f"Error in set_map_image: {str(e)}")
-                    # Отправляем черное изображение при ошибке
-                    black_img = np.zeros((480, 640, 3), dtype=np.uint8)
-                    _, buffer = cv2.imencode('.jpg', black_img)
-                    map_encoded = base64.b64encode(buffer).decode('utf-8')
-                    socketio.emit('video_frame', {
-                        'camera': 3,
-                        'frame': map_encoded
-                    })
 
 
 camera_client = CameraClient()
@@ -293,46 +263,7 @@ def handle_stop_stream(data):
             camera_client.stream_active = False
 
 
-@socketio.on('set_map_image')
-def handle_set_map_image(data):
-    """Обработчик для установки изображения карты через WebSocket"""
-    try:
-        # Декодируем изображение из base64
-        img_data = base64.b64decode(data['image'])
-        # Преобразуем в numpy array
-        nparr = np.frombuffer(img_data, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        camera_client.set_map_image(img)
-    except Exception as e:
-        logger.error(f"Error setting map image: {str(e)}")
-
-
-def main():
-    mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
-    obj = VisualizePaths(mat)
-    obj.show()
-    img = obj.resizedPicture
-
-    if img.dtype != np.uint8:
-        img = (img * 255).astype(np.uint8)  # Для float [0,1] -> [0,255]
-
-    cv2.imwrite('debug_map.jpg', img)  # Сохраните для проверки
-    while True:
-        time.sleep(3)
-        obj.show()
-        img = obj.resizedPicture
-
-        # Добавьте проверку изображения
-        if img is not None and isinstance(img, np.ndarray):
-            print(f"Image shape: {img.shape}, dtype: {img.dtype}")  # Для отладки
-            camera_client.set_map_image(img)
-        else:
-            print("Invalid image!")
-
 if __name__ == "__main__":
-    main_code = threading.Thread(target = main)
-    main_code.start()
-
     time.sleep(1)
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
 
