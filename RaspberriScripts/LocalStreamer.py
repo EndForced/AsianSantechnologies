@@ -91,6 +91,7 @@ class DualCameraServer:
                         if data:
                             command = data.decode('utf-8').strip()
                             if command == "GET_UNCOMPRESSED":
+                                print("command: ", command)
                                 self.get_uncompressed(self.conn)
                     except socket.timeout:
                         pass  # Таймаут, данных нет
