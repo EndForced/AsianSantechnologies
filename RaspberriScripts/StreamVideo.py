@@ -294,7 +294,8 @@ def main():
     while 1:
         time.sleep(3)
         print(123)
-        img = obj.show()
+        obj.show()
+        img = obj.resizedPicture
         camera_client.set_map_image(img)
 
 if __name__ == "__main__":
