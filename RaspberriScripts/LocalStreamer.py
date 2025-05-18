@@ -38,11 +38,11 @@ class CameraServer:
     def process_frame(self, frame):
         """Конвертация из RGB в BGR для OpenCV"""
         # Picamera2 возвращает RGB, OpenCV ожидает BGR
-        bgr_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        # bgr_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
         _, buffer = cv2.imencode(
             '.jpg',
-            bgr_frame,
+            frame,
             [
                 int(cv2.IMWRITE_JPEG_QUALITY), self.quality,
                 int(cv2.IMWRITE_JPEG_OPTIMIZE), 1
