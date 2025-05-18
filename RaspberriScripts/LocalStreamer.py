@@ -10,36 +10,50 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class CameraServer:
+class DualCameraServer:
     def __init__(self):
-        self.picam2 = Picamera2()
+        # Инициализация двух камер
+        self.picam2_primary = Picamera2(0)  # Основная камера
+        self.picam2_secondary = Picamera2(1)  # Вторая камера
         self.stream_active = False
         self.conn = None
         self.lock = threading.Lock()
         self.quality = 70
 
-        # Правильные настройки для цветного изображения
-        self.config = self.picam2.create_video_configuration(
+        # Конфигурация для основной камеры
+        self.primary_config = self.picam2_primary.create_video_configuration(
             main={
                 "size": (640, 480),
-                "format": "RGB888",  # Используем RGB вместо YUV
+                "format": "RGB888",
             },
             controls={
                 "FrameRate": 30,
-                # "AwbMode": "auto",  # Автобаланс белого
                 "ExposureTime": 10000,
                 "AnalogueGain": 1.0,
-                # "NoiseReductionMode": "Fast"
             },
             buffer_count=6
         )
-        self.picam2.configure(self.config)
 
-    def process_frame(self, frame):
-        """Конвертация из RGB в BGR для OpenCV"""
-        # Picamera2 возвращает RGB, OpenCV ожидает BGR
-        # bgr_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        # Конфигурация для второй камеры (может отличаться)
+        self.secondary_config = self.picam2_secondary.create_video_configuration(
+            main={
+                "size": (640, 480),
+                "format": "RGB888",
+            },
+            controls={
+                "FrameRate": 30,
+                "ExposureTime": 10000,
+                "AnalogueGain": 1.0,
+            },
+            buffer_count=6
+        )
 
+        self.picam2_primary.configure(self.primary_config)
+        self.picam2_secondary.configure(self.secondary_config)
+
+    def process_frame(self, frame, camera_id):
+        """Обработка кадра с указанием камеры"""
+        # Здесь можно добавить специфичную обработку для каждой камеры
         _, buffer = cv2.imencode(
             '.jpg',
             frame,
@@ -48,12 +62,14 @@ class CameraServer:
                 int(cv2.IMWRITE_JPEG_OPTIMIZE), 1
             ]
         )
-        return buffer
+        return buffer, camera_id
 
     def start(self):
         try:
-            self.picam2.start()
-            logger.info("Camera initialized with optimized settings")
+            # Запускаем обе камеры
+            self.picam2_primary.start()
+            self.picam2_secondary.start()
+            logger.info("Both cameras initialized")
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -69,13 +85,25 @@ class CameraServer:
 
                     try:
                         while self.stream_active:
-                            frame = self.picam2.capture_array("main")
-                            buffer = self.process_frame(frame)
-                            data = pickle.dumps(buffer)
+                            # Получаем кадры с обеих камер
+                            primary_frame = self.picam2_primary.capture_array("main")
+                            secondary_frame = self.picam2_secondary.capture_array("main")
 
+                            # Обрабатываем кадры
+                            primary_buffer, _ = self.process_frame(primary_frame, 1)
+                            secondary_buffer, _ = self.process_frame(secondary_frame, 2)
+
+                            # Упаковываем данные в словарь
+                            data = {
+                                'camera1': primary_buffer,
+                                'camera2': secondary_buffer
+                            }
+
+                            # Сериализуем и отправляем
+                            serialized_data = pickle.dumps(data)
                             try:
-                                self.conn.sendall(len(data).to_bytes(4, 'big'))
-                                self.conn.sendall(data)
+                                self.conn.sendall(len(serialized_data).to_bytes(4, 'big'))
+                                self.conn.sendall(serialized_data)
                             except (ConnectionResetError, BrokenPipeError):
                                 logger.warning("Client disconnected")
                                 break
@@ -87,10 +115,11 @@ class CameraServer:
         except Exception as e:
             logger.error(f"Error: {str(e)}", exc_info=True)
         finally:
-            self.picam2.stop()
-            logger.info("Camera stopped")
+            self.picam2_primary.stop()
+            self.picam2_secondary.stop()
+            logger.info("Both cameras stopped")
 
 
 if __name__ == "__main__":
-    server = CameraServer()
+    server = DualCameraServer()
     server.start()
