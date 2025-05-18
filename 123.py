@@ -29,6 +29,7 @@ def get_single_uncompressed_frame(camera_id=1):
 # Использование
 while not get_single_uncompressed_frame(1):
     frame = get_single_uncompressed_frame(1)
-    cv2.imwrite("Uncompressed Frame", frame)
+    if frame:
+        cv2.imwrite("Uncompressed Frame", frame)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
