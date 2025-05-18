@@ -116,14 +116,14 @@ class VisualizeMatrix:
 
     def show(self):
         # print(self.OS)
+        self.resizedPicture = self.smart_resize()
         if self.OS == "Windows":
-            self.resizedPicture = self.smart_resize()
             cv2.imshow("map", self.resizedPicture)
             cv2.waitKey(0)
         else:
             #smth for frame updating
             print("Cant imshow on rp")
-            pass
+            return self.resizedPicture
 
 class VisualizeWaves(VisualizeMatrix, PattersSolver):
     def __init__(self, matrix:list[list[int]]):
