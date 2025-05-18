@@ -143,4 +143,123 @@
                 </div>
                 <div class="camera-controls">
                     <button class="start-btn" data-cam="3">Start</button>
-                    <button class="stop-btn" data-cam="3" disabled>Stop</button
+                    <button class="stop-btn" data-cam="3" disabled>Stop</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="status" id="status">Status: Ready</div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const startAllBtn = document.getElementById('startAllBtn');
+        const stopAllBtn = document.getElementById('stopAllBtn');
+        const qualitySelect = document.getElementById('qualitySelect');
+        const statusElement = document.getElementById('status');
+
+        const cameras = {
+            1: {
+                feed: document.getElementById('videoFeed1'),
+                startBtn: document.querySelector('.start-btn[data-cam="1"]'),
+                stopBtn: document.querySelector('.stop-btn[data-cam="1"]'),
+                streaming: false
+            },
+            2: {
+                feed: document.getElementById('videoFeed2'),
+                startBtn: document.querySelector('.start-btn[data-cam="2"]'),
+                stopBtn: document.querySelector('.stop-btn[data-cam="2"]'),
+                streaming: false
+            },
+            3: {
+                feed: document.getElementById('videoFeed3'),
+                startBtn: document.querySelector('.start-btn[data-cam="3"]'),
+                stopBtn: document.querySelector('.stop-btn[data-cam="3"]'),
+                streaming: false
+            }
+        };
+
+        socket.on('video_frame', function(data) {
+            if (data.camera && cameras[data.camera] && data.frame) {
+                cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
+            }
+        });
+
+        document.querySelectorAll('.start-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const camId = parseInt(this.getAttribute('data-cam'));
+                const quality = qualitySelect.value;
+                socket.emit('start_stream', { camera: camId, quality });
+                cameras[camId].startBtn.disabled = true;
+                cameras[camId].stopBtn.disabled = false;
+                cameras[camId].streaming = true;
+                updateStatus();
+            });
+        });
+
+        document.querySelectorAll('.stop-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const camId = parseInt(this.getAttribute('data-cam'));
+                socket.emit('stop_stream', { camera: camId });
+                cameras[camId].startBtn.disabled = false;
+                cameras[camId].stopBtn.disabled = true;
+                cameras[camId].streaming = false;
+                updateStatus();
+            });
+        });
+
+        startAllBtn.addEventListener('click', function() {
+            const quality = qualitySelect.value;
+            Object.keys(cameras).forEach(camId => {
+                if (!cameras[camId].streaming) {
+                    socket.emit('start_stream', { camera: parseInt(camId), quality });
+                    cameras[camId].startBtn.disabled = true;
+                    cameras[camId].stopBtn.disabled = false;
+                    cameras[camId].streaming = true;
+                }
+            });
+            updateStatus();
+        });
+
+        stopAllBtn.addEventListener('click', function() {
+            Object.keys(cameras).forEach(camId => {
+                if (cameras[camId].streaming) {
+                    socket.emit('stop_stream', { camera: parseInt(camId) });
+                    cameras[camId].startBtn.disabled = false;
+                    cameras[camId].stopBtn.disabled = true;
+                    cameras[camId].streaming = false;
+                }
+            });
+            updateStatus();
+        });
+
+        function updateStatus() {
+            const activeCams = Object.values(cameras).filter(cam => cam.streaming).length;
+            if (activeCams === 0) {
+                statusElement.textContent = 'Status: All streams stopped';
+                startAllBtn.disabled = false;
+                stopAllBtn.disabled = true;
+                qualitySelect.disabled = false;
+            } else {
+                statusElement.textContent = `Status: ${activeCams} stream(s) active`;
+                startAllBtn.disabled = true;
+                stopAllBtn.disabled = false;
+                qualitySelect.disabled = true;
+            }
+        }
+
+        socket.on('disconnect', function() {
+            statusElement.textContent = 'Status: Disconnected from server';
+            Object.values(cameras).forEach(cam => {
+                cam.streaming = false;
+                cam.startBtn.disabled = false;
+                cam.stopBtn.disabled = true;
+            });
+            startAllBtn.disabled = false;
+            stopAllBtn.disabled = true;
+            qualitySelect.disabled = false;
+        });
+    </script>
+</body>
+</html>
