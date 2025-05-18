@@ -23,8 +23,7 @@ def get_single_uncompressed_frame(camera_id=1):
             img_data = base64.b64decode(frame_data['uncompressed'])
             nparr = np.frombuffer(img_data, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-        return frame
+            return frame
 
 
 # Использование
