@@ -82,16 +82,16 @@ class DualCameraServer:
                     self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
 
-                    data = self.conn.recv(1024)
-                    if not data:
-                        break  # Соединение закрыто
+                    self.conn.settimeout(0.01)  # 0.1 сек таймаут
                     try:
-                        print("command:")
-                        command = data.decode('utf-8').strip()
-                        print(command)
-
-                    except UnicodeDecodeError:
-                        continue  # Пропустить бинарные данные
+                        data = self.conn.recv(1024)
+                        if data:
+                            command = data.decode('utf-8').strip()
+                            print("command:", command)
+                    except socket.timeout:
+                        pass  # Таймаут, данных нет
+                    except Exception as e:
+                        print("Ошибка:", e)
 
                     self.stream_active = True
 
