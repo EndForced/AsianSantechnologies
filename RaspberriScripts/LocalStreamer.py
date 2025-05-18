@@ -72,6 +72,8 @@ class DualCameraServer:
             logger.info("Both cameras initialized")
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                comm,addr = s.accept()
+                print(comm, addr)
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 s.bind(('0.0.0.0', 65432))
                 s.listen()
