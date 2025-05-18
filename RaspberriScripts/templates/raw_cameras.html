@@ -146,7 +146,7 @@
         const qualitySelect = document.getElementById('qualitySelect');
         const statusElement = document.getElementById('status');
 
-        // Инициализация камер (убрана камера 3, так как у вас только 2 камеры в разметке)
+        // Инициализация камер
         const cameras = {
             1: {
                 feed: document.getElementById('videoFeed1'),
@@ -159,31 +159,33 @@
                 startBtn: document.querySelector('.start-btn[data-cam="2"]'),
                 stopBtn: document.querySelector('.stop-btn[data-cam="2"]'),
                 streaming: false
+            },
+            3: {
+                feed: document.getElementById('videoFeed3'),
+                startBtn: document.querySelector('.start-btn[data-cam="3"]'),
+                stopBtn: document.querySelector('.stop-btn[data-cam="3"]'),
+                streaming: false
             }
         };
 
-        // Новый обработчик видео-потока
+        // Обработка входящего видео для каждой камеры
         socket.on('video_frame', function(data) {
-            if (data.type === 'compressed') {
-                // Обработка сжатого потока с двумя камерами
-                if (data.camera1 && cameras[1]) {
-                    cameras[1].feed.src = 'data:image/jpeg;base64,' +
-                        btoa(String.fromCharCode.apply(null, new Uint8Array(data.camera1)));
-                }
-                if (data.camera2 && cameras[2]) {
-                    cameras[2].feed.src = 'data:image/jpeg;base64,' +
-                        btoa(String.fromCharCode.apply(null, new Uint8Array(data.camera2)));
-                }
-            }
-        });
+    if (data.camera && cameras[data.camera] && data.frame) {
+        // Для камеры 3 может потребоваться особый обработчик
+        if (data.camera == 3) {
+            cameras[3].feed.src = 'data:image/jpeg;base64,' + data.frame;
+        } else {
+            cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
+        }
+    }
+});
 
-        // Модифицированные обработчики кнопок
+        // Обработчики для отдельных камер
         document.querySelectorAll('.start-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                const camId = parseInt(this.getAttribute('data-cam'));
+                const camId = this.getAttribute('data-cam');
                 const quality = qualitySelect.value;
-                // Отправляем команду START_STREAM вместо start_stream
-                socket.emit('START_STREAM');
+                socket.emit('start_stream', { camera: camId, quality });
                 cameras[camId].startBtn.disabled = true;
                 cameras[camId].stopBtn.disabled = false;
                 cameras[camId].streaming = true;
@@ -193,9 +195,8 @@
 
         document.querySelectorAll('.stop-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                const camId = parseInt(this.getAttribute('data-cam'));
-                // Отправляем команду STOP_STREAM вместо stop_stream
-                socket.emit('STOP_STREAM');
+                const camId = this.getAttribute('data-cam');
+                socket.emit('stop_stream', { camera: camId });
                 cameras[camId].startBtn.disabled = false;
                 cameras[camId].stopBtn.disabled = true;
                 cameras[camId].streaming = false;
@@ -203,29 +204,33 @@
             });
         });
 
-        // Модифицированные обработчики для всех камер
+        // Обработчики для всех камер
         startAllBtn.addEventListener('click', function() {
             const quality = qualitySelect.value;
-            socket.emit('START_STREAM');
             Object.keys(cameras).forEach(camId => {
-                cameras[camId].startBtn.disabled = true;
-                cameras[camId].stopBtn.disabled = false;
-                cameras[camId].streaming = true;
+                if (!cameras[camId].streaming) {
+                    socket.emit('start_stream', { camera: camId, quality });
+                    cameras[camId].startBtn.disabled = true;
+                    cameras[camId].stopBtn.disabled = false;
+                    cameras[camId].streaming = true;
+                }
             });
             updateStatus();
         });
 
         stopAllBtn.addEventListener('click', function() {
-            socket.emit('STOP_STREAM');
             Object.keys(cameras).forEach(camId => {
-                cameras[camId].startBtn.disabled = false;
-                cameras[camId].stopBtn.disabled = true;
-                cameras[camId].streaming = false;
+                if (cameras[camId].streaming) {
+                    socket.emit('stop_stream', { camera: camId });
+                    cameras[camId].startBtn.disabled = false;
+                    cameras[camId].stopBtn.disabled = true;
+                    cameras[camId].streaming = false;
+                }
             });
             updateStatus();
         });
 
-        // Функция updateStatus() остается без изменений
+        // Обновление статуса
         function updateStatus() {
             const activeCams = Object.values(cameras).filter(cam => cam.streaming).length;
             if (activeCams === 0) {
@@ -241,7 +246,7 @@
             }
         }
 
-        // Обработка отключения остается без изменений
+        // Обработка отключения
         socket.on('disconnect', function() {
             statusElement.textContent = 'Status: Disconnected from server';
             Object.values(cameras).forEach(cam => {
@@ -252,12 +257,6 @@
             startAllBtn.disabled = false;
             stopAllBtn.disabled = true;
             qualitySelect.disabled = false;
-        });
-
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            // Можно добавить автоматический старт потоков при необходимости
-            // socket.emit('START_STREAM');
         });
     </script>
 </body>
