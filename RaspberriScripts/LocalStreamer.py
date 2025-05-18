@@ -86,8 +86,10 @@ class DualCameraServer:
                     if not data:
                         break  # Соединение закрыто
                     try:
+                        print("command:")
                         command = data.decode('utf-8').strip()
-                        print("command:", command)
+                        print(command)
+
                     except UnicodeDecodeError:
                         continue  # Пропустить бинарные данные
 
