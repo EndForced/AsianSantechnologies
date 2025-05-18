@@ -19,9 +19,10 @@ def get_single_uncompressed_frame(camera_id=1):
         data = s.recv(length)
 
         frame_data = pickle.loads(data)
-        img_data = base64.b64decode(frame_data['uncompressed'])
-        nparr = np.frombuffer(img_data, np.uint8)
-        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if "type" in frame_data.keys() and frame_data["type"] == "uncompressed":
+            img_data = base64.b64decode(frame_data['uncompressed'])
+            nparr = np.frombuffer(img_data, np.uint8)
+            frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
         return frame
 
