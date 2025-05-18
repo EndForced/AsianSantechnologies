@@ -220,14 +220,33 @@ class CameraClient:
     def set_map_image(self, img):
         """Устанавливает изображение для третьей камеры (карты)"""
         with self.lock:
-            self.map_image = img
             if img is not None:
-                # Немедленно отправляем обновленное изображение карты
-                map_encoded = base64.b64encode(img.tobytes()).decode('utf-8')
-                socketio.emit('video_frame', {
-                    'camera': 3,
-                    'frame': map_encoded
-                })
+                try:
+                    # Проверяем изображение перед отправкой
+                    if len(img.shape) == 2:  # Если черно-белое
+                        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
+                    if img.dtype != np.uint8:
+                        img = img.astype(np.uint8)
+
+                    # Кодируем в JPEG
+                    _, buffer = cv2.imencode('.jpg', img)
+                    map_encoded = base64.b64encode(buffer).decode('utf-8')
+
+                    socketio.emit('video_frame', {
+                        'camera': 3,
+                        'frame': map_encoded
+                    })
+                except Exception as e:
+                    logger.error(f"Error in set_map_image: {str(e)}")
+                    # Отправляем черное изображение при ошибке
+                    black_img = np.zeros((480, 640, 3), dtype=np.uint8)
+                    _, buffer = cv2.imencode('.jpg', black_img)
+                    map_encoded = base64.b64encode(buffer).decode('utf-8')
+                    socketio.emit('video_frame', {
+                        'camera': 3,
+                        'frame': map_encoded
+                    })
 
 
 camera_client = CameraClient()
