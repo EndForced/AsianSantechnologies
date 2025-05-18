@@ -72,8 +72,6 @@ class DualCameraServer:
             logger.info("Both cameras initialized")
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                comm,addr = s.accept()
-                print(comm, addr)
                 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 s.bind(('0.0.0.0', 65432))
                 s.listen()
@@ -83,6 +81,8 @@ class DualCameraServer:
                     self.conn, addr = s.accept()
                     self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
+                    command = self.conn.recv(1024).decode('utf-8').strip()
+                    print("command:",command)
                     self.stream_active = True
 
                     try:
