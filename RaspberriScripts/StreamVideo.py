@@ -299,8 +299,8 @@ def main():
         camera_client.set_map_image(img)
 
 if __name__ == "__main__":
-    # main_code = threading.Thread(target = main)
-    # main_code.start()
+    main_code = threading.Thread(target = main)
+    main_code.start()
 
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
 
