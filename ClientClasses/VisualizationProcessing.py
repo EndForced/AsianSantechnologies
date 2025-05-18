@@ -16,7 +16,7 @@ class VisualizeMatrix:
     import numpy as np
 
     def __init__(self, matrix:list[list[int]]):
-        super().__init__(matrix)
+        # super().__init__(matrix)
         self.pathToPics = "field_pictures/"
 
         self._possibleCodes = possible_codes
