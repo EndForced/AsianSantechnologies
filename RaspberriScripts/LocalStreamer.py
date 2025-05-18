@@ -27,7 +27,7 @@ class DualCameraServer:
                 "format": "RGB888",
             },
             controls={
-                "FrameRate": 30,
+                "FrameRate": 15,
                 "ExposureTime": 10000,
                 "AnalogueGain": 1.0,
             },
@@ -41,7 +41,7 @@ class DualCameraServer:
                 "format": "RGB888",
             },
             controls={
-                "FrameRate": 30,
+                "FrameRate": 15,
                 "ExposureTime": 10000,
                 "AnalogueGain": 1.0,
             },
