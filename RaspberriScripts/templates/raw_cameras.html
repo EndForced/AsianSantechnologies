@@ -182,10 +182,15 @@
 
         // Обработка входящего видео для каждой камеры
         socket.on('video_frame', function(data) {
-            if (data.camera && cameras[data.camera]) {
-                cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
-            }
-        });
+    if (data.camera && cameras[data.camera] && data.frame) {
+        // Для камеры 3 может потребоваться особый обработчик
+        if (data.camera == 3) {
+            cameras[3].feed.src = 'data:image/jpeg;base64,' + data.frame;
+        } else {
+            cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
+        }
+    }
+});
 
         // Обработчики для отдельных камер
         document.querySelectorAll('.start-btn').forEach(btn => {

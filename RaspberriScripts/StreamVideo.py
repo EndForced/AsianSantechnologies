@@ -289,18 +289,24 @@ def handle_set_map_image(data):
 
 
 def main():
-    mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
+    mat = [[...]]  # ваша матрица
     obj = VisualizePaths(mat)
-    while 1:
+    while True:
         time.sleep(3)
-        print(123)
         obj.show()
         img = obj.resizedPicture
-        camera_client.set_map_image(img)
+
+        # Добавьте проверку изображения
+        if img is not None and isinstance(img, np.ndarray):
+            print(f"Image shape: {img.shape}, dtype: {img.dtype}")  # Для отладки
+            camera_client.set_map_image(img)
+        else:
+            print("Invalid image!")
 
 if __name__ == "__main__":
     main_code = threading.Thread(target = main)
     main_code.start()
 
+    time.sleep(1)
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
 
