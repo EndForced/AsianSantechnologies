@@ -5,6 +5,7 @@ import time
 import cv2
 import threading
 import logging
+import base64
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -64,8 +65,35 @@ class DualCameraServer:
         )
         return buffer, camera_id
 
-    def get_uncompressed(self, conn):
-        print("Getting uncompressed")
+    def get_uncompressed(self, client_socket, camera_id=0):
+        """
+        Отправка несжатых кадров указанному клиенту
+        :param client_socket: сокет клиента
+        :param camera_id: 1 или 2 - какая камера
+        """
+        try:
+            camera = self.picam2_primary if camera_id == 1 else self.picam2_secondary
+            while self.stream_active:
+                frame = camera.capture_array("main")
+
+                # Конвертируем в base64 без сжатия
+                _, buffer = cv2.imencode('.png', frame)  # PNG для сохранения качества
+                frame_data = {
+                    'camera': camera_id,
+                    'frame': base64.b64encode(buffer).decode('utf-8'),
+                    'type': 'uncompressed'
+                }
+
+                try:
+                    serialized = pickle.dumps(frame_data)
+                    client_socket.sendall(len(serialized).to_bytes(4, 'big'))
+                    client_socket.sendall(serialized)
+                except (ConnectionResetError, BrokenPipeError):
+                    logger.warning("Uncompressed stream client disconnected")
+                    break
+
+        except Exception as e:
+            logger.error(f"Uncompressed stream error: {str(e)}")
 
     def start(self):
         try:

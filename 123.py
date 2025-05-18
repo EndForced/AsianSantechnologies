@@ -11,24 +11,24 @@ def get_single_uncompressed_frame(camera_id=1):
 
         # Запрашиваем одно несжатое изображение
         s.sendall(b"GET_UNCOMPRESSED")
-        # s.sendall(str(camera_id).encode())
-        #
-        # # Получаем данные
-        # length_bytes = s.recv(4)
-        # length = int.from_bytes(length_bytes, 'big')
-        # data = s.recv(length)
-        #
-        # frame_data = pickle.loads(data)
-        # img_data = base64.b64decode(frame_data['frame'])
-        # nparr = np.frombuffer(img_data, np.uint8)
-        # frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        #
-        # return frame
+        s.sendall(str(camera_id).encode())
+
+        # Получаем данные
+        length_bytes = s.recv(4)
+        length = int.from_bytes(length_bytes, 'big')
+        data = s.recv(length)
+
+        frame_data = pickle.loads(data)
+        img_data = base64.b64decode(frame_data['frame'])
+        nparr = np.frombuffer(img_data, np.uint8)
+        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        return frame
 
 
 # Использование
-while 1:
-    get_single_uncompressed_frame(1)
-# cv2.imwrite("Uncompressed Frame", frame)
+while not get_single_uncompressed_frame(1):
+    frame = get_single_uncompressed_frame(1)
+    cv2.imwrite("Uncompressed Frame", frame)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
