@@ -21,7 +21,7 @@ class CameraServer:
         # Правильные настройки для цветного изображения
         self.config = self.picam2.create_video_configuration(
             main={
-                "size": (1280, 720),
+                "size": (640, 480),
                 "format": "RGB888",  # Используем RGB вместо YUV
             },
             controls={
