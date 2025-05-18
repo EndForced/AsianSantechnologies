@@ -23,7 +23,7 @@ class DualCameraServer:
         # Конфигурация для основной камеры
         self.primary_config = self.picam2_primary.create_video_configuration(
             main={
-                "size": (640, 480),
+                "size": (1080, 720),
                 "format": "RGB888",
             },
             controls={
@@ -37,7 +37,7 @@ class DualCameraServer:
         # Конфигурация для второй камеры (может отличаться)
         self.secondary_config = self.picam2_secondary.create_video_configuration(
             main={
-                "size": (640, 480),
+                "size": (1080, 720),
                 "format": "RGB888",
             },
             controls={
@@ -64,6 +64,9 @@ class DualCameraServer:
         )
         return buffer, camera_id
 
+    def get_uncompressed(self, conn):
+        print("Getting uncompressed")
+
     def start(self):
         try:
             # Запускаем обе камеры
@@ -87,7 +90,8 @@ class DualCameraServer:
                         data = self.conn.recv(1024)
                         if data:
                             command = data.decode('utf-8').strip()
-                            print("command:", command)
+                            if command == "GET_UNCOMPRESSED":
+                                self.get_uncompressed(self.conn)
                     except socket.timeout:
                         pass  # Таймаут, данных нет
                     except Exception as e:
