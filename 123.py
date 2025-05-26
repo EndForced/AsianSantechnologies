@@ -38,7 +38,7 @@ def get_single_uncompressed_frame(camera_id=1):
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect(('localhost', 65432))
-    for i in range(100):
+    while 1:
             # Запрашиваем одно несжатое изображение
             s.sendall(b"GET_UNCOMPRESSED")
             s.settimeout(0.15)  # 0.1 сек таймаут
@@ -52,5 +52,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
             except socket.timeout:
                 pass  # Таймаут, данных нет
-
-            time.sleep(0.05)

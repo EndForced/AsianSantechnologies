@@ -93,7 +93,7 @@ class DualCameraServer:
                     self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
 
-                    self.conn.settimeout(0.15)  # 0.1 сек таймаут
+                    self.conn.settimeout(0.01)  # 0.1 сек таймаут
                     try:
                         data = self.conn.recv(1024)
                         if data:
