@@ -124,23 +124,14 @@ class DualCameraServer:
                                 conn.sendall(len(serialized_data).to_bytes(4, 'big'))
                                 conn.sendall(serialized_data)
 
-                                # Проверка входящих команд каждые 0.2 секунды
-                                start_time = time.time()
-                                while time.time() - start_time < 0.2:
-                                    # Проверяем, есть ли данные для чтения (таймаут 0.01 сек)
-                                    ready = select.select([conn], [], [], 0.01)
-                                    if ready[0]:
-                                        command = conn.recv(1024).decode().strip()
-                                        if not command:
-                                            # Пустая команда означает разрыв соединения
-                                            raise ConnectionResetError("Client disconnected")
+                                # Проверка входящих команд
+                                ready = select.select([conn], [], [], 0.01)  # Небольшой таймаут
+                                if ready[0]:
+                                    command = conn.recv(1024).strip()
+                                    if not command:
+                                        raise ConnectionResetError("Client disconnected")
 
-                                        # Обработка команды
-                                        self.handle_command(command, self.conn)
-
-                                    # Если stream_active стал False, выходим из внутреннего цикла
-                                    if not self.stream_active:
-                                        break
+                                    self.handle_command(command, conn)
 
                             except (ConnectionResetError, BrokenPipeError):
                                 logger.warning("Client disconnected during streaming")
@@ -151,12 +142,39 @@ class DualCameraServer:
                         self.stream_active = False
                         logger.info("Connection closed")
 
-        except Exception as e:
-            logger.error(f"Error: {str(e)}", exc_info=True)
-        finally:
-            self.picam2_primary.stop()
-            self.picam2_secondary.stop()
-            logger.info("Both cameras stopped")
+                    def handle_command(self, command, conn):
+                        try:
+                            # Пытаемся декодировать команду
+                            decoded_command = command.decode('utf-8')
+                            logger.info(f"Received command: {decoded_command}")
+
+                            if decoded_command == "GET_UNCOMPRESSED":
+                                # Отправляем подтверждение
+                                conn.sendall(b"accepted")
+
+                                # Получаем номер камеры (следующие данные)
+                                camera_id = conn.recv(1024).decode('utf-8').strip()
+
+                                # Получаем кадр с нужной камеры
+                                frame = self.picam2_primary.capture_array(
+                                    "main") if camera_id == "1" else self.picam2_secondary.capture_array("main")
+
+                                # Отправляем несжатый кадр
+                                _, img_encoded = cv2.imencode('.jpg', frame)
+                                img_bytes = img_encoded.tobytes()
+                                response = {
+                                    'type': 'uncompressed',
+                                    'uncompressed': img_bytes
+                                }
+                                serialized_response = pickle.dumps(response)
+                                conn.sendall(len(serialized_response).to_bytes(4, 'big'))
+                                conn.sendall(serialized_response)
+
+                            elif decoded_command == "STOP":
+                                self.stream_active = False
+
+                        except UnicodeDecodeError:
+                            logger.warning("Received binary command that couldn't be decoded")
 
 
 if __name__ == "__main__":
