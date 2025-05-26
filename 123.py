@@ -29,9 +29,14 @@ def get_single_uncompressed_frame(camera_id=1):
 
 
 # Использование
-while not get_single_uncompressed_frame(1):
-    frame = get_single_uncompressed_frame(1)
-    if frame:
-        cv2.imwrite("Uncompressed Frame", frame)
+# while not get_single_uncompressed_frame(1):
+#     frame = get_single_uncompressed_frame(1)
+#     if frame:
+#         cv2.imwrite("Uncompressed Frame", frame)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect(('localhost', 65432))
+for i in range(10):
+        # Запрашиваем одно несжатое изображение
+        s.sendall(b"GET_UNCOMPRESSED")
