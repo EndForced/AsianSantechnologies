@@ -74,12 +74,24 @@
         button:disabled {
             background-color: #cccccc;
         }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            min-width: 120px;
+        }
         .status {
             margin-top: 10px;
             padding: 10px;
             border-radius: 4px;
             background-color: #f8f8f8;
             text-align: center;
+        }
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
         }
     </style>
 </head>
@@ -88,6 +100,11 @@
         <h1>Multi-Camera Streaming System</h1>
 
         <div class="controls">
+            <select id="qualitySelect">
+                {% for quality in qualities %}
+                <option value="{{ quality }}">{{ quality|capitalize }}</option>
+                {% endfor %}
+            </select>
             <button id="startAllBtn">Start All Cameras</button>
         </div>
 
@@ -98,6 +115,8 @@
                     <div class="camera-label">Camera 1</div>
                     <img id="videoFeed1" class="camera-feed" src="{{ url_for('static', filename='black.jpg') }}" alt="Camera 1">
                 </div>
+                <div class="camera-controls">
+                </div>
             </div>
 
             <!-- Camera 2 -->
@@ -105,6 +124,8 @@
                 <div class="camera-container">
                     <div class="camera-label">Camera 2</div>
                     <img id="videoFeed2" class="camera-feed" src="{{ url_for('static', filename='black.jpg') }}" alt="Camera 2">
+                </div>
+                <div class="camera-controls">
                 </div>
             </div>
         </div>
@@ -116,6 +137,8 @@
     <script>
         const socket = io();
         const startAllBtn = document.getElementById('startAllBtn');
+        const stopAllBtn = document.getElementById('stopAllBtn');
+        const qualitySelect = document.getElementById('qualitySelect');
         const statusElement = document.getElementById('status');
 
         // Инициализация камер
@@ -127,31 +150,40 @@
             2: {
                 feed: document.getElementById('videoFeed2'),
                 streaming: false
+            },
+            3: {
+                feed: document.getElementById('videoFeed3'),
+                streaming: false
             }
         };
 
         // Обработка входящего видео для каждой камеры
         socket.on('video_frame', function(data) {
-            if (data.camera && cameras[data.camera] && data.frame) {
-                cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
-                if (!cameras[data.camera].streaming) {
-                    cameras[data.camera].streaming = true;
-                    updateStatus();
-                }
-            }
-        });
+    if (data.camera && cameras[data.camera] && data.frame) {
+        // Для камеры 3 может потребоваться особый обработчик
+        if (data.camera == 3) {
+            cameras[3].feed.src = 'data:image/jpeg;base64,' + data.frame;
+        } else {
+            cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
+        }
+    }
+});
 
-        // Обработчик для всех камер
+
+        // Обработчики для всех камер
         startAllBtn.addEventListener('click', function() {
-            const quality = 'high'; // Установите качество по умолчанию
+            const quality = qualitySelect.value;
             Object.keys(cameras).forEach(camId => {
                 if (!cameras[camId].streaming) {
-                    socket.emit('start_stream', { camera: camId, quality: quality });
+                    socket.emit('start_stream', { camera: camId, quality });
+                    cameras[camId].startBtn.disabled = true;
+                    cameras[camId].stopBtn.disabled = false;
+                    cameras[camId].streaming = true;
                 }
             });
-            startAllBtn.disabled = true;
-            statusElement.textContent = 'Status: Starting cameras...';
+            updateStatus();
         });
+
 
         // Обновление статуса
         function updateStatus() {
@@ -159,19 +191,16 @@
             if (activeCams === 0) {
                 statusElement.textContent = 'Status: All cameras stopped';
                 startAllBtn.disabled = false;
+                stopAllBtn.disabled = true;
+                qualitySelect.disabled = false;
             } else {
                 statusElement.textContent = `Status: ${activeCams} camera(s) active`;
+                startAllBtn.disabled = true;
+                stopAllBtn.disabled = false;
+                qualitySelect.disabled = true;
             }
         }
 
-        // Обработка отключения
-        socket.on('disconnect', function() {
-            statusElement.textContent = 'Status: Disconnected from server';
-            Object.values(cameras).forEach(cam => {
-                cam.streaming = false;
-            });
-            startAllBtn.disabled = false;
-        });
     </script>
 </body>
 </html>
