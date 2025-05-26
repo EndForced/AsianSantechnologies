@@ -85,20 +85,20 @@ class DualCameraServer:
                     self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
 
-                    self.conn.settimeout(0.01)  # 0.1 сек таймаут
-                    try:
-                        data = self.conn.recv(1024)
-                        if data:
-                            command = data.decode('utf-8').strip()
-                            if command == "GET_UNCOMPRESSED":
-                                print("command: ", command)
-                                self.get_uncompressed(self.conn)
-                    except socket.timeout:
-                        pass  # Таймаут, данных нет
-                    except Exception as e:
-                        print("Ошибка:", e)
-
-                    self.stream_active = True
+                    # self.conn.settimeout(0.01)  # 0.1 сек таймаут
+                    # try:
+                    #     data = self.conn.recv(1024)
+                    #     if data:
+                    #         command = data.decode('utf-8').strip()
+                    #         if command == "GET_UNCOMPRESSED":
+                    #             print("command: ", command)
+                    #             self.get_uncompressed(self.conn)
+                    # except socket.timeout:
+                    #     pass  # Таймаут, данных нет
+                    # except Exception as e:
+                    #     print("Ошибка:", e)
+                    #
+                    # self.stream_active = True
 
                     try:
                         while self.stream_active:
@@ -140,4 +140,6 @@ class DualCameraServer:
 if __name__ == "__main__":
     server = DualCameraServer()
     threading.Thread(target=server.start(), daemon=True).start()
-    print("bypassed one thread")
+    while 1:
+        time.sleep(2)
+        print("bypassed one thread")
