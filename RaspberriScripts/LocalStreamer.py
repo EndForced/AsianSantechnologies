@@ -77,7 +77,6 @@ class DualCameraServer:
 
     def command_handler(self, conn):
         while 1:
-            conn.settimeout(0.01)  # 0.1 сек таймаут
             try:
                 data = self.conn.recv(1024)
                 if data:
