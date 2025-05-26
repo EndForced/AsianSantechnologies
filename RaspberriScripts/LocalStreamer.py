@@ -73,6 +73,8 @@ class DualCameraServer:
             print(f"Error sending acceptance: {e}")
 
     def command_handler(self, conn):
+        conn.settimeout(0.5)  # Таймаут 500мс на чтение
+
         while 1:
             try:
                 data = self.conn.recv(1024)
