@@ -76,29 +76,13 @@ class DualCameraServer:
         except Exception as e:
             print(f"Error sending acceptance: {e}")
 
-    def handle_command(self, conn):
-        while self.stream_active:
-            try:
-                conn.settimeout(0.5)
-                data = conn.recv(1024)
-                if data:
-                    command = data.decode('utf-8').strip()
-                    logger.info(f"Received command: {command}")
-                    if command == "GET_UNCOMPRESSED":
-                        self.get_uncompressed(conn)
-                    elif command == "STOP":
-                        self.stream_active = False
-                elif not data:  # Пустые данные = разрыв соединения
-                    break
+    def handle_command(self, command):
 
-            except socket.timeout:
-                continue
-            except (ConnectionResetError, BrokenPipeError):
-                logger.warning("Client disconnected in command handler")
-                break
-            except Exception as e:
-                logger.error(f"Command handler error: {e}")
-                break
+        logger.info(f"Received command: {command}")
+        if command == "GET_UNCOMPRESSED":
+            self.get_uncompressed(self.conn)
+        elif command == "STOP":
+            self.stream_active = False
 
     def start(self):
         try:
