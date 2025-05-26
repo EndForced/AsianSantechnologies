@@ -66,9 +66,6 @@ class DualCameraServer:
 
     def get_uncompressed(self, conn):
         try:
-            # ... ваш код обработки ...
-
-            # Отправка подтверждения
             conn.send(b"accepted")
             print("Sent acceptance confirmation")
 
@@ -83,7 +80,9 @@ class DualCameraServer:
                     command = data.decode('utf-8').strip()
                     print("command: ", command)
                     if command == "GET_UNCOMPRESSED":
-                        self.get_uncompressed(self.conn)
+                        # self.get_uncompressed(self.conn)
+                        conn.send(b"accepted")
+                        pass
             except socket.timeout:
                 pass  # Таймаут, данных нет
             except Exception as e:
