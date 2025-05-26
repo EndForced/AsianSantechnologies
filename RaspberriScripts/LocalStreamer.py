@@ -136,7 +136,7 @@ class DualCameraServer:
                                             raise ConnectionResetError("Client disconnected")
 
                                         # Обработка команды
-                                        self.handle_command(command)
+                                        self.handle_command(command, self.conn)
 
                                     # Если stream_active стал False, выходим из внутреннего цикла
                                     if not self.stream_active:
