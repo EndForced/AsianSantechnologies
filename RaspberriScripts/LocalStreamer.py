@@ -76,11 +76,11 @@ class DualCameraServer:
         except Exception as e:
             print(f"Error sending acceptance: {e}")
 
-    def handle_command(self, command):
+    def handle_command(self, command, conn):
 
         logger.info(f"Received command: {command}")
         if command == "GET_UNCOMPRESSED":
-            self.get_uncompressed(self.conn)
+            conn.send(b"accepted")
         elif command == "STOP":
             self.stream_active = False
 
@@ -104,8 +104,6 @@ class DualCameraServer:
                     self.conn = conn  # Сохраняем соединение
                     self.stream_active = True
 
-                    import select
-                    import time
 
                     try:
                         while self.stream_active:
