@@ -142,4 +142,4 @@ if __name__ == "__main__":
     threading.Thread(target=server.start(), daemon=True).start()
     while 1:
         time.sleep(2)
-        print("bypassed one thread")
+        logger.info("bypassed one thread")
