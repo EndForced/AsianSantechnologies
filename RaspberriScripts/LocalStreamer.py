@@ -139,4 +139,5 @@ class DualCameraServer:
 
 if __name__ == "__main__":
     server = DualCameraServer()
-    server.start()
+    threading.Thread(target=server.start(), daemon=True).start()
+    print("bypassed one thread")
