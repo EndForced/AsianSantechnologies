@@ -134,18 +134,23 @@
         socket.on('video_frame', function(data) {
             if (data.camera && cameras[data.camera] && data.frame) {
                 cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
+                if (!cameras[data.camera].streaming) {
+                    cameras[data.camera].streaming = true;
+                    updateStatus();
+                }
             }
         });
 
         // Обработчик для всех камер
         startAllBtn.addEventListener('click', function() {
+            const quality = 'high'; // Установите качество по умолчанию
             Object.keys(cameras).forEach(camId => {
                 if (!cameras[camId].streaming) {
-                    socket.emit('start_stream', { camera: camId });
-                    cameras[camId].streaming = true;
+                    socket.emit('start_stream', { camera: camId, quality: quality });
                 }
             });
-            updateStatus();
+            startAllBtn.disabled = true;
+            statusElement.textContent = 'Status: Starting cameras...';
         });
 
         // Обновление статуса
@@ -156,7 +161,6 @@
                 startAllBtn.disabled = false;
             } else {
                 statusElement.textContent = `Status: ${activeCams} camera(s) active`;
-                startAllBtn.disabled = true;
             }
         }
 
