@@ -110,6 +110,8 @@ class DualCameraServer:
 
                     try:
                         while self.stream_active:
+
+                            self.conn.settimeout(0.005)  # 0.1 сек таймаут
                             data = self.conn.recv(1024)
                             if data:
                                 command = data.decode('utf-8').strip()
