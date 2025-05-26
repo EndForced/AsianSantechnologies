@@ -41,4 +41,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     for i in range(100):
             # Запрашиваем одно несжатое изображение
             s.sendall(b"GET_UNCOMPRESSED")
-            time.sleep(10)
+            time.sleep(5)
