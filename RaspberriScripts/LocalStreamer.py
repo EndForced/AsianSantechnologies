@@ -73,22 +73,22 @@ class DualCameraServer:
             print(f"Error sending acceptance: {e}")
 
     def command_handler(self, conn):
-        conn.settimeout(0.5)  # Таймаут 500мс на чтение
-
         while 1:
-            try:
-                data = self.conn.recv(1024)
-                if data:
-                    command = data.decode('utf-8').strip()
-                    print("command: ", command)
-                    if command == "GET_UNCOMPRESSED":
-                        # self.get_uncompressed(self.conn)
-                        conn.send(b"accepted")
-                        pass
-            except socket.timeout:
-                pass  # Таймаут, данных нет
-            except Exception as e:
-                print("Ошибка:", e)
+            conn.settimeout(0.5)  # Таймаут 500мс на чтение
+            while 1:
+                try:
+                    data = self.conn.recv(1024)
+                    if data:
+                        command = data.decode('utf-8').strip()
+                        print("command: ", command)
+                        if command == "GET_UNCOMPRESSED":
+                            # self.get_uncompressed(self.conn)
+                            conn.send(b"accepted")
+                            pass
+                except socket.timeout:
+                    pass  # Таймаут, данных нет
+                except Exception as e:
+                    print("Ошибка:", e)
 
 
     def start(self):
