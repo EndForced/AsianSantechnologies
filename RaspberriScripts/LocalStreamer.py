@@ -75,6 +75,22 @@ class DualCameraServer:
         except Exception as e:
             print(f"Error sending acceptance: {e}")
 
+    def command_handler(self, conn):
+        while 1:
+            conn.settimeout(0.01)  # 0.1 сек таймаут
+            try:
+                data = self.conn.recv(1024)
+                if data:
+                    command = data.decode('utf-8').strip()
+                    print("command: ", command)
+                    if command == "GET_UNCOMPRESSED":
+                        self.get_uncompressed(self.conn)
+            except socket.timeout:
+                pass  # Таймаут, данных нет
+            except Exception as e:
+                print("Ошибка:", e)
+
+
     def start(self):
         try:
             # Запускаем обе камеры
@@ -93,31 +109,29 @@ class DualCameraServer:
                     self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
 
-                    self.conn.settimeout(0.01)  # 0.1 сек таймаут
-                    try:
-                        data = self.conn.recv(1024)
-                        if data:
-                            command = data.decode('utf-8').strip()
-                            print("command: ", command)
-                            if command == "GET_UNCOMPRESSED":
-                                self.get_uncompressed(self.conn)
-                    except socket.timeout:
-                        pass  # Таймаут, данных нет
-                    except Exception as e:
-                        print("Ошибка:", e)
+                    thread = threading.Thread(target=self.command_handler, args= self.conn)
+                    thread.start()
+
+
 
                     self.stream_active = True
 
                     try:
                         while self.stream_active:
 
-                            self.conn.settimeout(0.005)  # 0.1 сек таймаут
-                            data = self.conn.recv(1024)
-                            if data:
-                                command = data.decode('utf-8').strip()
-                                print("command: ", command)
-                                if command == "GET_UNCOMPRESSED":
-                                    self.get_uncompressed(self.conn)
+                            self.conn.settimeout(0.01)  # 0.1 сек таймаут
+                            try:
+                                data = self.conn.recv(1024)
+                                if data:
+                                    command = data.decode('utf-8').strip()
+                                    print("command: ", command)
+                                    if command == "GET_UNCOMPRESSED":
+                                        self.get_uncompressed(self.conn)
+                            except socket.timeout:
+                                pass  # Таймаут, данных нет
+                            except Exception as e:
+                                print("Ошибка:", e)
+
 
                             # Получаем кадры с обеих камер
                             primary_frame = self.picam2_primary.capture_array("main")
