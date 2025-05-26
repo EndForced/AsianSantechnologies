@@ -136,10 +136,13 @@ class DualCameraServer:
             self.picam2_secondary.stop()
             logger.info("Both cameras stopped")
 
+def do_smth():
+    while 1:
+        print("doing smth")
+        time.sleep(1)
 
 if __name__ == "__main__":
     server = DualCameraServer()
     threading.Thread(target=server.start(), daemon=True).start()
-    while 1:
-        time.sleep(2)
-        logger.info("bypassed one thread")
+
+    threading.Thread(target=do_smth()).start()
