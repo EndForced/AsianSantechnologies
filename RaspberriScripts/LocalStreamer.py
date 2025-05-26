@@ -66,6 +66,9 @@ class DualCameraServer:
 
     def get_uncompressed(self, conn):
         try:
+            # ... ваш код обработки ...
+
+            # Отправка подтверждения
             conn.send(b"accepted")
             print("Sent acceptance confirmation")
 
@@ -73,59 +76,24 @@ class DualCameraServer:
             print(f"Error sending acceptance: {e}")
 
     def command_handler(self, conn):
-        while self.stream_active:
+        while 1:
+            conn.settimeout(0.01)  # 0.1 сек таймаут
             try:
-                conn.settimeout(0.5)
-                data = conn.recv(1024)
+                data = self.conn.recv(1024)
                 if data:
                     command = data.decode('utf-8').strip()
-                    logger.info(f"Received command: {command}")
+                    print("command: ", command)
                     if command == "GET_UNCOMPRESSED":
-                        self.get_uncompressed(conn)
-                    elif command == "STOP":
-                        self.stream_active = False
-                elif not data:  # Пустые данные = разрыв соединения
-                    break
-
+                        self.get_uncompressed(self.conn)
             except socket.timeout:
-                continue
-            except (ConnectionResetError, BrokenPipeError):
-                logger.warning("Client disconnected in command handler")
-                break
+                pass  # Таймаут, данных нет
             except Exception as e:
-                logger.error(f"Command handler error: {e}")
-                break
+                print("Ошибка:", e)
 
-    def video_stream(self, conn):
-        while self.stream_active:
-            try:
-                primary_frame = self.picam2_primary.capture_array("main")
-                secondary_frame = self.picam2_secondary.capture_array("main")
-
-                primary_buffer, _ = self.process_frame(primary_frame, 1)
-                secondary_buffer, _ = self.process_frame(secondary_frame, 2)
-
-                data = {
-                    'camera1': primary_buffer,
-                    'camera2': secondary_buffer
-                }
-
-                serialized_data = pickle.dumps(data)
-                with self.lock:  # Блокировка для безопасной отправки
-                    conn.sendall(len(serialized_data).to_bytes(4, 'big'))
-                    conn.sendall(serialized_data)
-
-                time.sleep(0.01)  # Небольшая пауза для других операций
-
-            except (ConnectionResetError, BrokenPipeError):
-                logger.warning("Video stream disconnected")
-                self.stream_active = False
-            except Exception as e:
-                logger.error(f"Video stream error: {e}")
-                self.stream_active = False
 
     def start(self):
         try:
+            # Запускаем обе камеры
             self.picam2_primary.start()
             self.picam2_secondary.start()
             logger.info("Both cameras initialized")
@@ -136,46 +104,65 @@ class DualCameraServer:
                 s.listen()
                 logger.info("Socket server ready on port 65432")
 
-                conn, addr = s.accept()
-                conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                logger.info(f"Client connected: {addr}")
+                while True:
+                    self.conn, addr = s.accept()
+                    self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+                    logger.info(f"Client connected: {addr}")
 
-                self.stream_active = True
-                self.lock = threading.Lock()
+                    thread = threading.Thread(target=self.command_handler, args= (self.conn,))
+                    thread.start()
 
-                # Запуск потока видео
-                video_thread = threading.Thread(target=self.video_stream, args=(conn,))
-                video_thread.daemon = True
-                video_thread.start()
 
-                # Основной поток для команд
-                while self.stream_active:
+
+                    self.stream_active = True
+
                     try:
-                        data = conn.recv(1024)
-                        if data:
-                            command = data.decode('utf-8').strip()
-                            if command == "GET_UNCOMPRESSED":
-                                self.get_uncompressed(conn)
-                            elif command == "STOP":
-                                self.stream_active = False
-                        elif not data:  # Пустые данные = разрыв
-                            break
+                        while self.stream_active:
 
-                    except socket.timeout:
-                        continue
-                    except (ConnectionResetError, BrokenPipeError):
-                        logger.warning("Command channel disconnected")
-                        break
-                    except Exception as e:
-                        logger.error(f"Command error: {e}")
-                        break
+                            self.conn.settimeout(0.01)  # 0.1 сек таймаут
+                            try:
+                                data = self.conn.recv(1024)
+                                if data:
+                                    command = data.decode('utf-8').strip()
+                                    print("command: ", command)
+                                    if command == "GET_UNCOMPRESSED":
+                                        self.get_uncompressed(self.conn)
+                            except socket.timeout:
+                                pass  # Таймаут, данных нет
+                            except Exception as e:
+                                print("Ошибка:", e)
 
-                video_thread.join()  # Ожидаем завершение потока видео
+
+                            # Получаем кадры с обеих камер
+                            primary_frame = self.picam2_primary.capture_array("main")
+                            secondary_frame = self.picam2_secondary.capture_array("main")
+
+                            # Обрабатываем кадры
+                            primary_buffer, _ = self.process_frame(primary_frame, 1)
+                            secondary_buffer, _ = self.process_frame(secondary_frame, 2)
+
+                            # Упаковываем данные в словарь
+                            data = {
+                                'camera1': primary_buffer,
+                                'camera2': secondary_buffer
+                            }
+
+                            # Сериализуем и отправляем
+                            serialized_data = pickle.dumps(data)
+                            try:
+                                self.conn.sendall(len(serialized_data).to_bytes(4, 'big'))
+                                self.conn.sendall(serialized_data)
+                            except (ConnectionResetError, BrokenPipeError):
+                                logger.warning("Client disconnected")
+                                break
+
+                    finally:
+                        self.conn.close()
+                        self.stream_active = False
 
         except Exception as e:
             logger.error(f"Error: {str(e)}", exc_info=True)
         finally:
-            conn.close()
             self.picam2_primary.stop()
             self.picam2_secondary.stop()
             logger.info("Both cameras stopped")
