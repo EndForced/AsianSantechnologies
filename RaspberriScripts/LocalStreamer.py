@@ -93,23 +93,25 @@ class DualCameraServer:
                     self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
 
-                    self.conn.settimeout(0.01)  # 0.1 сек таймаут
-                    try:
-                        data = self.conn.recv(1024)
-                        if data:
-                            command = data.decode('utf-8').strip()
-                            print("command: ", command)
-                            if command == "GET_UNCOMPRESSED":
-                                self.get_uncompressed(self.conn)
-                    except socket.timeout:
-                        pass  # Таймаут, данных нет
-                    except Exception as e:
-                        print("Ошибка:", e)
+                    # self.conn.settimeout(0.01)  # 0.1 сек таймаут
+
 
                     self.stream_active = True
 
                     try:
                         while self.stream_active:
+                            try:
+                                data = self.conn.recv(1024)
+                                if data:
+                                    command = data.decode('utf-8').strip()
+                                    print("command: ", command)
+                                    if command == "GET_UNCOMPRESSED":
+                                        self.get_uncompressed(self.conn)
+                            except socket.timeout:
+                                pass  # Таймаут, данных нет
+                            except Exception as e:
+                                print("Ошибка:", e)
+
                             # Получаем кадры с обеих камер
                             primary_frame = self.picam2_primary.capture_array("main")
                             secondary_frame = self.picam2_secondary.capture_array("main")
