@@ -41,4 +41,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     for i in range(100):
             # Запрашиваем одно несжатое изображение
             s.sendall(b"GET_UNCOMPRESSED")
-            time.sleep(5)
+            s.settimeout(0.15)  # 0.1 сек таймаут
+            try:
+                data = s.recv(1024)
+                if data:
+                    command = data.decode('utf-8').strip()
+                    if command == "accepted":
+                        print("done")
+                        break
+
+            except socket.timeout:
+                pass  # Таймаут, данных нет
+
+            time.sleep(0.05)

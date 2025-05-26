@@ -65,7 +65,15 @@ class DualCameraServer:
         return buffer, camera_id
 
     def get_uncompressed(self, conn):
-        print("Getting uncompressed")
+        try:
+            # ... ваш код обработки ...
+
+            # Отправка подтверждения
+            conn.send(b"accepted")
+            print("Sent acceptance confirmation")
+
+        except Exception as e:
+            print(f"Error sending acceptance: {e}")
 
     def start(self):
         try:
