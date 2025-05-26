@@ -5,6 +5,7 @@ import time
 import cv2
 import threading
 import logging
+import select
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -75,7 +76,7 @@ class DualCameraServer:
         except Exception as e:
             print(f"Error sending acceptance: {e}")
 
-    def command_handler(self, conn):
+    def handle_command(self, conn):
         while self.stream_active:
             try:
                 conn.settimeout(0.5)
@@ -119,13 +120,8 @@ class DualCameraServer:
                     self.conn = conn  # Сохраняем соединение
                     self.stream_active = True
 
-                    # Запускаем обработчик команд в отдельном потоке
-                    command_thread = threading.Thread(
-                        target=self.command_handler,
-                        args=(conn,),
-                        daemon=True
-                    )
-                    command_thread.start()
+                    import select
+                    import time
 
                     try:
                         while self.stream_active:
@@ -145,6 +141,25 @@ class DualCameraServer:
                             try:
                                 conn.sendall(len(serialized_data).to_bytes(4, 'big'))
                                 conn.sendall(serialized_data)
+
+                                # Проверка входящих команд каждые 0.2 секунды
+                                start_time = time.time()
+                                while time.time() - start_time < 0.2:
+                                    # Проверяем, есть ли данные для чтения (таймаут 0.01 сек)
+                                    ready = select.select([conn], [], [], 0.01)
+                                    if ready[0]:
+                                        command = conn.recv(1024).decode().strip()
+                                        if not command:
+                                            # Пустая команда означает разрыв соединения
+                                            raise ConnectionResetError("Client disconnected")
+
+                                        # Обработка команды
+                                        self.handle_command(command)
+
+                                    # Если stream_active стал False, выходим из внутреннего цикла
+                                    if not self.stream_active:
+                                        break
+
                             except (ConnectionResetError, BrokenPipeError):
                                 logger.warning("Client disconnected during streaming")
                                 break
