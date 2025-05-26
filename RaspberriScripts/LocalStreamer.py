@@ -109,7 +109,7 @@ class DualCameraServer:
                     self.conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}")
 
-                    thread = threading.Thread(target=self.command_handler, args= self.conn)
+                    thread = threading.Thread(target=self.command_handler, args= (self.conn,))
                     thread.start()
 
 
