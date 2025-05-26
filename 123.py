@@ -3,7 +3,7 @@ import pickle
 import base64
 import cv2
 import numpy as np
-
+import time
 
 def get_single_uncompressed_frame(camera_id=1):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -38,6 +38,7 @@ def get_single_uncompressed_frame(camera_id=1):
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect(('localhost', 65432))
-    for i in range(10):
+    for i in range(100):
             # Запрашиваем одно несжатое изображение
             s.sendall(b"GET_UNCOMPRESSED")
+            time.sleep(10)
