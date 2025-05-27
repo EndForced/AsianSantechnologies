@@ -76,9 +76,8 @@ class DualCameraServer:
             print(f"Error sending acceptance: {e}")
 
     def command_handler(self, conn):
-        while self.stream_active:
+        while 1:
             try:
-                conn.settimeout(0.5)
                 data = conn.recv(1024)
                 if data:
                     command = data.decode('utf-8').strip()
@@ -156,6 +155,10 @@ class DualCameraServer:
                     if conn_type == "WEBSITE_STREAMING":
                         logger.info(f"Starting website stream...")
                         threading.Thread(target=self.handle_stream, args=(conn,)).start()
+
+                    elif conn_type == "UNCOMPRESSED_API":
+                        logger.info(f"Starting robot's API")
+                        threading.Thread(target=self.command_handler(), args=(conn,)).start()
 
 
 

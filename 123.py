@@ -2,11 +2,13 @@ import socket
 import pickle
 import cv2
 import numpy as np
-
+import time
 
 def get_single_uncompressed_frame(camera_id=1):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect(('localhost', 65432))
+        s.sendall("UNCOMPRESSED_API")
+        time.sleep(0.05)
 
         try:
             # Отправляем запрос
