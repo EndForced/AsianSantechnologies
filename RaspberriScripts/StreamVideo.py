@@ -35,7 +35,7 @@ current_quality = 'medium'
 stream_active = False
 
 class RobotAPI:
-    def __init__(self, position, orientation, serial, socketio):
+    def __init__(self, position, orientation, serial, socketio = None):
         self.ser = serial
         self.ser.flush()
         self.socket = socketio
@@ -72,17 +72,20 @@ class RobotAPI:
             self.send(args)
             while not res:
                 res = self.read()
-            self.socket.emit('uart_message', {
-                'message': res,
-                'type': 'received'
-            })
+
+            if self.socket:
+                self.socket.emit('uart_message', {
+                    'message': res,
+                    'type': 'received'
+                })
 
 class CameraClient:
-    def __init__(self):
+    def __init__(self, socket):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.stream_active = False
         self.lock = threading.Lock()
         self.map_image = None
+        self.socketio = socket
 
     def connect(self):
         try:
@@ -115,25 +118,18 @@ class CameraClient:
 
                         if 'camera1' in frames:
                             encoded1 = base64.b64encode(frames['camera1']).decode('utf-8')
-                            socketio.emit('video_frame', {
+                            self.socketio.emit('video_frame', {
                                 'camera': 1,
                                 'frame': encoded1
                             })
 
                         if 'camera2' in frames:
                             encoded2 = base64.b64encode(frames['camera2']).decode('utf-8')
-                            socketio.emit('video_frame', {
+                            self.socketio.emit('video_frame', {
                                 'camera': 2,
                                 'frame': encoded2
                             })
 
-                        if self.map_image is not None:
-                            _, buffer = cv2.imencode('.jpg', self.map_image)
-                            map_encoded = base64.b64encode(buffer).decode('utf-8')
-                            socketio.emit('video_frame', {
-                                'camera': 3,
-                                'frame': map_encoded
-                            })
 
                 except (ConnectionResetError, BrokenPipeError) as e:
                     logger.error(f"Connection error: {str(e)}")
