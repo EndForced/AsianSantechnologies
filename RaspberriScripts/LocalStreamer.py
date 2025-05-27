@@ -94,7 +94,7 @@ class DualCameraServer:
             }
 
             # Отправляем подтверждение
-            conn.sendall(b"accepted")
+            # conn.sendall(b"accepted")
 
             # Сериализуем и отправляем данные
             serialized_data = pickle.dumps(data)
