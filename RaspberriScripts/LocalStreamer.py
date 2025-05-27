@@ -76,7 +76,8 @@ class DualCameraServer:
             print(f"Error sending acceptance: {e}")
 
     def command_handler(self, conn):
-        while 1:
+        conn.settimeout(0.5)  # Ждём данные не больше 0.5 сек
+        while self.stream_active:  # Вместо while 1
             try:
                 data = conn.recv(1024)
                 if data:
@@ -86,11 +87,10 @@ class DualCameraServer:
                         self.get_uncompressed(conn)
                     elif command == "STOP":
                         self.stream_active = False
-                elif not data:  # Пустые данные = разрыв соединения
+                elif not data:  # Клиент отключился
                     break
-
             except socket.timeout:
-                continue
+                continue  # Продолжаем цикл, если нет данных
             except (ConnectionResetError, BrokenPipeError):
                 logger.warning("Client disconnected in command handler")
                 break
