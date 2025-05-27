@@ -119,6 +119,8 @@ class DualCameraServer:
                     conn_type = ""
                     while not conn_type:
                         conn_type = conn.recv(1024)
+
+                    conn_type = str(conn_type)
                     logger.info(f"Connection type {conn_type}")
 
                     if conn_type == "WEBSITE_STREAMING":
