@@ -80,12 +80,12 @@ class RobotAPI:
                 })
 
 class CameraClient:
-    def __init__(self, socket):
+    def __init__(self, sock):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.stream_active = False
         self.lock = threading.Lock()
         self.map_image = None
-        self.socketio = socket
+        self.socketio = sock
 
     def connect(self):
         try:
