@@ -14,7 +14,6 @@ import time
 import struct
 
 serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -77,109 +76,6 @@ class RobotAPI:
                 'type': 'received'
             })
 
-class Website:
-    def __init__(self, port):
-        self.uart = port
-        self.app = Flask(__name__)
-        self.socketio = SocketIO(self.app,
-                                 async_mode='threading',
-                                 engineio_logger=False,
-                                 ping_timeout=60,
-                                 max_http_buffer_size=50 * 1024 * 1024)
-
-        self.camera_client = CameraClient()
-        self.robot = RobotAPI((0, 0), 1, self.uart)
-        self.server_thread = None
-        self.running = False
-
-        self._setup_routes()
-        self._setup_socket_handlers()
-
-    def _setup_routes(self):
-        @self.app.route('/')
-        def index():
-            return render_template('index.html')
-
-        @self.app.route('/raw_cameras')
-        def get_raw():
-            self.robot.handle_website_commands("Reset")
-            return render_template('raw_cameras.html',
-                                   qualities=['low', 'medium', 'high', 'max'])
-
-    def _setup_socket_handlers(self):
-        @self.socketio.on('uart_command')
-        def handle_uart_command(data):
-            command = data.get('command', '')
-            print(f"Received UART command: {command}")
-            self.robot.handle_website_commands(command)
-
-        @self.socketio.on('start_stream')
-        def handle_start_stream(data=None):
-            if data is None:
-                camera = 1
-                quality = 'medium'
-            else:
-                camera = data.get('camera', 1)
-                quality = data.get('quality', 'medium')
-
-            if camera == 3:
-                self.socketio.emit('video_frame', {
-                    'camera': 3,
-                    'frame': ''
-                })
-            else:
-                with self.camera_client.lock:
-                    if not self.camera_client.stream_active:
-                        client_thread = threading.Thread(target=self.camera_client.connect)
-                        client_thread.daemon = True
-                        client_thread.start()
-
-        @self.socketio.on('stop_stream')
-        def handle_stop_stream(data=None):
-            if data is None:
-                camera = 1
-            else:
-                camera = data.get('camera', 1)
-
-            if camera == 3:
-                black_img = np.zeros((480, 640, 3), dtype=np.uint8)
-                encoded = base64.b64encode(black_img.tobytes()).decode('utf-8')
-                self.socketio.emit('video_frame', {
-                    'camera': 3,
-                    'frame': encoded
-                })
-            else:
-                with self.camera_client.lock:
-                    self.camera_client.stream_active = False
-
-    def start(self):
-        if not self.running:
-            self.running = True
-            self.server_thread = threading.Thread(
-                target=self.socketio.run,
-                kwargs={
-                    'app': self.app,
-                    'host': '0.0.0.0',
-                    'port': 5000,
-                    'debug': False,
-                    'allow_unsafe_werkzeug': True
-                }
-            )
-            self.server_thread.daemon = True
-            self.server_thread.start()
-            logging.info("Website server started")
-
-    def stop(self):
-        if self.running:
-            self.running = False
-            # Остановка потоков камеры
-            with self.camera_client.lock:
-                self.camera_client.stream_active = False
-            logging.info("Website server stopped")
-
-    def is_running(self):
-        return self.running
-
 class CameraClient:
     def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -194,15 +90,18 @@ class CameraClient:
                 self.stream_active = True
 
             self.client_socket.sendall(b"WEBSITE_STREAMING")
-            logging.info("Connected to dual camera server")
+            logger.info("Connected to dual camera server")
 
             while self.stream_active:
                 try:
+                    # Получаем длину данных
                     length_bytes = self.client_socket.recv(4)
                     if not length_bytes:
                         break
 
                     length = int.from_bytes(length_bytes, 'big')
+
+                    # Получаем данные
                     data = b''
                     while len(data) < length:
                         packet = self.client_socket.recv(length - len(data))
@@ -212,6 +111,7 @@ class CameraClient:
 
                     if data:
                         frames = pickle.loads(data)
+
                         if 'camera1' in frames:
                             encoded1 = base64.b64encode(frames['camera1']).decode('utf-8')
                             socketio.emit('video_frame', {
@@ -235,29 +135,80 @@ class CameraClient:
                             })
 
                 except (ConnectionResetError, BrokenPipeError) as e:
-                    logging.error(f"Connection error: {str(e)}")
+                    logger.error(f"Connection error: {str(e)}")
                     break
                 except pickle.UnpicklingError as e:
-                    logging.error(f"Data unpacking error: {str(e)}")
+                    logger.error(f"Data unpacking error: {str(e)}")
                     continue
 
         except Exception as e:
-            logging.error(f"Error: {str(e)}", exc_info=True)
+            logger.error(f"Error: {str(e)}", exc_info=True)
         finally:
             self.client_socket.close()
             with self.lock:
                 self.stream_active = False
 
+# Инициализация объектов
+robot = RobotAPI((0, 0), 1, serial)
+camera_client = CameraClient()
 
-# Пример использования
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/raw_cameras')
+def get_raw():
+    robot.handle_website_commands("Reset")
+    return render_template('raw_cameras.html',
+                         qualities=['low', 'medium', 'high', 'max'])
+
+@socketio.on('uart_command')
+def handle_uart_command(data):
+    command = data.get('command', '')
+    print(f"Received UART command: {command}")
+    robot.handle_website_commands(command)
+
+@socketio.on('start_stream')
+def handle_start_stream(data=None):
+    if data is None:
+        # Режим совместимости со старым кодом
+        camera = 1
+        quality = 'medium'
+    else:
+        camera = data.get('camera', 1)
+        quality = data.get('quality', 'medium')
+
+    if camera == 3:
+        socketio.emit('video_frame', {
+            'camera': 3,
+            'frame': ''
+        })
+    else:
+        with camera_client.lock:
+            if not camera_client.stream_active:
+                client_thread = threading.Thread(target=camera_client.connect)
+                client_thread.daemon = True
+                client_thread.start()
+
+@socketio.on('stop_stream')
+def handle_stop_stream(data=None):
+    if data is None:
+        # Режим совместимости со старым кодом
+        camera = 1
+    else:
+        camera = data.get('camera', 1)
+
+    if camera == 3:
+        black_img = np.zeros((480, 640, 3), dtype=np.uint8)
+        encoded = base64.b64encode(black_img.tobytes()).decode('utf-8')
+        socketio.emit('video_frame', {
+            'camera': 3,
+            'frame': encoded
+        })
+    else:
+        with camera_client.lock:
+            camera_client.stream_active = False
+
 if __name__ == "__main__":
-    website = Website(serial)
-    website.start()
-
-    try:
-        while True:
-            # Основной цикл программы
-            print("doing smth hehehaha")
-            time.sleep(1)
-    except KeyboardInterrupt:
-        website.stop()
+    time.sleep(1)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
