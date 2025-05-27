@@ -184,6 +184,7 @@ class WebsiteHolder:
                                    qualities=['low', 'medium', 'high', 'max'])
 
     def start_website(self):
+        self.__set_routes()
         self.socketio.run(self.app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
 
 
