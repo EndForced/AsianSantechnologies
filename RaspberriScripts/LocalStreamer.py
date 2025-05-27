@@ -121,7 +121,7 @@ class DualCameraServer:
                         conn_type = conn.recv(1024)
                     conn_type = str(conn_type)
                     conn_type = conn_type[1::]
-                    conn_type.replace("'","")
+                    conn_type = conn_type.replace("'","")
 
                     logger.info(f"Connection type {conn_type}")
 
