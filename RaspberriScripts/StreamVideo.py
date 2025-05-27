@@ -293,5 +293,6 @@ class WebsiteHolder:
 
 s = WebsiteHolder(serial)
 s.start_website()
-time.sleep(20)
+time.sleep(5)
+print("saving")
 s.robot.get_uncompressed_frames(1)
