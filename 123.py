@@ -3,6 +3,7 @@ import pickle
 import cv2
 import numpy as np
 import time
+
 def recvall(conn, n):
     """Читает ровно n байт из сокета conn."""
     data = bytearray()
@@ -72,7 +73,9 @@ def get_uncompressed_frames():
 
 frames = get_uncompressed_frames()
 if frames[0]:
-    print("LETS GO")
+    cv2.imwrite("No_way.png",frames[0])
+    print("Written!")
+
 
 else:
     print("((")
