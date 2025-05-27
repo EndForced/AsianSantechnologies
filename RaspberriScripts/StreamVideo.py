@@ -74,7 +74,7 @@ class RobotAPI:
 
     def get_uncompressed_frames(self, save_in_folder = False):
         conn = self.client_socket
-        # conn.connect(('localhost', 65432))
+        conn.connect(('localhost', 65432))
         conn.sendall(b"UNCOMPRESSED_API")
         time.sleep(0.1)
 
