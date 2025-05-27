@@ -73,7 +73,7 @@ def get_uncompressed_frames():
 
 frames = get_uncompressed_frames()
 if list(frames[0]):
-    cv2.imwrite("No_way.png",frames[0])
+    cv2.imwrite("No_way.png",frames[1])
     print("Written!")
 
 
