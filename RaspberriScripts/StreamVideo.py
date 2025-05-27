@@ -35,8 +35,8 @@ current_quality = 'medium'
 stream_active = False
 
 class RobotAPI:
-    def __init__(self, position, orientation, serial):
-        self.ser = serial
+    def __init__(self, position, orientation, uart_port):
+        self.ser = uart_port
         self.ser.flush()
 
         if max(position) > 15:
