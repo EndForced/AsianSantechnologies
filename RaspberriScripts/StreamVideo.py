@@ -108,8 +108,8 @@ class RobotAPI:
                 )
 
                 self.frames = {1:primary_frame, 2: secondary_frame}
-                if save_in_folder: cv2.imwrite("frame 1", primary_frame)
-                if save_in_folder: cv2.imwrite("frame 2", secondary_frame)
+                if save_in_folder: cv2.imwrite("frame_1.png", primary_frame)
+                if save_in_folder: cv2.imwrite("frame_2.png", secondary_frame)
 
                 return primary_frame, secondary_frame
 
@@ -193,12 +193,12 @@ class CameraClient:
                 self.stream_active = False
 
 class WebsiteHolder:
+    #не лезь сюда (хотя бы пока работает)
     def __init__(self, uart_port):
-        # Настройка логгера
+
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
-        # Инициализация Flask и SocketIO
         self.app = Flask(__name__)
         self.socketio = SocketIO(self.app,
                                  async_mode='threading',
