@@ -114,12 +114,16 @@ class DualCameraServer:
                 while True:
                     conn, addr = s.accept()
                     conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                    logger.info(f"Client connected: {addr}", " waiting for connection type")
+                    logger.info(f"Client connected: {addr} waiting for connection type")
 
                     conn_type = ""
                     while not conn_type:
                         conn_type = conn.recv(1024)
                     logger.info(f"Connection type {conn_type}")
+
+                    if conn_type == "WEBSITE_STREAMING":
+                        logger.info(f"Starting website stream...")
+
 
 
                     self.conn = conn  # Сохраняем соединение
