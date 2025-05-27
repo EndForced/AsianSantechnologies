@@ -4,47 +4,54 @@ import cv2
 import numpy as np
 import time
 
-def get_single_uncompressed_frame(camera_id=1):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('localhost', 65432))
-        s.sendall(b"UNCOMPRESSED_API")
+def get_uncompressed_frames():
+        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        conn.connect(('localhost', 65432))
+        conn.sendall(b"UNCOMPRESSED_API")
         time.sleep(0.05)
 
-        # try:
-        #     # Отправляем запрос
-        #     s.sendall(b"GET_UNCOMPRESSED")
-        #
-        #     # Получаем подтверждение
-        #     response = s.recv(1024)
-        #     if response != b"accepted":
-        #         print("Server didn't accept the request")
-        #         return None
-        #
-        #     # Отправляем номер камеры
-        #     s.sendall(str(camera_id).encode())
-        #
-        #     # Получаем данные кадра
-        #     length_bytes = s.recv(4)
-        #     if not length_bytes:
-        #         return None
-        #
-        #     length = int.from_bytes(length_bytes, 'big')
-        #     data = s.recv(length)
-        #
-        #     frame_data = pickle.loads(data)
-        #     if "type" in frame_data and frame_data["type"] == "uncompressed":
-        #         nparr = np.frombuffer(frame_data['uncompressed'], np.uint8)
-        #         frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        #         return frame
-        #
-        # except (socket.timeout, ConnectionError) as e:
-        #     print(f"Connection error: {e}")
-        return 1
+        try:
+            # Получаем данные
+            length_bytes = conn.recv(4)
+            if not length_bytes:
+                return None, None
+
+            length = int.from_bytes(length_bytes, 'big')
+            data = conn.recv(length)
+
+            frame_data = pickle.loads(data)
+
+            if frame_data.get('type') == 'uncompressed_dual':
+                # Восстанавливаем кадр первой камеры
+                cam1_info = frame_data['camera1']
+                primary_frame = np.frombuffer(
+                    cam1_info['data'],
+                    dtype=np.dtype(cam1_info['dtype'])
+                ).reshape(
+                    (cam1_info['height'], cam1_info['width'], cam1_info['channels'])
+                )
+
+                # Восстанавливаем кадр второй камеры
+                cam2_info = frame_data['camera2']
+                secondary_frame = np.frombuffer(
+                    cam2_info['data'],
+                    dtype=np.dtype(cam2_info['dtype'])
+                ).reshape(
+                    (cam2_info['height'], cam2_info['width'], cam2_info['channels'])
+                )
+
+                return primary_frame, secondary_frame
+
+            elif frame_data.get('type') == 'error':
+                print(f"Server error: {frame_data['message']}")
+                return None, None
+
+        except Exception as e:
+            print(f"Error receiving frames: {e}")
+            return None, None
 
 
-# Пример использования
-frame = get_single_uncompressed_frame(1)
-# if frame is not None:
-#     cv2.imshow("Uncompressed Frame", frame)
-#     cv2.waitKey(0)
-#     cv2.destroyAllWindows()
+
+frames = get_uncompressed_frames()
+if frames[0]:
+    print("LETS GO")

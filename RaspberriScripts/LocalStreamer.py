@@ -66,17 +66,59 @@ class DualCameraServer:
 
     def get_uncompressed(self, conn):
         try:
-            # ... ваш код обработки ...
+            # Получаем несжатые кадры с обеих камер
+            primary_frame = self.picam2_primary.capture_array("main")
+            secondary_frame = self.picam2_secondary.capture_array("main")
 
-            # Отправка подтверждения
-            conn.send(b"accepted")
-            print("Sent acceptance confirmation")
+            # Конвертируем кадры в байты без сжатия
+            primary_bytes = primary_frame.tobytes()
+            secondary_bytes = secondary_frame.tobytes()
+
+            # Формируем данные для отправки
+            data = {
+                'type': 'uncompressed_dual',
+                'camera1': {
+                    'width': primary_frame.shape[1],
+                    'height': primary_frame.shape[0],
+                    'channels': primary_frame.shape[2] if len(primary_frame.shape) > 2 else 1,
+                    'dtype': str(primary_frame.dtype),
+                    'data': primary_bytes
+                },
+                'camera2': {
+                    'width': secondary_frame.shape[1],
+                    'height': secondary_frame.shape[0],
+                    'channels': secondary_frame.shape[2] if len(secondary_frame.shape) > 2 else 1,
+                    'dtype': str(secondary_frame.dtype),
+                    'data': secondary_bytes
+                }
+            }
+
+            # Отправляем подтверждение
+            conn.sendall(b"accepted")
+
+            # Сериализуем и отправляем данные
+            serialized_data = pickle.dumps(data)
+            conn.sendall(len(serialized_data).to_bytes(4, 'big'))
+            conn.sendall(serialized_data)
+
+            logger.info("Sent uncompressed frames from both cameras")
 
         except Exception as e:
-            print(f"Error sending acceptance: {e}")
+            logger.error(f"Error in get_uncompressed: {e}")
+            # Попытка отправить сообщение об ошибке клиенту
+            try:
+                error_data = {
+                    'type': 'error',
+                    'message': str(e)
+                }
+                serialized_error = pickle.dumps(error_data)
+                conn.sendall(len(serialized_error).to_bytes(4, 'big'))
+                conn.sendall(serialized_error)
+            except:
+                pass
 
     def command_handler(self, conn):
-        conn.settimeout(0.5)  # Ждём данные не больше 0.5 сек
+        conn.settimeout(0.2)  # Ждём данные не больше 0.5 сек
         while self.stream_active:  # Вместо while 1
             try:
                 data = conn.recv(1024)
