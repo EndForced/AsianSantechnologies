@@ -116,6 +116,7 @@ class DualCameraServer:
                     conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     logger.info(f"Client connected: {addr}", " waiting for connection type")
 
+                    conn_type = ""
                     while not conn_type:
                         conn_type = conn.recv(1024)
                     logger.info(f"Connection type {conn_type}")
