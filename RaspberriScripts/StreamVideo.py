@@ -149,16 +149,18 @@ class CameraClient:
                 self.stream_active = False
 
 class WebsiteHolder:
-    logging.basicConfig(level=logging.INFO)
-
     def __init__(self, uart_port):
+        # Настройка логгера
+        logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
+
+        # Инициализация Flask и SocketIO
         self.app = Flask(__name__)
-        self.socketio = SocketIO(app,
-                            async_mode='threading',
-                            engineio_logger=False,
-                            ping_timeout=60,
-                            max_http_buffer_size=50 * 1024 * 1024)
+        self.socketio = SocketIO(self.app,
+                                 async_mode='threading',
+                                 engineio_logger=False,
+                                 ping_timeout=60,
+                                 max_http_buffer_size=50 * 1024 * 1024)
 
         self.camera_configs = {
             'low': {'size': (640, 480), 'fps': 30},
@@ -169,10 +171,15 @@ class WebsiteHolder:
         self.current_quality = 'medium'
         self.stream_active = False
 
+        # Инициализация робота и клиента камеры (предполагается, что классы определены)
         self.robot = RobotAPI((0, 0), 1, uart_port)
         self.camera_client = CameraClient()
 
-    def __set_routes(self):
+        # Установка маршрутов и обработчиков SocketIO
+        self._set_routes()
+        self._set_socketio_handlers()
+
+    def _set_routes(self):
         @self.app.route('/')
         def index():
             return render_template('index.html')
@@ -183,17 +190,16 @@ class WebsiteHolder:
             return render_template('raw_cameras.html',
                                    qualities=['low', 'medium', 'high', 'max'])
 
-    def __set_socketio_handlers(self):
+    def _set_socketio_handlers(self):
         @self.socketio.on('uart_command')
         def handle_uart_command(data):
             command = data.get('command', '')
-            print(f"Received UART command: {command}")
+            self.logger.info(f"Received UART command: {command}")
             self.robot.handle_website_commands(command)
 
         @self.socketio.on('start_stream')
         def handle_start_stream(data=None):
             if data is None:
-                # Режим совместимости со старым кодом
                 camera = 1
                 quality = 'medium'
             else:
@@ -201,13 +207,13 @@ class WebsiteHolder:
                 quality = data.get('quality', 'medium')
 
             if camera == 3:
-                socketio.emit('video_frame', {
+                self.socketio.emit('video_frame', {
                     'camera': 3,
                     'frame': ''
                 })
             else:
-                with camera_client.lock:
-                    if not camera_client.stream_active:
+                with self.camera_client.lock:
+                    if not self.camera_client.stream_active:
                         client_thread = threading.Thread(target=self.camera_client.connect)
                         client_thread.daemon = True
                         client_thread.start()
@@ -215,7 +221,6 @@ class WebsiteHolder:
         @self.socketio.on('stop_stream')
         def handle_stop_stream(data=None):
             if data is None:
-                # Режим совместимости со старым кодом
                 camera = 1
             else:
                 camera = data.get('camera', 1)
@@ -228,13 +233,10 @@ class WebsiteHolder:
                     'frame': encoded
                 })
             else:
-                with camera_client.lock:
-                    camera_client.stream_active = False
-
+                with self.camera_client.lock:
+                    self.camera_client.stream_active = False
 
     def start_website(self):
-        self.__set_routes()
-        self.__set_socketio_handlers()
         self.socketio.run(self.app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
 
 
