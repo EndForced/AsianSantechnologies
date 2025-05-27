@@ -18,12 +18,12 @@ class DualCameraServer:
         self.stream_active = False
         self.conn = None
         self.lock = threading.Lock()
-        self.quality = 30
+        self.quality = 15
 
         # Конфигурация для основной камеры
         self.primary_config = self.picam2_primary.create_video_configuration(
             main={
-                "size": (1080, 720),
+                "size": (1920, 1080),
                 "format": "RGB888",
             },
             controls={
@@ -37,7 +37,7 @@ class DualCameraServer:
         # Конфигурация для второй камеры (может отличаться)
         self.secondary_config = self.picam2_secondary.create_video_configuration(
             main={
-                "size": (1080, 720),
+                "size": (1920, 1080),
                 "format": "RGB888",
             },
             controls={
@@ -118,6 +118,8 @@ class DualCameraServer:
                 pass
 
     def command_handler(self, conn):
+        #eto dead code
+
         conn.settimeout(0.2)  # Ждём данные не больше 0.5 сек
         while self.stream_active:  # Вместо while 1
             try:

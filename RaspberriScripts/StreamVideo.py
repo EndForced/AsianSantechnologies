@@ -13,11 +13,10 @@ import os
 import time
 import struct
 
-# Настройка логирования
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Инициализация Flask и SocketIO
 app = Flask(__name__)
 socketio = SocketIO(app,
                    async_mode='threading',
@@ -25,7 +24,7 @@ socketio = SocketIO(app,
                    ping_timeout=60,
                    max_http_buffer_size=50*1024*1024)
 
-# Конфигурации камер
+
 camera_configs = {
     'low': {'size': (640, 480), 'fps': 30},
     'medium': {'size': (1296, 972), 'fps': 20},
@@ -38,7 +37,7 @@ stream_active = False
 class RobotAPI:
     def __init__(self, position, orientation):
         self.ser = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
-        self.ser.flush()  # очищаем буфер
+        self.ser.flush()
 
         if max(position) > 15:
             raise ValueError("Robot is out of borders!", position)
