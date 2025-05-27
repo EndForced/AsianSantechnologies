@@ -109,8 +109,8 @@ class RobotAPI:
                 )
 
                 self.frames = {1:primary_frame, 2: secondary_frame}
-                # if save_in_folder: cv2.imwrite("frame_1.png", primary_frame)
-                # if save_in_folder: cv2.imwrite("frame_2.png", secondary_frame)
+                if save_in_folder: cv2.imwrite("frame_1.png", primary_frame)
+                if save_in_folder: cv2.imwrite("frame_2.png", secondary_frame)
 
                 return primary_frame, secondary_frame
 
@@ -126,8 +126,8 @@ class RobotAPI:
             print(f"Error receiving frames: {e}")
             return None, None
 
-        finally:
-            conn.close()
+        # finally:
+            # conn.close()
 
 class CameraClient:
     def __init__(self, sock, logg):
