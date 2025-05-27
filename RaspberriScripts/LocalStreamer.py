@@ -205,7 +205,7 @@ class DualCameraServer:
                     elif conn_type == "UNCOMPRESSED_API":
                         logger.info("Starting robot's API")
                         threading.Thread(
-                            target=self.command_handler,  # Без скобок!
+                            target=self.get_uncompressed,  # Без скобок!
                             args=(conn,),
                             daemon=True
                         ).start()
