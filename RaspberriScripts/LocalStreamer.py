@@ -141,30 +141,37 @@ class DualCameraServer:
                 while True:
                     conn, addr = s.accept()
                     conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                    logger.info(f"Client connected: {addr} waiting for connection type")
+                    logger.info(f"Client connected: {addr}, waiting for connection type")
 
-                    conn_type = ""
+                    conn_type = b""
                     while not conn_type:
                         conn_type = conn.recv(1024)
-                    conn_type = str(conn_type)
-                    conn_type = conn_type[1::]
-                    conn_type = conn_type.replace("'","")
 
-                    logger.info(f"Connection type {conn_type}")
+                    conn_type = conn_type.decode().strip().replace("'", "")
+                    logger.info(f"Connection type: {conn_type}")
 
                     if conn_type == "WEBSITE_STREAMING":
-                        logger.info(f"Starting website stream...")
-                        threading.Thread(target=self.handle_stream, args=(conn,)).start()
+                        logger.info("Starting website stream...")
+                        threading.Thread(
+                            target=self.handle_stream,
+                            args=(conn,),
+                            daemon=True  # Поток завершится при завершении main-потока
+                        ).start()
 
                     elif conn_type == "UNCOMPRESSED_API":
-                        logger.info(f"Starting robot's API")
-                        threading.Thread(target=self.command_handler(), args=(conn,)).start()
+                        logger.info("Starting robot's API")
+                        threading.Thread(
+                            target=self.command_handler,  # Без скобок!
+                            args=(conn,),
+                            daemon=True
+                        ).start()
 
+                    # Не сохраняем conn в self.conn, иначе блокируем новые соединения
+                    # self.stream_active можно использовать для контроля состояния
 
-
-                    self.conn = conn  # Сохраняем соединение
-                    self.stream_active = True
-
+        except Exception as e:
+            logger.error(f"Error in start(): {e}")
+            raise
 
 
 
