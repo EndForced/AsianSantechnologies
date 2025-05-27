@@ -72,7 +72,7 @@ def get_uncompressed_frames():
 
 
 frames = get_uncompressed_frames()
-if frames[0]:
+if list(frames[0]):
     cv2.imwrite("No_way.png",frames[0])
     print("Written!")
 
