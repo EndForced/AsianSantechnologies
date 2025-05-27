@@ -170,7 +170,7 @@ class WebsiteHolder:
 
         # Инициализация робота и клиента камеры (предполагается, что классы определены)
         self.robot = RobotAPI((0, 0), 1, uart_port, self.socketio)
-        self.camera_client = CameraClient()
+        self.camera_client = CameraClient(self.socketio)
 
         # Установка маршрутов и обработчиков SocketIO
         self._set_routes()
