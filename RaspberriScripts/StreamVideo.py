@@ -234,6 +234,7 @@ class WebsiteHolder:
 
     def start_website(self):
         self.__set_routes()
+        self.__set_socketio_handlers()
         self.socketio.run(self.app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
 
 
