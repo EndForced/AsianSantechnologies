@@ -6,7 +6,7 @@ import time
 
 def get_single_uncompressed_frame(camera_id=1):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('localhost', 65432))
+        s.connect(('localhost', 48531))
         s.sendall(b"UNCOMPRESSED_API")
         time.sleep(0.05)
 
