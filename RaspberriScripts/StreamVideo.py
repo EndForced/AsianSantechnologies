@@ -15,7 +15,7 @@ serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
 class RobotAPI:
     #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
 
-    def __init__(self, position, orientation, serial, socketio = None):
+    def __init__(self, position, orientation, serial, socketio = None, client_sock = None):
         self.ser = serial
         self.ser.flush()
         self.socket = socketio
@@ -31,6 +31,7 @@ class RobotAPI:
         self.ESPMessage = self.read()
         self.IsDoingAction = 0
         self.frames = {}
+        self.client_socket = client_sock
 
     @staticmethod
     def recvall(conn, n):
@@ -72,8 +73,8 @@ class RobotAPI:
                 })
 
     def get_uncompressed_frames(self, save_in_folder = False):
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        conn.connect(('localhost', 65432))
+        conn = self.client_socket
+        # conn.connect(('localhost', 65432))
         conn.sendall(b"UNCOMPRESSED_API")
         time.sleep(0.1)
 
@@ -124,6 +125,9 @@ class RobotAPI:
         except Exception as e:
             print(f"Error receiving frames: {e}")
             return None, None
+
+        finally:
+            conn.close()
 
 class CameraClient:
     def __init__(self, sock, logg):
@@ -216,12 +220,14 @@ class WebsiteHolder:
         self.stream_active = False
 
         # Инициализация робота и клиента камеры (предполагается, что классы определены)
-        self.robot = RobotAPI((0, 0), 1, uart_port, self.socketio)
         self.camera_client = CameraClient(self.socketio, self.logger)
+        self.robot = RobotAPI((0, 0), 1, uart_port, self.socketio, self.camera_client.client_socket)
+
 
         # Установка маршрутов и обработчиков SocketIO
         self._set_routes()
         self._set_socketio_handlers()
+
 
     def _set_routes(self):
         @self.app.route('/')
