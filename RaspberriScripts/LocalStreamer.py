@@ -114,18 +114,16 @@ class DualCameraServer:
                 while True:
                     conn, addr = s.accept()
                     conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-                    logger.info(f"Client connected: {addr}")
+                    logger.info(f"Client connected: {addr}", " waiting for connection type")
+
+                    while not conn_type:
+                        conn_type = conn.recv(1024)
+                    logger.info(f"Connection type {conn_type}")
+
 
                     self.conn = conn  # Сохраняем соединение
                     self.stream_active = True
 
-                    # Запускаем обработчик команд в отдельном потоке
-                    command_thread = threading.Thread(
-                        target=self.command_handler,
-                        args=(conn,),
-                        daemon=True
-                    )
-                    command_thread.start()
 
                     try:
                         while self.stream_active:

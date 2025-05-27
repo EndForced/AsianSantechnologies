@@ -168,6 +168,9 @@ class CameraClient:
             self.client_socket.connect(('localhost', 65432))
             with self.lock:
                 self.stream_active = True
+
+
+            self.client_socket.sendall(b"WEBSITE_STREAMING")
             logger.info("Connected to dual camera server")
 
             while self.stream_active:
