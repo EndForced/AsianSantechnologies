@@ -8,7 +8,7 @@ def get_uncompressed_frames():
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn.connect(('localhost', 65432))
         conn.sendall(b"UNCOMPRESSED_API")
-        time.sleep(0.05)
+        time.sleep(0.1)
 
         try:
             # Получаем данные
@@ -55,3 +55,6 @@ def get_uncompressed_frames():
 frames = get_uncompressed_frames()
 if frames[0]:
     print("LETS GO")
+
+else:
+    print("((")

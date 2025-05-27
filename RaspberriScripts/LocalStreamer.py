@@ -126,7 +126,9 @@ class DualCameraServer:
                     command = data.decode('utf-8').strip()
                     logger.info(f"Received command: {command}")
                     if command == "GET_UNCOMPRESSED":
+                        logger.info("getting uncompressed...")
                         self.get_uncompressed(conn)
+
                     elif command == "STOP":
                         self.stream_active = False
                 elif not data:  # Клиент отключился
