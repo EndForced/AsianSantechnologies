@@ -126,8 +126,8 @@ class RobotAPI:
             print(f"Error receiving frames: {e}")
             return None, None
 
-        # finally:
-            # conn.close()
+        finally:
+            conn.close()
 
 class CameraClient:
     def __init__(self, sock, logg):
@@ -297,10 +297,12 @@ class WebsiteHolder:
         self.socketio.run(self.app, host='0.0.0.0', port=5000, debug=True, use_reloader=False,
                           allow_unsafe_werkzeug=True)
 
+if __name__ == "__main__":
+    s = WebsiteHolder(serial)
+    s.start_website()
 
-s = WebsiteHolder(serial)
-s.start_website()
-time.sleep(5)
-print("saving")
-s.robot.get_uncompressed_frames(1)
-time.sleep(100)
+    while 1:
+        time.sleep(5)
+        print("saving")
+        s.robot.get_uncompressed_frames(1)
+        time.sleep(100)
