@@ -35,9 +35,10 @@ current_quality = 'medium'
 stream_active = False
 
 class RobotAPI:
-    def __init__(self, position, orientation, serial):
+    def __init__(self, position, orientation, serial, socketio):
         self.ser = serial
         self.ser.flush()
+        self.socket = socketio
 
         if max(position) > 15:
             raise ValueError("Robot is out of borders!", position)
@@ -71,7 +72,7 @@ class RobotAPI:
             self.send(args)
             while not res:
                 res = self.read()
-            socketio.emit('uart_message', {
+            self.socket.emit('uart_message', {
                 'message': res,
                 'type': 'received'
             })
@@ -172,7 +173,7 @@ class WebsiteHolder:
         self.stream_active = False
 
         # Инициализация робота и клиента камеры (предполагается, что классы определены)
-        self.robot = RobotAPI((0, 0), 1, uart_port)
+        self.robot = RobotAPI((0, 0), 1, uart_port, self.socketio)
         self.camera_client = CameraClient()
 
         # Установка маршрутов и обработчиков SocketIO
