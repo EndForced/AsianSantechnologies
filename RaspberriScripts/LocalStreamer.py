@@ -99,6 +99,34 @@ class DualCameraServer:
                 logger.error(f"Command handler error: {e}")
                 break
 
+    def handle_stream(self, connection):
+        try:
+            while 1:
+                # Основной поток только отправляет видео
+                primary_frame = self.picam2_primary.capture_array("main")
+                secondary_frame = self.picam2_secondary.capture_array("main")
+
+                primary_buffer, _ = self.process_frame(primary_frame, 1)
+                secondary_buffer, _ = self.process_frame(secondary_frame, 2)
+
+                data = {
+                    'camera1': primary_buffer,
+                    'camera2': secondary_buffer
+                }
+
+                serialized_data = pickle.dumps(data)
+                try:
+                    connection.sendall(len(serialized_data).to_bytes(4, 'big'))
+                    connection.sendall(serialized_data)
+                except (ConnectionResetError, BrokenPipeError):
+                    logger.warning("Client disconnected during streaming")
+                    break
+
+        finally:
+            connection.close()
+            self.stream_active = False
+            logger.info("Connection closed")
+
     def start(self):
         try:
             self.picam2_primary.start()
@@ -127,6 +155,7 @@ class DualCameraServer:
 
                     if conn_type == "WEBSITE_STREAMING":
                         logger.info(f"Starting website stream...")
+                        threading.Thread(target=self.handle_stream, args=(conn,)).start()
 
 
 
@@ -134,32 +163,7 @@ class DualCameraServer:
                     self.stream_active = True
 
 
-                    try:
-                        while self.stream_active:
-                            # Основной поток только отправляет видео
-                            primary_frame = self.picam2_primary.capture_array("main")
-                            secondary_frame = self.picam2_secondary.capture_array("main")
 
-                            primary_buffer, _ = self.process_frame(primary_frame, 1)
-                            secondary_buffer, _ = self.process_frame(secondary_frame, 2)
-
-                            data = {
-                                'camera1': primary_buffer,
-                                'camera2': secondary_buffer
-                            }
-
-                            serialized_data = pickle.dumps(data)
-                            try:
-                                conn.sendall(len(serialized_data).to_bytes(4, 'big'))
-                                conn.sendall(serialized_data)
-                            except (ConnectionResetError, BrokenPipeError):
-                                logger.warning("Client disconnected during streaming")
-                                break
-
-                    finally:
-                        conn.close()
-                        self.stream_active = False
-                        logger.info("Connection closed")
 
         except Exception as e:
             logger.error(f"Error: {str(e)}", exc_info=True)
