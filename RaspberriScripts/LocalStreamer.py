@@ -1,7 +1,8 @@
+"Стримит картинку с камер в пределах распберри по запросу. Есть 2 режима"
+
 from picamera2 import Picamera2
 import socket
 import pickle
-import time
 import cv2
 import threading
 import logging
@@ -12,15 +13,13 @@ logger = logging.getLogger(__name__)
 
 class DualCameraServer:
     def __init__(self):
-        # Инициализация двух камер
-        self.picam2_primary = Picamera2(0)  # Основная камера
-        self.picam2_secondary = Picamera2(1)  # Вторая камера
+        self.picam2_primary = Picamera2(0)
+        self.picam2_secondary = Picamera2(1)
         self.stream_active = False
         self.conn = None
         self.lock = threading.Lock()
         self.quality = 15
 
-        # Конфигурация для основной камеры
         self.primary_config = self.picam2_primary.create_video_configuration(
             main={
                 "size": (1920, 1080),
@@ -34,7 +33,6 @@ class DualCameraServer:
             buffer_count=6
         )
 
-        # Конфигурация для второй камеры (может отличаться)
         self.secondary_config = self.picam2_secondary.create_video_configuration(
             main={
                 "size": (1920, 1080),
@@ -52,8 +50,6 @@ class DualCameraServer:
         self.picam2_secondary.configure(self.secondary_config)
 
     def process_frame(self, frame, camera_id):
-        """Обработка кадра с указанием камеры"""
-        # Здесь можно добавить специфичную обработку для каждой камеры
         _, buffer = cv2.imencode(
             '.jpg',
             frame,
@@ -66,15 +62,12 @@ class DualCameraServer:
 
     def get_uncompressed(self, conn):
         try:
-            # Получаем несжатые кадры с обеих камер
             primary_frame = self.picam2_primary.capture_array("main")
             secondary_frame = self.picam2_secondary.capture_array("main")
 
-            # Конвертируем кадры в байты без сжатия
             primary_bytes = primary_frame.tobytes()
             secondary_bytes = secondary_frame.tobytes()
 
-            # Формируем данные для отправки
             data = {
                 'type': 'uncompressed_dual',
                 'camera1': {
@@ -93,10 +86,7 @@ class DualCameraServer:
                 }
             }
 
-            # Отправляем подтверждение
-            # conn.sendall(b"accepted")
 
-            # Сериализуем и отправляем данные
             serialized_data = pickle.dumps(data)
             conn.sendall(len(serialized_data).to_bytes(4, 'big'))
             conn.sendall(serialized_data)
@@ -105,7 +95,6 @@ class DualCameraServer:
 
         except Exception as e:
             logger.error(f"Error in get_uncompressed: {e}")
-            # Попытка отправить сообщение об ошибке клиенту
             try:
                 error_data = {
                     'type': 'error',
@@ -120,8 +109,8 @@ class DualCameraServer:
     def command_handler(self, conn):
         #eto dead code
 
-        conn.settimeout(0.2)  # Ждём данные не больше 0.5 сек
-        while self.stream_active:  # Вместо while 1
+        conn.settimeout(0.2)
+        while self.stream_active:
             try:
                 data = conn.recv(1024)
                 if data:
@@ -133,10 +122,10 @@ class DualCameraServer:
 
                     elif command == "STOP":
                         self.stream_active = False
-                elif not data:  # Клиент отключился
+                elif not data:
                     break
             except socket.timeout:
-                continue  # Продолжаем цикл, если нет данных
+                continue
             except (ConnectionResetError, BrokenPipeError):
                 logger.warning("Client disconnected in command handler")
                 break
@@ -147,7 +136,6 @@ class DualCameraServer:
     def handle_stream(self, connection):
         try:
             while 1:
-                # Основной поток только отправляет видео
                 primary_frame = self.picam2_primary.capture_array("main")
                 secondary_frame = self.picam2_secondary.capture_array("main")
 
@@ -201,19 +189,17 @@ class DualCameraServer:
                         threading.Thread(
                             target=self.handle_stream,
                             args=(conn,),
-                            daemon=True  # Поток завершится при завершении main-потока
+                            daemon=True
                         ).start()
 
                     elif conn_type == "UNCOMPRESSED_API":
-                        logger.info("Starting robot's API")
+                        logger.info("Starting robot's API...")
                         threading.Thread(
-                            target=self.get_uncompressed,  # Без скобок!
+                            target=self.get_uncompressed,
                             args=(conn,),
                             daemon=True
                         ).start()
 
-                    # Не сохраняем conn в self.conn, иначе блокируем новые соединения
-                    # self.stream_active можно использовать для контроля состояния
 
         except Exception as e:
             logger.error(f"Error in start(): {e}")
