@@ -281,6 +281,13 @@ class WebsiteHolder:
                     self.camera_client.stream_active = False
 
     def start_website(self):
+
+        server_thread = threading.Thread(target=self._run_server)
+        server_thread.daemon = True
+        server_thread.start()
+
+    def _run_server(self):
+        #я больше никогда не буду тыкать сокеты
         self.socketio.run(self.app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
 
 
