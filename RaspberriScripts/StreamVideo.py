@@ -294,9 +294,8 @@ class WebsiteHolder:
 
     def _run_server(self):
         #я больше никогда не буду тыкать сокеты
-        def _run_server(self):
-            self.socketio.run(self.app, host='0.0.0.0', port=5000, debug=True, use_reloader=False,
-                              allow_unsafe_werkzeug=True)
+        self.socketio.run(self.app, host='0.0.0.0', port=5000, debug=True, use_reloader=False,
+                          allow_unsafe_werkzeug=True)
 
 
 s = WebsiteHolder(serial)
