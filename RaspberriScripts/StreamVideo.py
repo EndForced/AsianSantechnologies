@@ -108,8 +108,8 @@ class RobotAPI:
                 )
 
                 self.frames = {1:primary_frame, 2: secondary_frame}
-                if save_in_folder: cv2.imwrite("frame_1.png", primary_frame)
-                if save_in_folder: cv2.imwrite("frame_2.png", secondary_frame)
+                # if save_in_folder: cv2.imwrite("frame_1.png", primary_frame)
+                # if save_in_folder: cv2.imwrite("frame_2.png", secondary_frame)
 
                 return primary_frame, secondary_frame
 
