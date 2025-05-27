@@ -89,7 +89,7 @@ from flask_socketio import SocketIO
 
 
 class Website:
-    def __init__(self):
+    def __init__(self, port):
         self.app = Flask(__name__)
         self.socketio = SocketIO(self.app,
                                  async_mode='threading',
@@ -98,7 +98,7 @@ class Website:
                                  max_http_buffer_size=50 * 1024 * 1024)
 
         self.camera_client = CameraClient()
-        self.robot = RobotAPI((0, 0), 1)
+        self.robot = RobotAPI((0, 0), 1, port)
         self.server_thread = None
         self.running = False
 
@@ -262,7 +262,7 @@ class CameraClient:
 
 # Пример использования
 if __name__ == "__main__":
-    website = Website()
+    website = Website(serial)
     website.start()
 
     try:
