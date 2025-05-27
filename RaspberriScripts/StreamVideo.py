@@ -6,16 +6,15 @@ import pickle
 import threading
 import logging
 import base64
-import cv2
 import numpy as np
-import sys
-import os
 import time
-import struct
+import cv2
 
 serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
 
 class RobotAPI:
+    #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
+
     def __init__(self, position, orientation, serial, socketio = None):
         self.ser = serial
         self.ser.flush()
@@ -31,6 +30,19 @@ class RobotAPI:
 
         self.ESPMessage = self.read()
         self.IsDoingAction = 0
+        self.frames = {}
+
+    @staticmethod
+    def recvall(conn, n):
+        #крутая читалка для стабильности
+        data = bytearray()
+        while len(data) < n:
+            packet = conn.recv(n - len(data))
+            if not packet:
+                # Соединение закрыто или ошибка
+                return None
+            data.extend(packet)
+        return data
 
     def send(self, data):
         data_to_send = data + "\n"
@@ -38,7 +50,6 @@ class RobotAPI:
 
     def read(self):
         line = self.ser.readline().decode('utf-8').strip()
-        print(line)
         if line is not None:
             lines = line.split("*")
             return lines
@@ -59,6 +70,60 @@ class RobotAPI:
                     'message': res,
                     'type': 'received'
                 })
+
+    def get_uncompressed_frames(self, save_in_folder = False):
+        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        conn.connect(('localhost', 65432))
+        conn.sendall(b"UNCOMPRESSED_API")
+        time.sleep(0.1)
+
+        try:
+            length_bytes = self.recvall(conn, 4)
+            if not length_bytes:
+                return None, None
+
+            length = int.from_bytes(length_bytes, 'big')
+
+            data = self.recvall(conn, length)
+            if not data:
+                return None, None
+
+            frame_data = pickle.loads(data)
+
+            if frame_data.get('type') == 'uncompressed_dual':
+                cam1_info = frame_data['camera1']
+                primary_frame = np.frombuffer(
+                    cam1_info['data'],
+                    dtype=np.dtype(cam1_info['dtype'])
+                ).reshape(
+                    (cam1_info['height'], cam1_info['width'], cam1_info['channels'])
+                )
+
+                cam2_info = frame_data['camera2']
+                secondary_frame = np.frombuffer(
+                    cam2_info['data'],
+                    dtype=np.dtype(cam2_info['dtype'])
+                ).reshape(
+                    (cam2_info['height'], cam2_info['width'], cam2_info['channels'])
+                )
+
+                self.frames = {1:primary_frame, 2: secondary_frame}
+                if save_in_folder: cv2.imwrite("frame 1", primary_frame)
+                if save_in_folder: cv2.imwrite("frame 2", secondary_frame)
+
+                return primary_frame, secondary_frame
+
+            elif frame_data.get('type') == 'error':
+                print(f"Server error: {frame_data['message']}")
+                return None, None
+
+            else:
+                print("Unknown data type received")
+                return None, None
+
+        except Exception as e:
+            print(f"Error receiving frames: {e}")
+            return None, None
 
 class CameraClient:
     def __init__(self, sock, logg):
@@ -221,3 +286,5 @@ class WebsiteHolder:
 
 s = WebsiteHolder(serial)
 s.start_website()
+time.sleep(20)
+s.robot.get_uncompressed_frames(1)
