@@ -1,3 +1,5 @@
+'''Это самый непонятный файл тут. Низкоуровневая работа с сокетами и обмен данными с LocalStreamer'''
+
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import serial
@@ -10,12 +12,10 @@ import numpy as np
 import time
 import cv2
 
-serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
-
 class RobotAPI:
     #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
 
-    def __init__(self, position, orientation, serial, socketio = None, client_sock = None):
+    def __init__(self, position, orientation, serial, socketio = None):
         self.ser = serial
         self.ser.flush()
         self.socket = socketio
@@ -31,7 +31,6 @@ class RobotAPI:
         self.ESPMessage = self.read()
         self.IsDoingAction = 0
         self.frames = {}
-        self.client_socket = client_sock
 
     @staticmethod
     def recvall(conn, n):
@@ -72,7 +71,7 @@ class RobotAPI:
                     'type': 'received'
                 })
 
-    def get_uncompressed_frames(self, save_in_folder = False):
+    def get_uncompressed_frames(self, save_as_file = False):
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn.connect(('localhost', 65432))
         conn.sendall(b"UNCOMPRESSED_API")
@@ -109,8 +108,8 @@ class RobotAPI:
                 )
 
                 self.frames = {1:primary_frame, 2: secondary_frame}
-                if save_in_folder: cv2.imwrite("frame_1.png", primary_frame)
-                if save_in_folder: cv2.imwrite("frame_2.png", secondary_frame)
+                if save_as_file: cv2.imwrite("frame_1.png", primary_frame)
+                if save_as_file: cv2.imwrite("frame_2.png", secondary_frame)
 
                 return primary_frame, secondary_frame
 
@@ -219,9 +218,9 @@ class WebsiteHolder:
         self.current_quality = 'medium'
         self.stream_active = False
 
-        # Инициализация робота и клиента камеры (предполагается, что классы определены)
+
         self.camera_client = CameraClient(self.socketio, self.logger)
-        self.robot = RobotAPI((0, 0), 1, uart_port, self.socketio, self.camera_client.client_socket)
+        self.robot = RobotAPI((0, 0), 1, uart_port, self.socketio)
 
 
         # Установка маршрутов и обработчиков SocketIO
@@ -298,6 +297,7 @@ class WebsiteHolder:
                           allow_unsafe_werkzeug=True)
 
 if __name__ == "__main__":
+    serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
     s = WebsiteHolder(serial)
     s.start_website()
 
