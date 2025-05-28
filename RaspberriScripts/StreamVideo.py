@@ -307,6 +307,6 @@ if __name__ == "__main__":
 
     while 1:
         time.sleep(5)
-        print("saving")
+        # print("saving")
         s.robot.get_uncompressed_frames(1)
         # time.sleep(100)
