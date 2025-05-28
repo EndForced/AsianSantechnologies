@@ -28,7 +28,7 @@
 
         .dashboard {
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-columns: 1fr 2fr;
             grid-template-rows: auto 1fr;
             gap: 20px;
             padding: 20px;
@@ -37,7 +37,7 @@
         }
 
         .header {
-            grid-column: 1 / 4;
+            grid-column: 1 / 3;
             background: linear-gradient(135deg, #2c3e50, #4a6491);
             padding: 15px;
             border-radius: 10px;
@@ -61,12 +61,8 @@
             flex-direction: column;
         }
 
-        .visualization {
+        .map-panel {
             position: relative;
-            overflow: hidden;
-        }
-
-        .status-panel {
             display: flex;
             flex-direction: column;
         }
@@ -181,26 +177,131 @@
             background: var(--success);
         }
 
-        .robot-visual {
-            position: relative;
-            width: 100%;
-            height: 300px;
+        .gripper-control {
+            margin-top: 20px;
+            padding: 15px;
             background: rgba(30, 30, 30, 0.7);
             border-radius: 10px;
-            margin-bottom: 20px;
+        }
+
+        .gripper-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .gripper-btn {
+            width: 48%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gripper-open {
+            background: var(--success);
+        }
+
+        .gripper-close {
+            background: var(--danger);
+        }
+
+        .gripper-btn:hover {
+            opacity: 0.9;
+        }
+
+        .gripper-status {
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .map-container {
+            flex-grow: 1;
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            position: relative;
             overflow: hidden;
         }
 
-        .robot-model {
-            position: absolute;
-            width: 100px;
-            height: 150px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150"><rect x="20" y="30" width="60" height="90" fill="%234a6491" rx="5"/><circle cx="30" cy="120" r="15" fill="%232c3e50"/><circle cx="70" cy="120" r="15" fill="%232c3e50"/><rect x="35" y="10" width="30" height="20" fill="%23d81b60" rx="3"/></svg>') no-repeat center;
-            background-size: contain;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.5s ease;
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-cell {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .map-cell:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .map-cell.obstacle {
+            background-color: #f44336;
+        }
+
+        .map-cell.target {
+            background-color: #4CAF50;
+        }
+
+        .map-cell.start {
+            background-color: #2196F3;
+        }
+
+        .map-cell.path {
+            background-color: #FFC107;
+        }
+
+        .map-cell.robot {
+            background-color: #9C27B0;
+        }
+
+        .map-tools {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .map-tool-btn {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(60, 60, 60, 0.7);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .map-tool-btn:hover {
+            background: rgba(90, 90, 90, 0.7);
+        }
+
+        .map-tool-btn.active {
+            background: var(--primary);
+        }
+
+        .footer {
+            grid-column: 1 / 3;
+            text-align: center;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+
+        /* Анимации */
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
         }
 
         .gear {
@@ -210,118 +311,9 @@
             animation: spin 10s linear infinite;
         }
 
-        .gear.small {
-            font-size: 20px;
-            animation: spin-reverse 8s linear infinite;
-        }
-
-        .gear.large {
-            font-size: 60px;
-            animation: spin 15s linear infinite;
-        }
-
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
-        }
-
-        @keyframes spin-reverse {
-            from { transform: rotate(360deg); }
-            to { transform: rotate(0deg); }
-        }
-
-        .circuit {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0.1;
-            background-image:
-                linear-gradient(to right, #fff 1px, transparent 1px),
-                linear-gradient(to bottom, #fff 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .status-value {
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .battery {
-            height: 20px;
-            background: rgba(70, 70, 70, 0.7);
-            border-radius: 10px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-
-        .battery-level {
-            height: 100%;
-            background: linear-gradient(to right, #4CAF50, #8BC34A);
-            width: 75%;
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-
-        .sensor-data {
-            margin-top: 20px;
-        }
-
-        .sensor-row {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-        .sensor-name {
-            flex: 1;
-        }
-
-        .sensor-value {
-            flex: 1;
-            text-align: right;
-            font-family: monospace;
-        }
-
-        .footer {
-            grid-column: 1 / 4;
-            text-align: center;
-            padding: 15px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-        }
-
-        /* Анимации для схемы */
-        .wire {
-            position: absolute;
-            height: 2px;
-            background: rgba(216, 27, 96, 0.5);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.3; }
-            50% { opacity: 1; }
-            100% { opacity: 0.3; }
-        }
-
-        .connection-node {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            animation: glow 1.5s infinite alternate;
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 0 5px var(--primary); }
-            to { box-shadow: 0 0 15px var(--primary); }
         }
     </style>
 </head>
@@ -338,15 +330,10 @@
             <h2><i class="fas fa-gamepad"></i> Управление</h2>
 
             <div class="joystick-area">
-                <div class="circuit"></div>
                 <div class="joystick">
                     <div class="joystick-handle" id="joystickHandle"></div>
                 </div>
-
-                <!-- Шестеренки фона -->
                 <i class="fas fa-cog gear" style="top: 20px; left: 30px;"></i>
-                <i class="fas fa-cog gear small" style="bottom: 40px; right: 30px;"></i>
-                <i class="fas fa-cog gear large" style="top: 70px; right: 20px;"></i>
             </div>
 
             <div class="control-grid">
@@ -385,78 +372,46 @@
                     <span>Быстро</span>
                 </div>
             </div>
-        </div>
 
-        <div class="panel visualization">
-            <h2><i class="fas fa-eye"></i> Визуализация</h2>
-
-            <div class="robot-visual">
-                <div class="circuit"></div>
-                <div class="robot-model" id="robotModel"></div>
-
-                <!-- Элементы электрической схемы -->
-                <div class="wire" style="width: 100px; top: 50px; left: 30px; transform: rotate(30deg);"></div>
-                <div class="wire" style="width: 80px; bottom: 70px; right: 40px; transform: rotate(-15deg);"></div>
-                <div class="connection-node" style="top: 60px; left: 40px;"></div>
-                <div class="connection-node" style="bottom: 80px; right: 50px;"></div>
-
-                <!-- Шестеренки -->
-                <i class="fas fa-cog gear" style="bottom: 30px; left: 30px;"></i>
-                <i class="fas fa-cog gear small" style="top: 40px; right: 40px;"></i>
-            </div>
-
-            <div class="camera-feed">
-                <h3><i class="fas fa-video"></i> Камера робота</h3>
-                <div style="background: #000; border-radius: 5px; height: 150px; display: flex; justify-content: center; align-items: center;">
-                    <img id="cameraFeed" src="" style="max-width: 100%; max-height: 100%; display: none;">
-                    <span id="cameraStatus">Камера отключена</span>
+            <div class="gripper-control">
+                <h3><i class="fas fa-grip-vertical"></i> Управление захватом</h3>
+                <div class="gripper-buttons">
+                    <button class="gripper-btn gripper-open" id="btnGripperOpen">
+                        <i class="fas fa-hand-paper"></i> Открыть
+                    </button>
+                    <button class="gripper-btn gripper-close" id="btnGripperClose">
+                        <i class="fas fa-hand-rock"></i> Закрыть
+                    </button>
+                </div>
+                <div class="gripper-status" id="gripperStatus">
+                    Состояние: закрыт
                 </div>
             </div>
         </div>
 
-        <div class="panel status-panel">
-            <h2><i class="fas fa-chart-line"></i> Статус</h2>
+        <div class="panel map-panel">
+            <h2><i class="fas fa-map"></i> Карта поля</h2>
 
-            <div class="status-item">
-                <span><i class="fas fa-battery-three-quarters"></i> Заряд батареи:</span>
-                <span class="status-value">75%</span>
-            </div>
-            <div class="battery">
-                <div class="battery-level" id="batteryLevel"></div>
+            <div class="map-container">
+                <div class="map-grid" id="mapGrid"></div>
             </div>
 
-            <div class="status-item">
-                <span><i class="fas fa-microchip"></i> CPU:</span>
-                <span class="status-value">42°C</span>
-            </div>
-
-            <div class="status-item">
-                <span><i class="fas fa-network-wired"></i> Сигнал:</span>
-                <span class="status-value">Хороший</span>
-            </div>
-
-            <div class="sensor-data">
-                <h3><i class="fas fa-sensor"></i> Датчики</h3>
-
-                <div class="sensor-row">
-                    <div class="sensor-name">Лидар:</div>
-                    <div class="sensor-value" id="lidarValue">2.5m</div>
-                </div>
-
-                <div class="sensor-row">
-                    <div class="sensor-name">Гироскоп:</div>
-                    <div class="sensor-value" id="gyroValue">0.12 rad/s</div>
-                </div>
-
-                <div class="sensor-row">
-                    <div class="sensor-name">Акселерометр:</div>
-                    <div class="sensor-value" id="accelValue">0.98g</div>
-                </div>
-
-                <div class="sensor-row">
-                    <div class="sensor-name">Ультразвук:</div>
-                    <div class="sensor-value" id="sonarValue">1.2m</div>
-                </div>
+            <div class="map-tools">
+                <button class="map-tool-btn active" id="btnSelect" data-mode="select">
+                    <i class="fas fa-mouse-pointer"></i> Выбрать
+                </button>
+                <button class="map-tool-btn" id="btnObstacle" data-mode="obstacle">
+                    <i class="fas fa-ban"></i> Препятствие
+                </button>
+                <button class="map-tool-btn" id="btnTarget" data-mode="target">
+                    <i class="fas fa-bullseye"></i> Цель
+                </button>
+                <button class="map-tool-btn" id="btnStart" data-mode="start">
+                    <i class="fas fa-flag"></i> Старт
+                </button>
+                <button class="map-tool-btn" id="btnClear">
+                    <i class="fas fa-trash"></i> Очистить
+                </button>
             </div>
         </div>
 
@@ -472,27 +427,84 @@
         // Элементы управления
         const joystickHandle = document.getElementById('joystickHandle');
         const joystick = document.querySelector('.joystick');
-        const robotModel = document.getElementById('robotModel');
         const speedSlider = document.getElementById('speedSlider');
         const speedValue = document.getElementById('speedValue');
-        const batteryLevel = document.getElementById('batteryLevel');
-        const cameraFeed = document.getElementById('cameraFeed');
-        const cameraStatus = document.getElementById('cameraStatus');
+        const gripperStatus = document.getElementById('gripperStatus');
+        const mapGrid = document.getElementById('mapGrid');
 
         // Переменные состояния
         let isDragging = false;
         let joystickPos = { x: 0, y: 0 };
-        let maxDistance = 50; // Максимальное расстояние от центра
+        let maxDistance = 50;
+        let currentMapMode = 'select';
+        let gripperState = 'closed';
+        let robotPosition = { x: 7, y: 5 }; // Начальная позиция робота
 
-        // Обновление значений датчиков
-        function updateSensors() {
-            document.getElementById('lidarValue').textContent = (Math.random() * 3).toFixed(2) + 'm';
-            document.getElementById('gyroValue').textContent = (Math.random() * 0.5).toFixed(2) + ' rad/s';
-            document.getElementById('accelValue').textContent = (0.8 + Math.random() * 0.4).toFixed(2) + 'g';
-            document.getElementById('sonarValue').textContent = (0.5 + Math.random() * 2).toFixed(2) + 'm';
+        // Инициализация карты
+        function initMap() {
+            mapGrid.innerHTML = '';
 
-            // Обновление каждые 500мс
-            setTimeout(updateSensors, 500);
+            // Создаем 10x15 сетку
+            for (let y = 0; y < 10; y++) {
+                for (let x = 0; x < 15; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'map-cell';
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+
+                    // Помечаем стартовую позицию робота
+                    if (x === robotPosition.x && y === robotPosition.y) {
+                        cell.classList.add('robot');
+                    }
+
+                    cell.addEventListener('click', handleMapClick);
+                    mapGrid.appendChild(cell);
+                }
+            }
+        }
+
+        // Обработчик кликов по карте
+        function handleMapClick(e) {
+            const cell = e.target;
+            const x = parseInt(cell.dataset.x);
+            const y = parseInt(cell.dataset.y);
+
+            // Очищаем предыдущие классы, если не в режиме выбора
+            if (currentMapMode !== 'select') {
+                cell.className = 'map-cell';
+            }
+
+            switch (currentMapMode) {
+                case 'select':
+                    // Отправляем команду движения к выбранной клетке
+                    socket.emit('robot_command', {
+                        type: 'move_to',
+                        x: x,
+                        y: y
+                    });
+                    break;
+
+                case 'obstacle':
+                    cell.classList.add('obstacle');
+                    break;
+
+                case 'target':
+                    // Удаляем предыдущую цель
+                    document.querySelectorAll('.target').forEach(el => {
+                        el.classList.remove('target');
+                    });
+                    cell.classList.add('target');
+                    break;
+
+                case 'start':
+                    // Обновляем позицию робота
+                    document.querySelectorAll('.robot').forEach(el => {
+                        el.classList.remove('robot');
+                    });
+                    cell.classList.add('robot');
+                    robotPosition = { x: x, y: y };
+                    break;
+            }
         }
 
         // Обработчик джойстика
@@ -525,22 +537,17 @@
                 clientY = e.touches[0].clientY;
             }
 
-            // Вычисляем расстояние от центра
             let deltaX = clientX - centerX;
             let deltaY = clientY - centerY;
             const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-            // Ограничиваем расстояние
             if (distance > maxDistance) {
                 deltaX = (deltaX / distance) * maxDistance;
                 deltaY = (deltaY / distance) * maxDistance;
             }
 
-            // Обновляем позицию джойстика
             joystickHandle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px)`;
             joystickPos = { x: deltaX / maxDistance, y: deltaY / maxDistance };
-
-            // Отправляем команду роботу
             sendJoystickCommand();
         }
 
@@ -548,8 +555,6 @@
             isDragging = false;
             joystickHandle.style.transform = 'translate(-50%, -50%)';
             joystickPos = { x: 0, y: 0 };
-
-            // Отправляем команду остановки
             sendJoystickCommand();
 
             document.removeEventListener('mousemove', drag);
@@ -563,18 +568,28 @@
             const command = {
                 type: 'joystick',
                 x: joystickPos.x,
-                y: -joystickPos.y, // Инвертируем Y для интуитивного управления
+                y: -joystickPos.y,
                 speed: speed
             };
-
             socket.emit('robot_command', command);
-
-            // Анимация робота
-            const rotate = joystickPos.x * 30;
-            robotModel.style.transform = `translate(-50%, -50%) rotate(${rotate}deg)`;
         }
 
-        // Обработчики кнопок
+        // Управление захватом
+        document.getElementById('btnGripperOpen').addEventListener('click', () => {
+            socket.emit('robot_command', { type: 'gripper', action: 'open' });
+            gripperState = 'open';
+            gripperStatus.textContent = 'Состояние: открыт';
+            gripperStatus.style.color = '#4CAF50';
+        });
+
+        document.getElementById('btnGripperClose').addEventListener('click', () => {
+            socket.emit('robot_command', { type: 'gripper', action: 'close' });
+            gripperState = 'closed';
+            gripperStatus.textContent = 'Состояние: закрыт';
+            gripperStatus.style.color = '#f44336';
+        });
+
+        // Обработчики кнопок управления
         document.getElementById('btnForward').addEventListener('click', () => {
             socket.emit('robot_command', { type: 'move', direction: 'forward', speed: speedSlider.value });
         });
@@ -602,44 +617,54 @@
         // Обработчик слайдера скорости
         speedSlider.addEventListener('input', () => {
             speedValue.textContent = speedSlider.value + '%';
-            batteryLevel.style.width = (100 - parseInt(speedSlider.value) / 2 + 25) + '%';
+        });
+
+        // Управление инструментами карты
+        document.querySelectorAll('.map-tool-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.id === 'btnClear') {
+                    // Очищаем карту
+                    document.querySelectorAll('.map-cell').forEach(cell => {
+                        cell.className = 'map-cell';
+                    });
+                    return;
+                }
+
+                // Устанавливаем активный режим
+                currentMapMode = this.dataset.mode;
+                document.querySelectorAll('.map-tool-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
         });
 
         // Получение данных с сервера
         socket.on('robot_status', (data) => {
-            // Обновление статуса робота
-            console.log('Status update:', data);
-        });
+            // Обновление позиции робота на карте
+            if (data.position) {
+                document.querySelectorAll('.robot').forEach(el => {
+                    el.classList.remove('robot');
+                });
 
-        socket.on('video_frame', (data) => {
-            if (data.frame) {
-                cameraFeed.src = 'data:image/jpeg;base64,' + data.frame;
-                cameraFeed.style.display = 'block';
-                cameraStatus.style.display = 'none';
-            } else {
-                cameraFeed.style.display = 'none';
-                cameraStatus.style.display = 'block';
+                const cell = document.querySelector(`.map-cell[data-x="${data.position.x}"][data-y="${data.position.y}"]`);
+                if (cell) {
+                    cell.classList.add('robot');
+                }
+            }
+
+            // Обновление состояния захвата
+            if (data.gripper) {
+                gripperState = data.gripper.state;
+                gripperStatus.textContent = `Состояние: ${gripperState === 'open' ? 'открыт' : 'закрыт'}`;
+                gripperStatus.style.color = gripperState === 'open' ? '#4CAF50' : '#f44336';
             }
         });
 
         // Инициализация
         joystickHandle.addEventListener('mousedown', startDrag);
         joystickHandle.addEventListener('touchstart', startDrag);
-
-        updateSensors();
-
-        // Случайное мерцание элементов схемы
-        setInterval(() => {
-            const wires = document.querySelectorAll('.wire');
-            wires.forEach(wire => {
-                wire.style.animationDuration = (2 + Math.random() * 3) + 's';
-            });
-
-            const nodes = document.querySelectorAll('.connection-node');
-            nodes.forEach(node => {
-                node.style.animationDuration = (1 + Math.random() * 2) + 's';
-            });
-        }, 3000);
+        initMap();
     </script>
 </body>
 </html>
