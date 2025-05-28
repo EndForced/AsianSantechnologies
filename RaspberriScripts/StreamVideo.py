@@ -240,7 +240,7 @@ class WebsiteHolder:
                                    qualities=['low', 'medium', 'high', 'max'])
 
         @self.app.route('/manual_control')
-        def index():
+        def manual_control():
             return render_template('manual_control.html')
 
     def _set_socketio_handlers(self):
