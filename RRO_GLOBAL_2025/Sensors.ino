@@ -1,26 +1,43 @@
 /*----------------------SENSORS-------------------------*/
-#define sa 13
-#define sb 11
-#define sc 16
-#define sd 7
+#define sa 11
+#define sb 7
+#define sc 13
+#define sd 16
 
-#define xsa 14
-#define xsb 12
-#define xsc 15
-#define xsd 6
+#define xsa 12
+#define xsb 6
+#define xsc 14
+#define xsd 15
+
+int raw(int dat) {
+  int data = 0;
+  switch (dat) {
+    case 1: data = analogRead(sa); break;
+    case 2: data = analogRead(sb); break;
+    case 3: data = analogRead(sc); break;
+    case 4: data = analogRead(sd); break;
+    case 5: data = analogRead(xsa); break;
+    case 6: data = analogRead(xsb); break;
+    case 7: data = analogRead(xsc); break;
+    case 8: data = analogRead(xsd); break;
+    default: data = 37707; break;
+  }
+
+  return data;
+}
 
 float sensor(int dat) {
   float data = 0;
 
-  uint16_t datamin = 10;
-  uint16_t datbmin = 10;
-  uint16_t datcmin = 10;
-  uint16_t datdmin = 10;
+  uint16_t datamin = 1300;
+  uint16_t datbmin = 1220;
+  uint16_t datcmin = 1430;
+  uint16_t datdmin = 1290;
 
-  uint16_t datamax = 3800;
-  uint16_t datbmax = 3800;
-  uint16_t datcmax = 3800;
-  uint16_t datdmax = 3800;
+  uint16_t datamax = 3990;
+  uint16_t datbmax = 4025;
+  uint16_t datcmax = 4050;
+  uint16_t datdmax = 4020;
 
   switch (dat) {
     case 1:
@@ -37,21 +54,21 @@ float sensor(int dat) {
       break;
   }
 
-  return constrain(data * 256.0, 0, 256);
+  return constrain(data * 1023.0, 0, (1<<10)-1);
 }
 
 float sensor_x(int dat) {
   float data = 0;
 
-  uint16_t datamin = 10;
-  uint16_t datbmin = 10;
-  uint16_t datcmin = 10;
-  uint16_t datdmin = 10;
+  uint16_t datamin = 1460;
+  uint16_t datbmin = 1080;
+  uint16_t datcmin = 1380;
+  uint16_t datdmin = 1350;
 
-  uint16_t datamax = 3800;
-  uint16_t datbmax = 3800;
-  uint16_t datcmax = 3800;
-  uint16_t datdmax = 3800;
+  uint16_t datamax = 4000;
+  uint16_t datbmax = 3830;
+  uint16_t datcmax = 4060;
+  uint16_t datdmax = 4040;
 
   switch (dat) {
     case 1:
@@ -68,7 +85,5 @@ float sensor_x(int dat) {
       break;
   }
 
-  return constrain(data * 256.0, 0, 256);
+  return constrain(data * 1023.0, 0, (1<<10)-1);
 }
-
-

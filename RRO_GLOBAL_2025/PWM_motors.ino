@@ -1,15 +1,15 @@
 /*----------------------MOTORS-------------------------*/
-#define ma1 4
-#define ma2 5
+#define ma1 38
+#define ma2 40
 
-#define mb1 40
-#define mb2 39
+#define mb1 4
+#define mb2 5
 
 #define mc1 41
 #define mc2 42
 
-#define md1 2
-#define md2 1
+#define md1 1
+#define md2 2
 
 #define PWM_FREQ 8000
 #define PWM_RES 10
@@ -17,6 +17,7 @@
 #define PWM_MAX ((1 << PWM_RES) - 1)
 
 void motors_init() {
+  Serial.println(PWM_MAX);
   /*------------PWM_PINS-------------*/
   ledcAttach(ma1, PWM_FREQ, PWM_RES);
   ledcAttach(ma2, PWM_FREQ, PWM_RES);
@@ -29,11 +30,11 @@ void motors_init() {
 
   // turn off all
   for (int i = 0; i < 8; i++)
-    ledcWriteChannel(i, 0);
+    ledcWriteChannel(i, PWM_MAX);
 
   /*-------INTERRUPTS---------*/
   attachInterrupt(digitalPinToInterrupt(47), encl, RISING);
-  attachInterrupt(digitalPinToInterrupt(48), encr, RISING);
+  attachInterrupt(digitalPinToInterrupt(36), encr, RISING);
 }
 
 
