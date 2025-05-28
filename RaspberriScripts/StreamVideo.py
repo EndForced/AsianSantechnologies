@@ -196,7 +196,7 @@ class CameraClient:
                 self.stream_active = False
 
 class WebsiteHolder:
-    #не лезь сюда (хотя бы пока работает)
+    #не лезь сюда (хотя-бы пока работает)
     def __init__(self, uart_port):
 
         logging.basicConfig(level=logging.INFO)
@@ -238,6 +238,10 @@ class WebsiteHolder:
             self.robot.handle_website_commands("Reset")
             return render_template('raw_cameras.html',
                                    qualities=['low', 'medium', 'high', 'max'])
+
+        @self.app.route('/manual_control')
+        def index():
+            return render_template('manual_control.html')
 
     def _set_socketio_handlers(self):
         @self.socketio.on('uart_command')
