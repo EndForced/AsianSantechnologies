@@ -16,7 +16,7 @@ class RobotAPI:
     #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
 
     def __init__(self, position, orientation, serial, socketio = None):
-        self.telemetryQuality = 25
+        self.telemetryQuality = 15
 
         self.ser = serial
         self.ser.flush()
@@ -335,5 +335,5 @@ if __name__ == "__main__":
         frames = s.robot.get_uncompressed_frames(0)
         s.robot.set_frame(frames[(c%2)-1])
         print(c)
-        # time.sleep(1)
+        time.sleep(0.15)
         c += 1
