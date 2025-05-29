@@ -1,11 +1,55 @@
 #тут типо жоски слем алгоритме
-import serial, sys, os
+import sys, os, platform
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ClientClasses.VisualizationProcessing import VisualizePaths
+from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 
-serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+if platform.system() == "Linux":
+    from StreamVideo import WebsiteHolder
+    import serial
+    serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+
+else:
+    class WebsiteHolder:
+        pass
+    serial = None
+
 
 #ты ему клетки со фрейма, а он тебе все остальное
-class MainComputer(VisualizePaths):
-    def __init__(self):
-        pass
+class MainComputer(VisualizePaths, WebsiteHolder):
+    def __init__(self, matrix, serial_p):
+
+        if not matrix:
+            matrix = [[0]*15]*15
+
+        VisualizePaths.__init__(self,matrix)
+
+        if self.OS == "Linux":
+            WebsiteHolder.__init__(self,serial_p)
+
+    def send_map(self):
+        if self.resizedPicture is not None:
+            encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.telemetryQuality]
+            buffer1 = cv2.imencode('.jpg', self.resizedPicture, encode_params)
+
+            _, buffer = cv2.imencode('.jpg', frame)
+            encoded_image = base64.b64encode(buffer).decode('utf-8')
+        else:
+            return
+
+        self.socket.emit('field_map', {
+            'fieldMap': encoded_image
+        })
+
+
+mat = [[20]*10]*10
+mc = MainComputer(mat, serial)
+res = mc.show()
+if res:
+    mc.send_map()
+    print("sent")
+
+print(MainComputer.__mro__)
+
+
+
+
