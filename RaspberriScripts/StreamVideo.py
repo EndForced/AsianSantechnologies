@@ -11,6 +11,7 @@ import base64
 import numpy as np
 import time
 import cv2
+import Buffer
 
 class RobotAPI:
     #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
@@ -71,7 +72,21 @@ class RobotAPI:
                     'type': 'received'
                 })
 
+    def set_frame(self, frame=None):
+        if frame is not None:
+            _, buffer = cv2.imencode('.jpg', frame)
+            encoded_image = base64.b64encode(buffer).decode('utf-8')
+        else:
+            return
+
+        self.socket.emit('camera_frame', {
+            'camera_id': 1,
+            'frame': encoded_image
+        })
+
+
     def get_uncompressed_frames(self, save_as_file = False):
+
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn.connect(('localhost', 65432))
         conn.sendall(b"UNCOMPRESSED_API")
@@ -308,9 +323,10 @@ if __name__ == "__main__":
     serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
     s = WebsiteHolder(serial)
     s.start_website()
-
+    c = 0
     while 1:
         time.sleep(5)
         # print("saving")
-        s.robot.get_uncompressed_frames(1)
-        # time.sleep(100)
+        frames = s.robot.get_uncompressed_frames(1)
+        s.robot.set_frame(frames[(c%2)-1])
+        c += 1
