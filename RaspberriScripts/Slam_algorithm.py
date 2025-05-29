@@ -38,7 +38,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         else:
             return
 
-        self.socket.emit('field_map', {
+        self.robot.socket.emit('field_map', {
             'fieldMap': encoded_image
         })
 
