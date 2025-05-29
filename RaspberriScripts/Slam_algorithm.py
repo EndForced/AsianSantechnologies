@@ -3,7 +3,8 @@ import sys, os, platform
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
-
+import cv2
+import base64
 
 if platform.system() == "Windows":
     class WebsiteHolder:
@@ -32,7 +33,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.telemetryQuality]
             buffer1 = cv2.imencode('.jpg', self.resizedPicture, encode_params)
 
-            _, buffer = cv2.imencode('.jpg', frame)
+            _, buffer = cv2.imencode('.jpg', self.resizedPicture)
             encoded_image = base64.b64encode(buffer).decode('utf-8')
         else:
             return
