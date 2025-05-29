@@ -29,19 +29,32 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             WebsiteHolder.__init__(self,serial_p)
 
     def send_map(self):
-        if self.resizedPicture is not None:
-            encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.robot.mapQuality]
-            buffer1 = cv2.imencode('.jpg', self.resizedPicture, encode_params)
+        if self.resizedPicture is None:
+            print("FAIL: No image to send")
+            return  # Или exit(), если это критично
 
-            _, buffer = cv2.imencode('.jpg', self.resizedPicture)
+        # Убедимся, что качество в допустимых пределах
+        quality = max(0, min(100, self.robot.mapQuality))  # Ограничиваем 0-100
+        encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
+
+        # Кодируем с выбранным качеством
+        success, buffer = cv2.imencode('.jpg', self.resizedPicture, encode_params)
+        if not success:
+            print("FAIL: Image encoding failed")
+            return
+
+        # Преобразуем в base64
+        try:
             encoded_image = base64.b64encode(buffer).decode('utf-8')
-        else:
-            print("FAIL")
-            exit()
+        except Exception as e:
+            print(f"FAIL: Base64 encoding failed: {e}")
+            return
 
-        self.robot.socket.emit('field_map', {
-            'frame': encoded_image
-        })
+        # Отправляем
+        try:
+            self.robot.socket.emit('field_map', {'frame': encoded_image})
+        except Exception as e:
+            print(f"FAIL: Socket emit failed: {e}")
 
 
 # mat = [[20, 20, 20, 34, 10, 10, 10, 31], [20, 51, 20, 10, 10, 10, 41, 20], [20, 10, 10, 10, 10, 10, 10, 20], [20, 20, 20, 34, 10, 20, 10, 33], [33, 10, 10, 71, 10, 20, 10, 62], [20, 10, 10, 20, 10, 33, 10, 62], [10, 10, 10, 20, 10, 42, 10, 62], [10, 32, 34, 32, 20, 20, 20, 34]]
