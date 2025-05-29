@@ -63,37 +63,41 @@ class DualCameraServer:
     def get_uncompressed(self, conn):
         while 1:
             try:
+                data = conn.recv(1024)
+                if data:
+                    command = data.decode('utf-8').strip()
+                    if command == "GET_FRAMES":
 
-                primary_frame = self.picam2_primary.capture_array("main")
-                secondary_frame = self.picam2_secondary.capture_array("main")
+                        primary_frame = self.picam2_primary.capture_array("main")
+                        secondary_frame = self.picam2_secondary.capture_array("main")
 
-                primary_bytes = primary_frame.tobytes()
-                secondary_bytes = secondary_frame.tobytes()
+                        primary_bytes = primary_frame.tobytes()
+                        secondary_bytes = secondary_frame.tobytes()
 
-                data = {
-                    'type': 'uncompressed_dual',
-                    'camera1': {
-                        'width': primary_frame.shape[1],
-                        'height': primary_frame.shape[0],
-                        'channels': primary_frame.shape[2] if len(primary_frame.shape) > 2 else 1,
-                        'dtype': str(primary_frame.dtype),
-                        'data': primary_bytes
-                    },
-                    'camera2': {
-                        'width': secondary_frame.shape[1],
-                        'height': secondary_frame.shape[0],
-                        'channels': secondary_frame.shape[2] if len(secondary_frame.shape) > 2 else 1,
-                        'dtype': str(secondary_frame.dtype),
-                        'data': secondary_bytes
-                    }
-                }
+                        data = {
+                            'type': 'uncompressed_dual',
+                            'camera1': {
+                                'width': primary_frame.shape[1],
+                                'height': primary_frame.shape[0],
+                                'channels': primary_frame.shape[2] if len(primary_frame.shape) > 2 else 1,
+                                'dtype': str(primary_frame.dtype),
+                                'data': primary_bytes
+                            },
+                            'camera2': {
+                                'width': secondary_frame.shape[1],
+                                'height': secondary_frame.shape[0],
+                                'channels': secondary_frame.shape[2] if len(secondary_frame.shape) > 2 else 1,
+                                'dtype': str(secondary_frame.dtype),
+                                'data': secondary_bytes
+                            }
+                        }
 
 
-                serialized_data = pickle.dumps(data)
-                conn.sendall(len(serialized_data).to_bytes(4, 'big'))
-                conn.sendall(serialized_data)
+                        serialized_data = pickle.dumps(data)
+                        conn.sendall(len(serialized_data).to_bytes(4, 'big'))
+                        conn.sendall(serialized_data)
 
-                logger.info("Sent uncompressed frames from both cameras")
+                        logger.info("Sent uncompressed frames from both cameras")
 
             except Exception as e:
                 logger.error(f"Error in get_uncompressed: {e}")
