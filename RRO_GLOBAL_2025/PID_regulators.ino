@@ -1,17 +1,18 @@
 void pidXN(float sped, int n) {
   if (n > 1)
     for (int i = 1; i < n; i++) {
-      pidX(1.5, 0.02, 0.8, sped, 100, 0);
+      pidX(1.5, 0.1, 1, sped, 150, 0);
     }
-  int overdrive = 555;
-  pidX(2.5, 0.01, 0.8, sped * 0.7, overdrive, 1);
+  int overdrive = 500;
+  pidX(1.5, 0.1, 1, sped * 0.7, 0, 0);
+  pidEnc(1.5, 0.1, 1, min(400.0, sped * 0.5), overdrive, 1);
 }
 
 void pidX(float kp, float ki, float kd, float sped, int overdrive, int stopp) {
-
-  int minx = 60;
+  all_forward();
+  int minx = 200;
   if (inverse == 1) {
-    minx = 230;
+    minx = 830;
   }
 
   uint8_t datx1 = 0;
@@ -31,7 +32,7 @@ void pidX(float kp, float ki, float kd, float sped, int overdrive, int stopp) {
   e_old = 0;
 
   int counter = 0;
-  while (counter < 20) {
+  while (counter < 10) {
     pid_regulator(kp, ki, kd, sped);
 
     if (!inverse) {
@@ -56,9 +57,10 @@ void pidX(float kp, float ki, float kd, float sped, int overdrive, int stopp) {
 }
 
 void pidEnc(float kp, float ki, float kd, float sped, int enc, int stopp) {
-  // 800 enc - > 125 mm
-  // 100 enc - > 15.625 mm
-  // ^ to update
+  // 5000 enc - > 725 mm
+  // 100 enc - > 14.5 mm
+  all_forward();
+
   countl = 0;
   countr = 0;
   err_i = 0;
@@ -77,7 +79,7 @@ void pidEnc(float kp, float ki, float kd, float sped, int enc, int stopp) {
   delay(50);
 }
 
-
+uint32_t timer = 0;
 void pid_regulator(float kp, float ki, float kd, float sped) {
 
   float speed = abs(sped);
@@ -94,7 +96,7 @@ void pid_regulator(float kp, float ki, float kd, float sped) {
   // error calculation
   float e = (dat2 - dat1);
   if (inverse) e = -e;
-  if (abs(e) < 4)
+  if (abs(e) < 16)
     e = 0;
   // integral part
   errors[err_i] = e;
@@ -114,21 +116,27 @@ void pid_regulator(float kp, float ki, float kd, float sped) {
 
   mot1 = mot1 * way;
   mot2 = mot2 * way;
-
-  // servo jiggle
-  // int deg = constrain(U * 0.025, -3, 3);
-  // bserv.write(BSF - deg);
-  // cserv.write(CSF - deg);
-  // dserv.write(DSF + deg);
-  // aserv.write(ASF + deg);
-
+  if (millis() - timer > 10) {
+    timer = millis();
+    // servo jiggle
+    if (abs(e)>20){
+    int deg = constrain(U * 0.006, -2, 2);
+    int serv[4] = { 0, 1, 6, 7 };
+    int degs[4] = { ASF + deg, BSF - deg, CSF - deg, DSF + deg };
+    Wire.beginTransmission(I2C_ADDRESS);  // Slave address
+    for (int i = 0; i < 4; i++)
+      send_servo(serv[i], degs[i]);
+    Wire.endTransmission();
+  }}
   drive(mot1, mot1, mot2, mot2);
 }
 
 void stop_after_pid(float sped) {
   int way = sped / abs(sped);
-  int tormoz_speed = -way * 255;
+  int tormoz_speed = -way * (1023);
   drive(tormoz_speed, tormoz_speed, tormoz_speed, tormoz_speed);
-  delay(abs(sped) / 255.0 * 30);
+  delay(10);
+  all_forward();
+  delay((abs(sped) / 1023.0 * 40)-10);
   stop();
 }

@@ -1,6 +1,17 @@
 /*-----------------------------BUZZERS-----------------------------*/
 #define BZ1_PIN 10
 #define BZ2_PIN 35
+#define BTN_PIN 21
+
+void buzzer_init(){
+  pinMode(BZ1_PIN,OUTPUT);
+  pinMode(BTN_PIN,INPUT_PULLUP);
+}
+
+bool button(){
+  return digitalRead(BTN_PIN);
+}
+
 // у меня не сделаны асинхронные бипы
 // скорее всего сделаю через микрос
 void beep(int freq, int dur) {
@@ -17,6 +28,15 @@ void myTone(float per, int dur) {
   }
 }
 
+
+#define D4 293
+#define D5 587
+#define A4 440
+#define GH4 415
+#define G4 391
+#define F4 350
+#define C4 261
+#define C5 523
 
 
 void do_megalovania() {
