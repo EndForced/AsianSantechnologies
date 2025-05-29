@@ -68,7 +68,7 @@ res = mc.show()
 
 if list(res):
     mc.start_website()
-    time.sleep(5)
+    time.sleep(1)
     mc.send_map()
     print("sent")
 
