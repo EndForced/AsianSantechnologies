@@ -17,6 +17,7 @@ class RobotAPI:
 
     def __init__(self, position, orientation, serial, socketio = None):
         self.telemetryQuality = 15
+        self.mapQuality = 60
 
         self.ser = serial
         self.ser.flush()
