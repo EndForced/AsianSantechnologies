@@ -30,7 +30,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def send_map(self):
         if self.resizedPicture is not None:
-            encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.robot.telemetryQuality]
+            encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.robot.mapQuality]
             buffer1 = cv2.imencode('.jpg', self.resizedPicture, encode_params)
 
             _, buffer = cv2.imencode('.jpg', self.resizedPicture)
