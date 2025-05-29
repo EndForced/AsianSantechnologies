@@ -33,7 +33,10 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             print("FAIL: No image to send")
             return  # Или exit(), если это критично
 
-        if self.resizedPicture.dtype != 'uint8':
+        if self.resizedPicture.dtype == 'uint16':
+            # Option 1: Scale to 8-bit by dividing by 257 (preserves full range)
+            self.resizedPicture = (self.resizedPicture // 257).astype('uint8')
+            # Option 2: Normalize to min-max range
             self.resizedPicture = cv2.normalize(self.resizedPicture, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
 
 
@@ -65,6 +68,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 mat = [[10]*15]*15
 mc = MainComputer(mat, serial)
 res = mc.show()
+print(mc.resizedPicture.dtype)
 
 if list(res):
     mc.start_website()
