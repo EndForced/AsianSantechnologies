@@ -2,17 +2,18 @@
 import sys, os, platform
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
+import time
+
+
+if platform.system() == "Windows":
+    class WebsiteHolder:
+        pass
+    serial = None
 
 if platform.system() == "Linux":
     from StreamVideo import WebsiteHolder
     import serial
     serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
-
-else:
-    class WebsiteHolder:
-        pass
-    serial = None
-
 
 #ты ему клетки со фрейма, а он тебе все остальное
 class MainComputer(VisualizePaths, WebsiteHolder):
@@ -44,7 +45,10 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 mat = [[20]*10]*10
 mc = MainComputer(mat, serial)
 res = mc.show()
-if res:
+
+if list(res):
+    mc.start_website()
+    time.sleep(5)
     mc.send_map()
     print("sent")
 
