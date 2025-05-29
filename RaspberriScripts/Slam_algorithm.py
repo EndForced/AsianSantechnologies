@@ -40,7 +40,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             exit()
 
         self.robot.socket.emit('field_map', {
-            'fieldMap': encoded_image
+            'frame': encoded_image
         })
 
 
