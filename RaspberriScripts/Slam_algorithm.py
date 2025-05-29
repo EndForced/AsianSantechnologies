@@ -36,7 +36,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             _, buffer = cv2.imencode('.jpg', self.resizedPicture)
             encoded_image = base64.b64encode(buffer).decode('utf-8')
         else:
-            return
+            print("FAIL")
+            exit()
 
         self.robot.socket.emit('field_map', {
             'fieldMap': encoded_image
