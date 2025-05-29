@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Processed stuff</title>
+    <title>Camera Monitoring</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,25 +55,6 @@
             border-radius: 4px;
             z-index: 10;
         }
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-        button {
-            padding: 8px 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            min-width: 120px;
-        }
-        button:disabled {
-            background-color: #cccccc;
-        }
         .status {
             margin-top: 10px;
             padding: 10px;
@@ -81,23 +62,32 @@
             background-color: #f8f8f8;
             text-align: center;
         }
+        .connection-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+            background-color: #ccc;
+        }
+        .connected {
+            background-color: #4CAF50;
+        }
+        .disconnected {
+            background-color: #f44336;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>CV Processing Output</h1>
-
-        <div class="controls">
-            <button id="startProcessingBtn">Start watching</button>
-            <button id="stopProcessingBtn" disabled>Break</button>
-        </div>
+        <h1>Camera Monitoring System</h1>
 
         <div class="output-grid">
             <!-- Объединенное изображение с камер -->
             <div class="output-box">
                 <div class="output-container">
                     <div class="output-label">Stitched Camera View</div>
-                    <img id="stitchedView" class="output-image" src="{{ url_for('static', filename='black.jpg') }}" alt="Telemetry cameras">
+                    <img id="stitchedView" class="output-image" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Stitched Camera View">
                 </div>
             </div>
 
@@ -105,53 +95,63 @@
             <div class="output-box">
                 <div class="output-container">
                     <div class="output-label">Field Map</div>
-                    <img id="fieldMap" class="output-image" src="{{ url_for('static', filename='black.jpg') }}" alt="Field Map">
+                    <img id="fieldMap" class="output-image" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="Field Map">
                 </div>
             </div>
         </div>
 
-        <div class="status" id="status">Status: Ready</div>
+        <div class="status">
+            <span id="connectionStatus" class="connection-status"></span>
+            <span id="statusText">Connecting to server...</span>
+        </div>
     </div>
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
-        const socket = io();
-        const startBtn = document.getElementById('startProcessingBtn');
-        const stopBtn = document.getElementById('stopProcessingBtn');
-        const statusElement = document.getElementById('status');
+        const socket = io({
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000
+        });
+
         const stitchedView = document.getElementById('stitchedView');
         const fieldMap = document.getElementById('fieldMap');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const statusText = document.getElementById('statusText');
+
+        // Обработка подключения
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            connectionStatus.className = 'connection-status connected';
+            statusText.textContent = 'Connected to server';
+        });
+
+        // Обработка отключения
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            connectionStatus.className = 'connection-status disconnected';
+            statusText.textContent = 'Disconnected from server. Trying to reconnect...';
+        });
 
         // Обработка входящих данных
-        socket.on('cv_output', function(data) {
-            if (data.stitched_frame) {
-                stitchedView.src = 'data:image/jpeg;base64,' + data.stitched_frame;
-            }
-            if (data.field_map) {
-                fieldMap.src = 'data:image/jpeg;base64,' + data.field_map;
+        socket.on('camera_frame', (data) => {
+            if (data.camera_id === 1 && data.frame) {
+                stitchedView.src = `data:image/jpeg;base64,${data.frame}`;
             }
         });
 
-        // Управление обработкой
-        startBtn.addEventListener('click', function() {
-            socket.emit('start_processing');
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            statusElement.textContent = 'Status: Processing active';
-        });
-
-        stopBtn.addEventListener('click', function() {
-            socket.emit('stop_processing');
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            statusElement.textContent = 'Status: Processing stopped';
+        socket.on('field_map', (data) => {
+            if (data.frame) {
+                fieldMap.src = `data:image/jpeg;base64,${data.frame}`;
+            }
         });
 
         // Обработка ошибок
-        socket.on('processing_error', function(error) {
-            statusElement.textContent = 'Status: Error - ' + error.message;
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
+        socket.on('connect_error', (error) => {
+            console.error('Connection error:', error);
+            connectionStatus.className = 'connection-status disconnected';
+            statusText.textContent = `Connection error: ${error.message}`;
         });
     </script>
 </body>
