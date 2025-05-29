@@ -90,7 +90,7 @@ class RobotAPI:
 
 
     def get_uncompressed_frames(self, save_as_file = False):
-        self.conn.sendall(b"API_GET")
+        # self.conn.sendall(b"API_GET")
 
         try:
             length_bytes = self.recvall(self.conn, 4)
