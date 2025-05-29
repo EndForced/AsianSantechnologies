@@ -327,7 +327,7 @@ if __name__ == "__main__":
     while 1:
         # time.sleep(5)
         # print("saving")
-        frames = s.robot.get_uncompressed_frames(1)
+        frames = s.robot.get_uncompressed_frames(0)
         s.robot.set_frame(frames[(c%2)-1])
         print(c)
         c += 1
