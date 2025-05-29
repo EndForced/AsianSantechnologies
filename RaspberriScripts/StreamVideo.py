@@ -95,7 +95,7 @@ class RobotAPI:
 
 
     def get_uncompressed_frames(self, save_as_file = False):
-        # self.conn.sendall(b"API_GET")
+        self.conn.sendall(b"GET_FRAMES")
 
         try:
             length_bytes = self.recvall(self.conn, 4)
@@ -333,7 +333,7 @@ if __name__ == "__main__":
         # time.sleep(5)
         # print("saving")
         frames = s.robot.get_uncompressed_frames(0)
-        # s.robot.set_frame(frames[(c%2)-1])
+        s.robot.set_frame(frames[(c%2)-1])
         print(c)
         time.sleep(1)
         c += 1
