@@ -243,6 +243,10 @@ class WebsiteHolder:
         def manual_control():
             return render_template('manual_control.html')
 
+        @self.app.route('/telemetry_cameras')
+        def telemetry_cameras():
+            return render_template('telemetry.html')
+
     def _set_socketio_handlers(self):
         @self.socketio.on('uart_command')
         def handle_uart_command(data):

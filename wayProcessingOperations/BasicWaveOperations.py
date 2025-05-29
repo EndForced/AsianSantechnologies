@@ -14,7 +14,7 @@ class WaveCreator:
             raise ValueError("Can't create neighbor dictionary with this matrix:" , self._matrix)
 
         self.Waves = []
-        self.Way = []
+        self.Ways = []
 
         self.cellsConnections = {10:{"up":[31,10, 41], "left":[34,10, 42], "down":[33,10, 41], "right":[32,10, 42]},
                                  20:{"up":[33,20, 51], "left":[32,20, 52], "down":[31,20, 51], "right":[34,20, 52]},
@@ -43,7 +43,7 @@ class WaveCreator:
                                  0: {"up": [None], "left": [None], "down": [None], "right": [None]},
                                  }
 
-        self._matrixConnections = self._process_cells_connections()
+        self.matrixConnections = self._process_cells_connections()
 
     def _process_cells_connections(self):
         #возвращает список вида [ {(y1,x1):[(y2,x2),(y3,x3)]}, ...]
@@ -117,7 +117,7 @@ class WaveCreator:
             next_wave = []
 
             for element in waves[-1]:
-                for neighbour in self._matrixConnections[element]:
+                for neighbour in self.matrixConnections[element]:
                     if neighbour not in visited:
                         next_wave.append(neighbour)
                         visited.add(neighbour)
@@ -188,15 +188,42 @@ class WaveCreator:
             if last_cell in [41,42, 51,52]:
                 ways[i].pop(-1)
 
-        self.Way = ways
+        if not ways:
+            return "No way"
+
+        self.Ways = ways
         return ways
+
+    def sort_ways(self, ways):
+        res = {}
+        count = 0
+        prev_conn = ""
+
+        if len(ways) == 1:
+            return ways[0]
+
+        for i in range(len(ways)):
+            for j in range(len(ways[i])):
+
+                if j+1 == len(ways[i]):
+                    break
+                cells = self.get_relative_cells(ways[i][j+1])[0]
+                for key, item in cells.items():
+                    if item == ways[i][j]:
+                        if key != prev_conn:
+                            count += 1
+                            prev_conn = key
+
+            res[count] = ways[i]
+
+        return res[min(res.keys())]
 
 class PattersSolver(WaveCreator):
     def __init__(self, matrix_for_solving):
         self.matrix = matrix_for_solving
         super().__init__(self.matrix)
         tubes = self.find_tubes()
-        print(tubes)
+        # print(tubes)
 
 
     def find_tubes(self):
@@ -214,9 +241,12 @@ class PattersSolver(WaveCreator):
 if __name__ == "__main__":
     mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
 
-    # w = WaveCreator(mat)
-    # w.create_wave((0,0))
-
-    w = PattersSolver(mat)
+    w = WaveCreator(mat)
+    w.create_wave((0,0))
+    print(w.Waves)
+    print(np.array(w._matrix))
+    w.create_way((0,6),(2,6))
+    print(w.Way)
+    # w = PattersSolver(mat)
 
 

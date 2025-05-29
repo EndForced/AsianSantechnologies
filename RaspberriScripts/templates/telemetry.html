@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processed stuff</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .output-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .output-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #000;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .output-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .output-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            padding: 2px 8px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 120px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CV Processing Output</h1>
+
+        <div class="controls">
+            <button id="startProcessingBtn">Start watching</button>
+            <button id="stopProcessingBtn" disabled>Break</button>
+        </div>
+
+        <div class="output-grid">
+            <!-- Объединенное изображение с камер -->
+            <div class="output-box">
+                <div class="output-container">
+                    <div class="output-label">Stitched Camera View</div>
+                    <img id="stitchedView" class="output-image" src="{{ url_for('static', filename='black.jpg') }}" alt="Telemetry cameras">
+                </div>
+            </div>
+
+            <!-- Карта поля -->
+            <div class="output-box">
+                <div class="output-container">
+                    <div class="output-label">Field Map</div>
+                    <img id="fieldMap" class="output-image" src="{{ url_for('static', filename='black.jpg') }}" alt="Field Map">
+                </div>
+            </div>
+        </div>
+
+        <div class="status" id="status">Status: Ready</div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const startBtn = document.getElementById('startProcessingBtn');
+        const stopBtn = document.getElementById('stopProcessingBtn');
+        const statusElement = document.getElementById('status');
+        const stitchedView = document.getElementById('stitchedView');
+        const fieldMap = document.getElementById('fieldMap');
+
+        // Обработка входящих данных
+        socket.on('cv_output', function(data) {
+            if (data.stitched_frame) {
+                stitchedView.src = 'data:image/jpeg;base64,' + data.stitched_frame;
+            }
+            if (data.field_map) {
+                fieldMap.src = 'data:image/jpeg;base64,' + data.field_map;
+            }
+        });
+
+        // Управление обработкой
+        startBtn.addEventListener('click', function() {
+            socket.emit('start_processing');
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            statusElement.textContent = 'Status: Processing active';
+        });
+
+        stopBtn.addEventListener('click', function() {
+            socket.emit('stop_processing');
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            statusElement.textContent = 'Status: Processing stopped';
+        });
+
+        // Обработка ошибок
+        socket.on('processing_error', function(error) {
+            statusElement.textContent = 'Status: Error - ' + error.message;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

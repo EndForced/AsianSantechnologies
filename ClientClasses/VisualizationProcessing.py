@@ -125,9 +125,10 @@ class VisualizeMatrix:
             print("Cant imshow on rp")
             return self.resizedPicture
 
-class VisualizeWaves(VisualizeMatrix, PattersSolver):
+class VisualizeWaves(PattersSolver,VisualizeMatrix):
     def __init__(self, matrix:list[list[int]]):
-        super().__init__(matrix)
+        PattersSolver.__init__(self,matrix)
+        VisualizeMatrix.__init__(self,matrix)
         self.frameWeight = 7
         self.fontSize = 0.7
         self.fontThickness = 2
@@ -346,19 +347,21 @@ class VisualizePaths(VisualizeWaves):
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (65535, 65535, 65535), 2)
 
 if __name__ == "__main__":
-    mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
-
+    # mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
+    mat = [[10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10],
+     [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 20, 20, 20, 10, 10],
+     [10, 10, 10, 10, 10, 10, 10, 10], [10, 10, 10, 10, 10, 10, 10, 10]]
     obj = VisualizePaths(mat)
-    obj.create_way((4,4),(4,7))
-    for i in obj.Way:
-        obj.visualize_wave()
-        obj.draw_path(path=i)
-    # obj.draw_path(obj.Way[0])
-        obj.show()
-        # cv2.waitKey(0)
-    # obj.visualize_wave()
-    # test commit
-    #test commit 2
+    print(obj.matrixConnections)
+    obj.create_wave((6,0))
+    obj.visualize_wave()
 
+    print(VisualizePaths.__mro__)
+
+    obj.create_way((0,7),(6,4))
+    sortede = obj.sort_ways(obj.Ways)
+    obj.draw_path(sortede)
+    print(sortede)
+    obj.show()
 
 
