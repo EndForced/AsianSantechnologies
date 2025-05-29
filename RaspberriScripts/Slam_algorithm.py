@@ -33,6 +33,10 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             print("FAIL: No image to send")
             return  # Или exit(), если это критично
 
+        if self.resizedPicture.dtype != 'uint8':
+            self.resizedPicture = cv2.normalize(self.resizedPicture, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+
+
         # Убедимся, что качество в допустимых пределах
         quality = max(0, min(100, self.robot.mapQuality))  # Ограничиваем 0-100
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
