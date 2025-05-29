@@ -32,6 +32,11 @@ class RobotAPI:
         self.IsDoingAction = 0
         self.frames = {}
 
+        self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.conn.connect(('localhost', 65432))
+        self.conn.sendall(b"UNCOMPRESSED_API")
+        # time.sleep(0.1)
+
     @staticmethod
     def recvall(conn, n):
         #крутая читалка для стабильности
@@ -85,20 +90,16 @@ class RobotAPI:
 
 
     def get_uncompressed_frames(self, save_as_file = False):
-
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        conn.connect(('localhost', 65432))
-        conn.sendall(b"UNCOMPRESSED_API")
-        time.sleep(0.1)
+        self.conn.sendall(b"API_GET")
 
         try:
-            length_bytes = self.recvall(conn, 4)
+            length_bytes = self.recvall(self.conn, 4)
             if not length_bytes:
                 return None, None
 
             length = int.from_bytes(length_bytes, 'big')
 
-            data = self.recvall(conn, length)
+            data = self.recvall(self.conn, length)
             if not data:
                 return None, None
 
@@ -139,8 +140,8 @@ class RobotAPI:
             print(f"Error receiving frames: {e}")
             return None, None
 
-        finally:
-            conn.close()
+        # finally:
+            # conn.close()
 
 class CameraClient:
     def __init__(self, sock, logg):
