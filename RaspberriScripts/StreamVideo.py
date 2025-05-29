@@ -324,7 +324,7 @@ if __name__ == "__main__":
     s.start_website()
     c = 0
     while 1:
-        time.sleep(5)
+        # time.sleep(5)
         # print("saving")
         frames = s.robot.get_uncompressed_frames(1)
         s.robot.set_frame(frames[(c%2)-1])
