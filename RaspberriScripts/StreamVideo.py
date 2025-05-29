@@ -11,7 +11,6 @@ import base64
 import numpy as np
 import time
 import cv2
-import Buffer
 
 class RobotAPI:
     #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
