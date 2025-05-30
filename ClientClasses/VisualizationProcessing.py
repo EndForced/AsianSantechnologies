@@ -122,7 +122,7 @@ class VisualizeMatrix:
             cv2.waitKey(0)
         else:
             #smth for frame updating
-            print("Cant imshow on rp")
+            # print("Cant imshow on rp")
             return self.resizedPicture
 
 class VisualizeWaves(PattersSolver,VisualizeMatrix):

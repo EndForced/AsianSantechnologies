@@ -83,9 +83,7 @@ class RobotAPI:
         if frame is not None:
             encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.telemetryQuality]
             buffer1 = cv2.imencode('.jpg', frame, encode_params)
-
-            _, buffer = cv2.imencode('.jpg', frame)
-            encoded_image = base64.b64encode(buffer).decode('utf-8')
+            encoded_image = base64.b64encode(buffer1).decode('utf-8')
         else:
             return
 
@@ -326,15 +324,16 @@ class WebsiteHolder:
                           allow_unsafe_werkzeug=True)
 
 if __name__ == "__main__":
-    serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
-    s = WebsiteHolder(serial)
-    s.start_website()
-    c = 0
-    while 1:
+    pass
+    # serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+    # s = WebsiteHolder(serial)
+    # s.start_website()
+    # c = 0
+    # while 1:
         # time.sleep(5)
         # print("saving")
         # frames = s.robot.get_uncompressed_frames(0)
         # s.robot.set_frame(frames[(c%2)-1])
         # print(c)
         # time.sleep(0.15)
-        c += 1
+        # c += 1

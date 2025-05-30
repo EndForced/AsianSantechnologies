@@ -207,6 +207,7 @@ class WaveCreator:
 
                 if j+1 == len(ways[i]):
                     break
+
                 cells = self.get_relative_cells(ways[i][j+1])[0]
                 for key, item in cells.items():
                     if item == ways[i][j]:

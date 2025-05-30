@@ -1,5 +1,8 @@
 #тут типо жоски слем алгоритме
 import sys, os, platform
+
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
@@ -31,33 +34,26 @@ class MainComputer(VisualizePaths, WebsiteHolder):
     def send_map(self):
         if self.resizedPicture is None:
             print("FAIL: No image to send")
-            return  # Или exit(), если это критично
+            return
 
         if self.resizedPicture.dtype == 'uint16':
-            # Option 1: Scale to 8-bit by dividing by 257 (preserves full range)
             self.resizedPicture = (self.resizedPicture // 257).astype('uint8')
-            # Option 2: Normalize to min-max range
-            self.resizedPicture = cv2.normalize(self.resizedPicture, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
 
 
-        # Убедимся, что качество в допустимых пределах
-        quality = max(0, min(100, self.robot.mapQuality))  # Ограничиваем 0-100
+        quality = max(0, min(100, self.robot.mapQuality))
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
 
-        # Кодируем с выбранным качеством
         success, buffer = cv2.imencode('.jpg', self.resizedPicture, encode_params)
         if not success:
             print("FAIL: Image encoding failed")
             return
 
-        # Преобразуем в base64
         try:
             encoded_image = base64.b64encode(buffer).decode('utf-8')
         except Exception as e:
             print(f"FAIL: Base64 encoding failed: {e}")
             return
 
-        # Отправляем
         try:
             self.robot.socket.emit('field_map', {'frame': encoded_image})
         except Exception as e:
@@ -70,15 +66,22 @@ mc = MainComputer(mat, serial)
 res = mc.show()
 print(mc.resizedPicture.dtype)
 
-if list(res):
+if mc.OS == "Linux":
     mc.start_website()
+    frames = mc.robot.get_uncompressed_frames()
     time.sleep(1)
-    mc.send_map()
-    print("sent")
+    # mc.send_map()
+    print(np.median(frames[0]))
 
-print(MainComputer.__mro__)
-while 1:
-    pass
+else:
+    print(type(res))
+    #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
+    #mc.robot.set_frame(frames[0])...
+    #mc.send_map() no args!
+
+    print(MainComputer.__mro__)
+    while 1:
+        pass
 
 
 
