@@ -74,8 +74,8 @@ if mc.OS == "Linux":
     # print(np.median(frames[0]))
     # c = 2
     while 1:
-        frames = mc.robot.get_uncompressed_frames()
-        mc.robot.set_frame(frames[0])
+        frames = mc.robot.get_uncompressed_frames(1)
+        # mc.robot.set_frame(frames[0])
         # print(c)
         # c += 1
 
