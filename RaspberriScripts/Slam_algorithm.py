@@ -72,8 +72,8 @@ if mc.OS == "Linux":
     while 1:
         frames = mc.robot.get_uncompressed_frames(0)
         frame = cv2.resize(frames[0], (600,600))
-        time.sleep(1)
-        # mc.send_map()
+        # time.sleep(1)
+        mc.send_map()
         mc.robot.set_frame(frames[0])
         print(np.median(frames[0]))
 
