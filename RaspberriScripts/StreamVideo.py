@@ -90,7 +90,7 @@ class RobotAPI:
         else:
             return
 
-        self.socket.emit('camera_frame', {
+        self.socket.emit('video_frame', {
             'camera_id': 1,
             'frame': encoded_image_base64
         })
