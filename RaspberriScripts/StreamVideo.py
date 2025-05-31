@@ -87,7 +87,7 @@ class RobotAPI:
         if frame.dtype == 'uint16':
             frame= (frame // 257).astype('uint8')
 
-        quality = max(0, min(100, self.robot.mapQuality))
+        quality = max(0, min(100, self.telemetryQuality))
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
 
         success, buffer = cv2.imencode('.jpg', frame, encode_params)
