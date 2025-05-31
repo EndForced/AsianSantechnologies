@@ -84,9 +84,7 @@ class RobotAPI:
         if frame is not None:
             encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.telemetryQuality]
             buffer1 = cv2.imencode('.jpg', frame, encode_params)
-
-            _, buffer = cv2.imencode('.jpg', frame)
-            encoded_image = base64.b64encode(buffer).decode('utf-8')
+            encoded_image = base64.b64encode(buffer1).decode('utf-8')
         else:
             return
 
