@@ -71,6 +71,7 @@ if mc.OS == "Linux":
     # time.sleep(10)
     while 1:
         frames = mc.robot.get_uncompressed_frames(0)
+        frame = cv2.resize(frames[0], (600,600))
         time.sleep(1)
         # mc.send_map()
         mc.robot.set_frame(frames[0])
