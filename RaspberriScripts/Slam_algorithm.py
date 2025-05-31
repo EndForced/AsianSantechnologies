@@ -76,7 +76,7 @@ if mc.OS == "Linux":
         # mc.send_map()
         # mc.robot.set_frame(frames[0])
         # print(np.median(frames[0]))
-        print(mc.robot.read())
+        # print(mc.robot.read())
         pass
 else:
     print(type(res))
