@@ -22,7 +22,7 @@ class DualCameraServer:
 
         self.primary_config = self.picam2_primary.create_video_configuration(
             main={
-                "size": (1920, 1280),
+                "size": (1920, 1080),
                 "format": "RGB888",
             },
             controls={
@@ -35,7 +35,7 @@ class DualCameraServer:
 
         self.secondary_config = self.picam2_secondary.create_video_configuration(
             main={
-                "size": (1920, 1280),
+                "size": (1920, 1080),
                 "format": "RGB888",
             },
             controls={
