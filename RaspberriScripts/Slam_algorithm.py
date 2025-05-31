@@ -72,6 +72,8 @@ if mc.OS == "Linux":
     time.sleep(1)
     # mc.send_map()
     print(np.median(frames[0]))
+    while 1:
+        pass
 
 else:
     print(type(res))
