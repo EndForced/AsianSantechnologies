@@ -136,7 +136,7 @@
 
         socket.on('framee', (data) => {
             if (data.frame) {
-                fieldMap.src = `data:image/jpeg;base64,${data.frame}`;
+                stitchedView.src = `data:image/jpeg;base64,${data.frame}`;
             }
         });
 
