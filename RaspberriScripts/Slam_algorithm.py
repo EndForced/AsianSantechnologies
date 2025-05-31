@@ -71,13 +71,13 @@ if mc.OS == "Linux":
     frames = mc.robot.get_uncompressed_frames()
     time.sleep(1)
     mc.send_map()
-    print(np.median(frames[0]))
-    c = 2
+    # print(np.median(frames[0]))
+    # c = 2
     while 1:
         frames = mc.robot.get_uncompressed_frames()
         mc.robot.set_frame(frames[0])
-        print(c)
-        c += 1
+        # print(c)
+        # c += 1
 
 else:
     print(type(res))
