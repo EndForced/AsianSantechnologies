@@ -1,3 +1,4 @@
+
 '''Это самый непонятный файл тут. Низкоуровневая работа с сокетами и обмен данными с LocalStreamer'''
 
 from flask import Flask, render_template
@@ -82,12 +83,10 @@ class RobotAPI:
     def set_frame(self, frame=None):
         if frame is not None:
             encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.telemetryQuality]
-            success, buffer1 = cv2.imencode('.jpg', frame, encode_params)  # Распаковываем кортеж
-            if success:  # Проверяем, успешно ли сжато изображение
-                encoded_image = base64.b64encode(buffer1).decode('utf-8')  # buffer1 теперь bytes
-            else:
-                print("Ошибка кодирования изображения")
-                return
+            buffer1 = cv2.imencode('.jpg', frame, encode_params)
+
+            _, buffer = cv2.imencode('.jpg', frame)
+            encoded_image = base64.b64encode(buffer).decode('utf-8')
         else:
             return
 
@@ -328,16 +327,15 @@ class WebsiteHolder:
                           allow_unsafe_werkzeug=True)
 
 if __name__ == "__main__":
-    pass
-    # serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
-    # s = WebsiteHolder(serial)
-    # s.start_website()
-    # c = 0
-    # while 1:
+    serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+    s = WebsiteHolder(serial)
+    s.start_website()
+    c = 0
+    while 1:
         # time.sleep(5)
         # print("saving")
         # frames = s.robot.get_uncompressed_frames(0)
         # s.robot.set_frame(frames[(c%2)-1])
         # print(c)
         # time.sleep(0.15)
-        # c += 1
+        c += 1
