@@ -17,7 +17,7 @@ class RobotAPI:
     #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
 
     def __init__(self, position, orientation, serial, socketio = None):
-        self.telemetryQuality = 15
+        self.telemetryQuality = 10
         self.mapQuality = 40
 
         self.ser = serial
