@@ -134,7 +134,8 @@
             statusText.textContent = 'Disconnected from server. Trying to reconnect...';
         });
 
-        // Обработка входящих данных
+        const stitchedView = document.getElementById('stitchedView');
+
         socket.on('camera_frame', (data) => {
             if (data.camera_id === 1 && data.frame) {
                 stitchedView.src = `data:image/jpeg;base64,${data.frame}`;
