@@ -82,8 +82,12 @@ class RobotAPI:
     def set_frame(self, frame=None):
         if frame is not None:
             encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.telemetryQuality]
-            buffer1 = cv2.imencode('.jpg', frame, encode_params)
-            encoded_image = base64.b64encode(buffer1).decode('utf-8')
+            success, buffer1 = cv2.imencode('.jpg', frame, encode_params)  # Распаковываем кортеж
+            if success:  # Проверяем, успешно ли сжато изображение
+                encoded_image = base64.b64encode(buffer1).decode('utf-8')  # buffer1 теперь bytes
+            else:
+                print("Ошибка кодирования изображения")
+                return
         else:
             return
 
