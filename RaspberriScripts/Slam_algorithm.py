@@ -70,7 +70,8 @@ if mc.OS == "Linux":
     # mc.start_website()
     frames = mc.robot.get_uncompressed_frames(1)
     time.sleep(1)
-    # mc.send_map()
+    mc.send_map()
+    mc.robot.set_frame(frames[0])
     print(np.median(frames[0]))
 
 else:
