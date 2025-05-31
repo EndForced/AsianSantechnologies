@@ -134,11 +134,9 @@
             statusText.textContent = 'Disconnected from server. Trying to reconnect...';
         });
 
-        // Обработка входящих данных
-        socket.on('video_frame', function(data) {
-            console.log("Получен кадр для камеры:", data.camera);
-            if (data.camera && cameras[data.camera] && data.frame) {
-                cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
+        socket.on('framee', (data) => {
+            if (data.frame) {
+                fieldMap.src = `data:image/jpeg;base64,${data.frame}`;
             }
         });
 

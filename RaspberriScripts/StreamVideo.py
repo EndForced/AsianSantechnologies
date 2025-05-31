@@ -80,22 +80,31 @@ class RobotAPI:
                 })
 
     def set_frame(self, frame=None):
-        if frame is not None:
-            # Конвертация BGR -> RGB
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        if frame is None:
+            print("FAIL: No image to send")
+            return
 
-            # Сжатие в JPEG
-            encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.telemetryQuality]
-            success, buffer = cv2.imencode('.jpg', frame, encode_params)
+        if frame.dtype == 'uint16':
+            frame= (frame // 257).astype('uint8')
 
-            if success:
-                encoded_image = base64.b64encode(buffer).decode('utf-8')
-                print(f"Отправка кадра для камеры 1, размер base64: {len(encoded_image)}")
+        quality = max(0, min(100, self.robot.mapQuality))
+        encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
 
-                self.socket.emit('video_frame', {
-                    'camera': 1,  # Важно: поле 'camera', а не 'camera_id'
-                    'frame': encoded_image
-                })
+        success, buffer = cv2.imencode('.jpg', frame, encode_params)
+        if not success:
+            print("FAIL: Image encoding failed")
+            return
+
+        try:
+            encoded_image = base64.b64encode(buffer).decode('utf-8')
+        except Exception as e:
+            print(f"FAIL: Base64 encoding failed: {e}")
+            return
+
+        try:
+            self.socket.emit('framee', {'frame': encoded_image})
+        except Exception as e:
+            print(f"FAIL: Socket emit failed: {e}")
 
     def get_uncompressed_frames(self, save_as_file = False):
         self.conn.sendall(b"GET_FRAMES")
