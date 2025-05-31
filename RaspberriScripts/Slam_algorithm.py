@@ -73,7 +73,7 @@ if mc.OS == "Linux":
     while 1:
         time.sleep(1)
         mc.send_map()
-        mc.robot.set_frame(cv2.imread("RaspberriScripts/static/black.jpg"))
+        mc.robot.set_frame(frames[0])
         print(np.median(frames[0]))
 
 else:
