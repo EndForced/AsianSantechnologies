@@ -81,19 +81,21 @@ class RobotAPI:
 
     def set_frame(self, frame=None):
         if frame is not None:
+            # Конвертация BGR -> RGB
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            # Сжатие в JPEG
             encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), self.telemetryQuality]
-            result, encoded_image = cv2.imencode('.jpg', frame, encode_params)
-            if not result:
-                return  # Можно добавить обработку ошибки кодирования
+            success, buffer = cv2.imencode('.jpg', frame, encode_params)
 
-            encoded_image_base64 = base64.b64encode(encoded_image.tobytes()).decode('utf-8')
-        else:
-            return
+            if success:
+                encoded_image = base64.b64encode(buffer).decode('utf-8')
+                print(f"Отправка кадра для камеры 1, размер base64: {len(encoded_image)}")
 
-        self.socket.emit('video_frame', {
-            'camera_id': 1,
-            'frame': encoded_image_base64
-        })
+                self.socket.emit('video_frame', {
+                    'camera': 1,  # Важно: поле 'camera', а не 'camera_id'
+                    'frame': encoded_image
+                })
 
     def get_uncompressed_frames(self, save_as_file = False):
         self.conn.sendall(b"GET_FRAMES")

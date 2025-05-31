@@ -135,9 +135,10 @@
         });
 
         // Обработка входящих данных
-        socket.on('camera_frame', (data) => {
-            if (data.camera_id === 1 && data.frame) {
-                stitchedView.src = `data:image/jpeg;base64,${data.frame}`;
+        socket.on('video_frame', function(data) {
+            console.log("Получен кадр для камеры:", data.camera);
+            if (data.camera && cameras[data.camera] && data.frame) {
+                cameras[data.camera].feed.src = 'data:image/jpeg;base64,' + data.frame;
             }
         });
 
