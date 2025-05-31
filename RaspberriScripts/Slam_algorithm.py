@@ -67,7 +67,7 @@ res = mc.show()
 print(mc.resizedPicture.dtype)
 
 if mc.OS == "Linux":
-    # mc.start_website()
+    mc.start_website()
     frames = mc.robot.get_uncompressed_frames()
     time.sleep(1)
     # mc.send_map()
