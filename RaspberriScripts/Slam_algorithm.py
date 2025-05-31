@@ -67,14 +67,11 @@ res = mc.show()
 print(mc.resizedPicture.dtype)
 
 if mc.OS == "Linux":
-    mc.start_website()
-    # print(np.median(frames[0]))
-    while 1:
-        frames = mc.robot.get_uncompressed_frames(0)
-        print(np.median(frames[0]))
-        time.sleep(1)
-        mc.send_map()
-        mc.robot.set_frame(frames[0])
+    # mc.start_website()
+    frames = mc.robot.get_uncompressed_frames()
+    time.sleep(1)
+    # mc.send_map()
+    print(np.median(frames[0]))
 
 else:
     print(type(res))
