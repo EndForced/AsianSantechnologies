@@ -1,18 +1,18 @@
 void pidXN(float sped, int n) {
   if (n > 1)
     for (int i = 1; i < n; i++) {
-      pidX(1.5, 0.1, 1, sped, 150, 0);
+      pidX(0.5, 0.01, 0.4, sped, 150, 0);
     }
-  int overdrive = 500;
-  pidX(1.5, 0.1, 1, sped * 0.7, 0, 0);
-  pidEnc(1.5, 0.1, 1, min(400.0, sped * 0.5), overdrive, 1);
+  int overdrive = 585;
+  pidX(0.5, 0.02, 0.5, sped, 0, 0);
+  pidEnc(0.5, 0.02, 0.5, sped * 0.6, overdrive, 1);
 }
 
 void pidX(float kp, float ki, float kd, float sped, int overdrive, int stopp) {
   all_forward();
   int minx = 200;
   if (inverse == 1) {
-    minx = 830;
+    minx = 730;
   }
 
   uint8_t datx1 = 0;
@@ -53,7 +53,7 @@ void pidX(float kp, float ki, float kd, float sped, int overdrive, int stopp) {
   else if (stopp == 1) {  //резко тормоз
     stop_after_pid(sped);
     delay(50);
-  } else delay(50);
+  }
 }
 
 void pidEnc(float kp, float ki, float kd, float sped, int enc, int stopp) {
@@ -76,7 +76,6 @@ void pidEnc(float kp, float ki, float kd, float sped, int enc, int stopp) {
   if (stopp == 1) {  //резко тормоз
     stop_after_pid(sped);
   }
-  delay(50);
 }
 
 uint32_t timer = 0;
@@ -96,7 +95,7 @@ void pid_regulator(float kp, float ki, float kd, float sped) {
   // error calculation
   float e = (dat2 - dat1);
   if (inverse) e = -e;
-  if (abs(e) < 16)
+  if (abs(e) < 20)
     e = 0;
   // integral part
   errors[err_i] = e;
@@ -116,18 +115,20 @@ void pid_regulator(float kp, float ki, float kd, float sped) {
 
   mot1 = mot1 * way;
   mot2 = mot2 * way;
-  if (millis() - timer > 10) {
+  if (millis() - timer > 15) {
     timer = millis();
     // servo jiggle
-    if (abs(e)>20){
-    int deg = constrain(U * 0.006, -2, 2);
-    int serv[4] = { 0, 1, 6, 7 };
-    int degs[4] = { ASF + deg, BSF - deg, CSF - deg, DSF + deg };
-    Wire.beginTransmission(I2C_ADDRESS);  // Slave address
-    for (int i = 0; i < 4; i++)
-      send_servo(serv[i], degs[i]);
-    Wire.endTransmission();
-  }}
+    if (abs(U) > 20) {
+      int deg = constrain(U * 0.006, -2, 2);
+      int serv[4] = { 0, 1, 6, 7 };
+      int degs[4] = { ASF + deg, BSF - deg, CSF - deg, DSF + deg };
+      Wire.beginTransmission(I2C_ADDRESS);  // Slave address
+      for (int i = 0; i < 4; i++)
+        send_servo(serv[i], degs[i]);
+      Wire.endTransmission();
+    } else if (abs(U) < 5)
+      all_forward();
+  }
   drive(mot1, mot1, mot2, mot2);
 }
 
@@ -137,6 +138,6 @@ void stop_after_pid(float sped) {
   drive(tormoz_speed, tormoz_speed, tormoz_speed, tormoz_speed);
   delay(10);
   all_forward();
-  delay((abs(sped) / 1023.0 * 40)-10);
+  delay((abs(sped) / 1023.0 * 40) - 10);
   stop();
 }

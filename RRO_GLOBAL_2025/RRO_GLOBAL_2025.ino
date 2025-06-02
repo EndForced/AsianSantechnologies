@@ -3,21 +3,27 @@ volatile int countl = 0;
 volatile int countr = 0;
 
 int inverse = 0;
+
+int dir = 1;
+
 float e_old = 0;
 int err_i = 0;
 float sum = 0;
 float errors[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 float dat1, dat2;
 
+byte collected_tubes = 0;
+
 void setup() {
   Serial.begin(115200);
-
+  Serial1.begin(115200, SERIAL_8N1, 16, 17);
+  Serial1.println("Started succesfully");
   motors_init();
 
   buzzer_init();
   beep(900, 300);
 
-  delay(1200);
+  delay(1000);
   servos_init();
 
   all_forward();
@@ -30,18 +36,91 @@ void setup() {
   beep(400, 90);
   delay(10);
   beep(900, 150);
+
+
+  // buttonWait(0);
 }
 
 void loop() {
   buttonWait(0);
-  send_rgb(100, 100, 0);
-  delay(10);
-  open_claws();
+  arm(3);
+  cam(1, 9);
+  delay(500);
 
-  buttonWait(0);
-  send_rgb(100, 0, 100);
-  delay(10);
-  close_claws();
+  pidXN(1000, 2);
+
+  turn_to_line(1000, -1, 1, 1);
+  pidXN(1000, 3);
+  turn_to_line(1000, -1, 1, 1);
+
+  grab();
+
+  turn_to_line(1000, -1, 1, 1);
+  pidXN(1000, 2);
+
+  turn_to_line(1000, -1, 1, 1);
+
+  pidXN(1000, 4);
+
+  turn_to_line(1000, -1, 1, 1);
+
+  go_up(1);
+
+  pidXN(1000, 2);
+  // buttonWait(0);
+
+  go_down(1);
+
+  pidXN(1000, 2);
+
+  turn_to_line(1000, 1, 1, 1);
+
+  grab();
+
+  turn_to_line(1000, 1, 1, 1);
+  pidXN(1000, 1);
+  turn_to_line(1000, 1, 1, 1);
+  pidXN(1000, 6);
+  turn_to_line(1000, 1, 1, 1);
+  pidXN(1000, 1);
+  turn_to_line(1000, 1, 1, 1);
+
+  go_up(1);
+  pidXN(1000, 1);
+  grab();
+  go_down(-1);
+  pidXN(-1000, 1);
+  turn_to_line(1000, 1, 1, 1);
+  pidXN(900, 1);
+  turn_to_line(1000, -1, 1, 1);
+  pidXN(1000, 6);
+  turn_to_line(1000, 1, 1, 1);
+  go_up(1);
+
+  pidXN(1000, 2);
+  // buttonWait(0);
+
+  go_down(1);
+  pidXN(1000, 1);
+  turn_to_line(1000, -1, 1, 1);
+  pidXN(900, 1);
+  turn_to_line(1000, 1, 1, 1);
+  put();
+  turn_to_line(1000, 1, 1, 1);
+  pidXN(1000, 1);
+  turn_to_line(1000, -1, 1, 1);
+  put();
+  turn_to_line(1000, 1, 1, 1);
+  pidXN(1000, 1);
+  turn_to_line(1000, -1, 1, 1);
+  put();
+
+
+
+
+
+
+  // uartProcessing();
 }
 
 

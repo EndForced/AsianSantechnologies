@@ -7,7 +7,7 @@
 Adafruit_NeoPixel pixels(NUMPIXELS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 
 /*------------------------------A---B---CL1-ARM-CL2-CAM-C---D-*/
-const int base_positions[8] = { 93, 87, 90, 10, 90, 90, 86, 88 };
+const int base_positions[8] = { 93, 87, 90, 10, 90, 150, 86, 88 };
 
 #define ASF 140
 #define BSF 40
@@ -16,43 +16,104 @@ const int base_positions[8] = { 93, 87, 90, 10, 90, 90, 86, 88 };
 
 void servos_init() {
   Wire.begin();  // Join I2C bus as master
-  Wire.setClock(1000000);
+  Wire.setClock(400000);
 
   send_rgb(0, 0, 0);
-  delay(10);
-  send_servo(3, 80);
-  delay(10);
+  delay(20);
+  arm(6);
+  cam(0);
+  close_claws();
   // open_claws();
   all_forward();
   delay(900);
 }
 
 const byte arm_num = 3;
-const byte arm_positions[] = { 100, 90, 50, 30, 10 };  // from stand to last tube
+const byte arm_positions[] = { 102, 98, 80, 60, 40, 22, 5 };  // from stand to last tube
+const byte max_pos = sizeof(arm_positions) / sizeof(byte) - 1;
 
 byte last_arm_pos = 10;
+byte last2_arm_pos = 10;
+
 void arm(byte num_of_pos) {
-  byte distance = abs(arm_position[num_of_pos] - last_arm_pos);
-  for (int i = last_arm_pos; i != arm_position[num_of_pos]; arm_position[num_of_pos] > last_arm_pos ? i++ : i--) {
+  last2_arm_pos = last_arm_pos;
+  byte distance = abs(arm_positions[num_of_pos] - last_arm_pos);
+  send_servo(arm_num, arm_positions[num_of_pos]);
+  last_arm_pos = arm_positions[num_of_pos];
+}
+
+void arm(byte num_of_pos, int del) {
+  last2_arm_pos = last_arm_pos;
+  byte distance = abs(arm_positions[num_of_pos] - last_arm_pos);
+  for (int i = last_arm_pos; i != arm_positions[num_of_pos]; arm_positions[num_of_pos] > last_arm_pos ? i++ : i--) {
     send_servo(arm_num, i);
-    delay((i < distance * 0.3 or i > distance * 0.7) ? 3 : 6);
+    float dist = distance;
+    delay(del);
   }
-  last_arm_pos = arm_position[num_of_pos];
+  // send_servo(arm_num, arm_positions[num_of_pos]);
+
+  last_arm_pos = arm_positions[num_of_pos];
+}
+
+int time_calc(byte new_pos) {
+  byte distance = abs(arm_positions[new_pos] - last2_arm_pos);
+  return distance * 10 + 100;
 }
 
 void grab() {
   open_claws();
-  arm(0);
-  pidEnc(1.5, 0.1, 1, 800, 700, 1);
   arm(1);
+  delay((time_calc(1) * 3) / 4);
+  pidEnc(0.7, 0.07, 0.8, 850, 350, 0);
+  pidEnc(0.7, 0.07, 0.8, 450, 220, 1);
+  delay(200);
+  arm(2);
+  delay(time_calc(2) + 150);
   close_claws();
+  delay(250);
+  lay();
+  pidEnc(1.5, 0.1, 1, -750, 570, 1);
+  delay(50);
+}
+
+void lay() {
+  close_claws();
+  if (0 <= collected_tubes && collected_tubes < 3) {
+    arm(max_pos - collected_tubes);
+    // delay(time_calc(max_pos - collected_tubes));
+    collected_tubes++;
+  }
+  // delay(50);
+}
+
+void put() {
+  if (0 < collected_tubes && collected_tubes <= 3) {
+    collected_tubes--;
+    arm(max_pos - collected_tubes);
+    delay(time_calc(max_pos - collected_tubes));
+    delay(100);
+  }
+  close_claws();
+  delay(150);
+  arm(0);
+  delay(time_calc(0));
+  delay(200);
+  open_claws();
   delay(100);
-  pidEnc(1.5, 0.1, 1, -800, 700, 1);
+  arm(2, 8);
+  // podexatb
+  pidEnc(0.4, 0.01, 0.5, 850, 1050, 0);
+  pidEnc(0.4, 0.01, 0.5, 450, 220, 1);
+  arm(0, 9);
+  delay(200);
+  // ot'exatb
+  pidXN(-800, 1);
+  arm(3);
 }
 
 const byte claw_nums[] = { 2, 4 };
-const byte claw_open[] = { 130, 51 };
-const byte claw_closed[] = { 50, 131 };
+const byte claw_open[] = { 120, 61 };
+const byte claw_closed[] = { 52, 129 };
 
 void open_claws() {
   Wire.beginTransmission(I2C_ADDRESS);  // Slave address
@@ -61,7 +122,6 @@ void open_claws() {
   send_command(cmd, claw_nums[1], claw_open[1]);
   Wire.endTransmission();
 }
-
 void close_claws() {
   Wire.beginTransmission(I2C_ADDRESS);  // Slave address
   char cmd[] = { 'S', 'E', 'R', 'V' };
@@ -69,6 +129,22 @@ void close_claws() {
     send_command(cmd, claw_nums[i], claw_closed[i]);
   }
   Wire.endTransmission();
+}
+
+const byte cam_pos[] = { 153, 50 };
+const byte cam_num = 5;
+byte last_cam = 0;
+
+void cam(byte num_pos, int del) {
+  int dist = abs(last_cam - cam_pos[num_pos]);
+  for (int i = last_cam; i != cam_pos[num_pos]; cam_pos[num_pos] > last_cam ? i++ : i--) {
+    send_servo(cam_num, i);
+    delay(del);
+  }
+  last_cam = cam_pos[num_pos];
+}
+void cam(byte num_pos) {
+  cam(num_pos, 0);
 }
 
 
@@ -82,7 +158,6 @@ void all_forward() {
     send_servo(abcd[i], forward[i]);
   Wire.endTransmission();
 }
-
 void all_diagonal() {
   Wire.beginTransmission(I2C_ADDRESS);  // Slave address
   for (int i = 0; i < 4; i++)

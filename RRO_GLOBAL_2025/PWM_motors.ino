@@ -17,7 +17,7 @@
 #define PWM_MAX ((1 << PWM_RES) - 1)
 
 void motors_init() {
-  Serial.println(PWM_MAX);
+  // Serial.println(PWM_MAX);
   /*------------PWM_PINS-------------*/
   ledcAttach(ma1, PWM_FREQ, PWM_RES);
   ledcAttach(ma2, PWM_FREQ, PWM_RES);
@@ -59,6 +59,10 @@ void drive(float spa, float spb, float spc, float spd) {
 
   ledcWrite(md1, spd > 0 ? spd : 0);
   ledcWrite(md2, spd < 0 ? -spd : 0);
+}
+
+void drive(int speed) {
+  drive(speed, speed, speed, speed);
 }
 
 void stop() {
