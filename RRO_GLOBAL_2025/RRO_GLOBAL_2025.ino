@@ -11,6 +11,10 @@ float dat1, dat2;
 
 void setup() {
   Serial.begin(115200);
+  Serial.begin(115200);
+  Serial1.begin(115200, SERIAL_8N1, 16, 17);
+  Serial.println("Started!");
+
 
   motors_init();
 

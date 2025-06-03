@@ -1,6 +1,5 @@
 /*-----------------------------BUZZERS-----------------------------*/
 #define BZ1_PIN 10
-#define BZ2_PIN 35
 #define BTN_PIN 21
 
 void buzzer_init(){

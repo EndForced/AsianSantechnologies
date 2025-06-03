@@ -1,7 +1,19 @@
+#define D4 293
+#define D5 587
+#define A4 440
+#define GH4 415
+#define G4 391
+#define F4 350
+#define C4 261
+#define C5 523
+
+
 const String commands[] = {"Beep", "Reset", "Turn", "Button_skip"};
 const int commandsCount = 4;
 String parameters[10];
 int paramCount = 0;
+
+
 
 void uartProcessing() {
   if (Serial1.available()) {

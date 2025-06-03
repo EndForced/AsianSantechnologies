@@ -25,11 +25,11 @@ class RobotAPI:
 
         if max(position) > 15:
             raise ValueError("Robot is out of borders!", position)
-        self.RobotPosition = position
+        self.Position = position
 
         if orientation not in [1, 2, 3, 4]:
             raise ValueError("Unknown orientation!", orientation)
-        self.RobotOrientation = orientation
+        self.Orientation = orientation
 
         self.ESPMessage = self.read()
         self.IsDoingAction = 0
@@ -252,7 +252,7 @@ class WebsiteHolder:
 
 
         self.camera_client = CameraClient(self.socketio, self.logger)
-        self.robot = RobotAPI((0, 0), 1, uart_port, self.socketio)
+        self.robot = RobotAPI((8, 8), 1, uart_port, self.socketio)
 
 
         # Установка маршрутов и обработчиков SocketIO

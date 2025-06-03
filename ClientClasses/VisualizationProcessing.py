@@ -7,8 +7,10 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from wayProcessingOperations import BasicWaveOperations as WaveProcessing
-from wayProcessingOperations.BasicWaveOperations import possible_codes, PattersSolver
+from wayProcessingOperations.BasicWaveOperations import PattersSolver
 import platform
+possible_codes = [0, 10, 20, 31,32,33,34, 41,42, 51,52, 61,62,63,64, 71,72,73,74, 81,82,83,84, 91,92,93,94]
+
 
 class VisualizeMatrix:
     import cv2
@@ -79,6 +81,16 @@ class VisualizeMatrix:
             return self.smart_resize()
 
         return self.picture
+
+    def update_matrix(self):
+        self.picture = self.image_by_matrix_size()
+
+        self._codesInMatrix = self.find_included_codes()
+        self._cached_images = self.cache_images()
+        self.visualize_matrix()
+
+        self.resizedPicture = self.smart_resize()
+        return self.resizedPicture
 
     def smart_resize(self, target_size=600, keep_aspect_ratio=True, interpolation=cv2.INTER_AREA):
 
@@ -255,61 +267,81 @@ class VisualizePaths(VisualizeWaves):
             (0, 65535, 65535),  # Желтый
             (65535, 0, 65535)  # Пурпурный
         ]
-        self.path_thickness = 15
+        self.path_thickness = 9
         self.arrow_thickness = 3
-        self.circle_radius = 20
-        self.start_color = (0, 32768, 0)  # Темно-зеленый
-        self.finish_color = (0, 0, 32768)  # Темно-красный
+        self.path_offset = 9 # Смещение для параллельных путей
         self.temp_canvas = None
+        self.route_number_font = cv2.FONT_HERSHEY_SIMPLEX
+        self.route_number_scale = 0.8
+        self.route_number_thickness = 2
 
-    def draw_path(self, path: List[Tuple[int, int]], color_index: int = 0):
-        """Рисует один путь на изображении"""
-        if not path:
+    def draw_path(self, path: List[Tuple[int, int]], color_index: int = 0, route_num: int = 0):
+        """Рисует один путь на изображении сплошной линией с номером маршрута"""
+        if not path or len(path) < 2:
             return
-
-        # Создаем временный холст для композиции
-        if self.temp_canvas is None:
-            self.temp_canvas = np.zeros_like(self.picture)
 
         color = self.path_colors[color_index % len(self.path_colors)]
 
-        # Рисуем линии между точками пути на временном холсте
-        for i in range(len(path) - 1):
-            start = self._get_center_coords(path[i])
-            end = self._get_center_coords(path[i + 1])
+        # Вычисляем смещение для текущего маршрута
+        offset_x = (color_index % 3 - 1) * self.path_offset
+        offset_y = ((color_index // 3) % 2) * self.path_offset
 
-            # Линия пути
-            cv2.line(self.temp_canvas, start, end, color, self.path_thickness)
+        # Подготавливаем массив точек для сплошной линии
+        points = []
+        for cell in path:
+            center = self._get_center_coords(cell, offset_x, offset_y)
+            points.append(center)
 
-            # Стрелка направления
-            if i < len(path) - 2:
-                cv2.arrowedLine(self.temp_canvas, start, end, (0, 0, 0),
-                                self.arrow_thickness, tipLength=0.3)
+        # Преобразуем в numpy массив и рисуем сплошную линию
+        points = np.array(points, dtype=np.int32)
+        cv2.polylines(self.picture, [points], False, color, self.path_thickness)
 
-        # Копируем временный холст на основное изображение
-        self._merge_canvas()
+        # # Добавляем стрелки направления
+        # for i in range(len(points) - 1):
+        #     cv2.arrowedLine(self.picture, points[i], points[i + 1], (0, 0, 0),
+        #                     self.arrow_thickness, tipLength=0.3)
 
-        # Рисуем начальную и конечную точки поверх всего
-        self._draw_point(path[0], self.start_color, "S")
-        self._draw_point(path[-1], self.finish_color, "F")
+        # Добавляем номер маршрута в верхний правый угол последней клетки
+        if route_num > 0:
+            self._draw_route_number(path[-1], route_num, color)
 
-    def _merge_canvas(self):
-        """Объединяет временный холст с основным изображением"""
-        if self.temp_canvas is not None:
-            # Применяем пути к основному изображению
-            mask = np.any(self.temp_canvas > 0, axis=2)
-            for c in range(3):
-                self.picture[:, :, c][mask] = self.temp_canvas[:, :, c][mask]
-            self.temp_canvas = None
+    def _get_center_coords(self, cell: Tuple[int, int], offset_x: int = 0, offset_y: int = 0) -> Tuple[int, int]:
+        """Возвращает координаты центра клетки в пикселях с учетом смещения"""
+        y, x = cell
+        center_x = x * 100 + 50 + offset_x
+        center_y = y * 100 + 50 + offset_y
+        return (center_x, center_y)
+
+    def _draw_route_number(self, cell: Tuple[int, int], route_num: int, color: Tuple[int, int, int]):
+        """Рисует номер маршрута в верхнем правом углу клетки"""
+        y, x = cell
+        text = str(route_num)
+
+        # Позиция текста (верхний правый угол клетки)
+        text_x = x * 100 + 80
+        text_y = y * 100 + 30
+
+        # Размер текста
+        text_size = cv2.getTextSize(text, self.route_number_font,
+                                    self.route_number_scale,
+                                    self.route_number_thickness)[0]
+
+        # Рисуем текст с контуром для лучшей видимости
+        cv2.putText(self.picture, text, (text_x - text_size[0], text_y),
+                    self.route_number_font, self.route_number_scale,
+                    (65535, 65535, 65535), self.route_number_thickness + 2)
+
+        cv2.putText(self.picture, text, (text_x - text_size[0], text_y),
+                    self.route_number_font, self.route_number_scale,
+                    color, self.route_number_thickness)
 
     def draw_multiple_paths(self, paths: List[List[Tuple[int, int]]]):
-        """Рисует несколько путей разными цветами"""
-        # Сначала рисуем все пути
+        """Рисует несколько путей разными цветами с номерами"""
+        # Рисуем все пути
         for i, path in enumerate(paths):
-            self.draw_path(path, i)
-
-        # Убедимся, что все временные холсты объединены
-        self._merge_canvas()
+            if len(path) == 1:
+                self._draw_route_number(path[0], i+1 , self.path_colors[1])
+            self.draw_path(path, i, i + 1)  # i+1 - номер маршрута
 
     def visualize(self, paths: List[List[Tuple[int, int]]], waves: List[List[Tuple[int, int]]] = None):
         """Основной метод визуализации"""
@@ -317,51 +349,39 @@ class VisualizePaths(VisualizeWaves):
         if waves:
             self.visualize_wave(waves)
 
-        # Затем рисуем пути (старт/финиш будут поверх)
+        # Затем рисуем пути с номерами
         self.draw_multiple_paths(paths)
 
         # Возвращаем изображение в формате BGR
         return cv2.cvtColor(self.picture, cv2.COLOR_RGB2BGR)
 
-    # Остальные методы остаются без изменений
-    def _get_center_coords(self, cell: Tuple[int, int]) -> Tuple[int, int]:
-        """Возвращает координаты центра клетки в пикселях"""
-        y, x = cell
-        center_x = x * 100 + 50
-        center_y = y * 100 + 50
-        return (center_x, center_y)
-
-    def _draw_point(self, cell: Tuple[int, int], color: Tuple[int, int, int], text: str = ""):
-        """Рисует круг в указанной клетке с текстом (поверх всего)"""
-        center = self._get_center_coords(cell)
-
-        # Рисуем круг
-        cv2.circle(self.picture, center, self.circle_radius, color, -1)
-
-        # Рисуем текст
-        if text:
-            text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
-            text_x = center[0] - text_size[0] // 2
-            text_y = center[1] + text_size[1] // 2
-            cv2.putText(self.picture, text, (text_x, text_y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (65535, 65535, 65535), 2)
-
 if __name__ == "__main__":
     # mat = [[10, 31, 10, 10, 42, 10, 10, 62], [10, 20, 10, 10, 20, 20, 10, 62], [20, 20, 20, 10, 32, 34, 10, 62], [20, 20, 20, 10, 20, 10, 20, 10], [20, 33, 33, 10, 71, 10, 10, 41], [33, 41, 20, 20, 34, 10, 10, 10], [10, 20, 10, 10, 32, 20, 20, 34], [10, 10, 10, 20, 20, 34, 10, 10]]
-    mat = [[10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10],
-     [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 10, 10, 20, 10, 10], [10, 10, 10, 20, 20, 20, 10, 10],
-     [10, 10, 10, 10, 10, 10, 10, 10], [10, 10, 10, 10, 10, 10, 10, 10]]
+    mat = [[0, 0, 10, 10, 10, 61, 61, 61],
+           [10, 10, 10, 10, 10, 10, 10, 10],
+           [10, 10, 10, 10, 10, 10, 10, 10],
+           [10, 10, 0, 0, 0, 41, 10, 10],
+           [10, 33, 10, 42, 10, 10, 10, 10],
+           [10, 31, 10, 10, 41, 10, 10, 10],
+           [10, 33, 10, 10, 10, 71, 10, 10],
+           [10, 10, 10, 10, 10, 10, 10, 10],]
+
+    # mat = [[64, 10, 10, 10, 42, 10, 20, 10], [64, 10, 20, 20, 20, 34, 10, 10], [64, 10, 32, 20, 81, 52, 34, 10], [42, 10, 10, 10, 10, 10, 10, 20], [20, 20, 34, 10, 20, 10, 20, 20], [10, 10, 10, 10, 10, 10, 20, 20], [31, 20, 10, 32, 20, 20, 34, 33], [33, 10, 10, 10, 20, 20, 34, 42]]
     obj = VisualizePaths(mat)
-    print(obj.matrixConnections)
-    obj.create_wave((6,0))
-    obj.visualize_wave()
 
-    print(VisualizePaths.__mro__)
+    robot = obj.find_robot()
+    obj.create_wave(robot)
+    obj.visualize_wave(obj.Waves)
+    # d = obj.solve()
+    # print(d)
+    # obj.draw_multiple_paths(d)
+    # res = obj.create_way((5,5),(6,4))
 
-    obj.create_way((0,7),(6,4))
-    sortede = obj.sort_ways(obj.Ways)
-    obj.draw_path(sortede)
-    print(sortede)
+    # print(res)
+    # obj.draw_path(res)
     obj.show()
+
+
+
 
 
