@@ -1,30 +1,20 @@
-#define D4 293
-#define D5 587
-#define A4 440
-#define GH4 415
-#define G4 391
-#define F4 350
-#define C4 261
-#define C5 523
-
-
-const String commands[] = {"Beep", "Reset", "Turn", "Button_skip"};
+const String commands[] = { "Beep", "Reset", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Button_skip", "Mode_swap", "Elevation_swap", "Tubes" };
 const int commandsCount = 4;
 String parameters[10];
 int paramCount = 0;
 
-
+bool ramp_last = 0;
 
 void uartProcessing() {
   if (Serial1.available()) {
     String uart_data = Serial1.readStringUntil('\n');
     uart_data.trim();
-    
+
     if (uart_data.length() == 0) return;
 
     String command = readUntilSpace(uart_data);
     int commandIndex = findCommandIndex(command, commands, commandsCount);
-    
+
     Serial.print("Received: ");
     Serial.println(uart_data);
     Serial.print("Command: ");
@@ -33,25 +23,24 @@ void uartProcessing() {
     Serial.println(commandIndex);
 
     splitIntoParameters(uart_data, parameters, paramCount);
-
+    if (ramp_last and commandIndex != 4 and commandIndex != 5) ramp_last = 0;
     switch (commandIndex) {
-      case 0: // "Beep"
-        handleBeepCommand();
-        break;
-        
-      case 1: // "Reset"
-        handleResetCommand();
-        break;
-        
-      case 2: // "Turn"
-        handleTurnCommand();
-        break;
-        
-      case 3: // "Button_skip"
-        handleButtonSkipCommand();
-        break;
-        
-      default: // we fucking dont know whut is it
+      case 0: handleBeepCommand(); break;   // "Beep"
+      case 1: handleResetCommand(); break;  // "Reset"
+
+      case 2: handleTurnCommand(); break;  // "Turn"
+      case 3: handlePidCommand(); break;   // "Pid"
+      case 4: handleUpCommand(); break;    // "Up"
+      case 5: handleDownCommand(); break;  // "Down"
+      case 6: handleGrabCommand(); break;  // "Grab"
+      // case 7: handlePutCommand(); break;   // "Put"
+
+      case 8: handleButtonSkipCommand(); break;  // "Button_skip"
+      case 9: handleBeepCommand(); break;        // "Beep"
+      case 10: handleBeepCommand(); break;       // "Beep"
+
+
+      default:  // we fucking dont know whut is it
         SendData("Unknown command: " + command);
         break;
     }
@@ -60,6 +49,8 @@ void uartProcessing() {
 }
 
 // command holders
+
+#define G4 391
 
 void handleBeepCommand() {
   switch (paramCount) {
@@ -85,18 +76,57 @@ void handleResetCommand() {
   esp_restart();
 }
 
+void handleGrabCommand() {
+  grab();
+  SendData("Grab");
+  Serial.println("Grab");
+}
+
+void handleUpCommand() {
+  go_up(dir * (ramp_last + 1));
+  SendData("Up");
+  Serial.println("Up");
+}
+
+void handleDownCommand() {
+  go_down(dir * (ramp_last + 1));
+  SendData("Down");
+  Serial.println("Down");
+}
+
 void handleTurnCommand() {
   if (paramCount == 0) {
     SendData("Error: No direction specified");
     return;
   }
-  
+
   String direction = parameters[0];
-  int speed = (paramCount > 1) ? parameters[1].toInt() : 100; 
-  int steps = (paramCount > 2) ? parameters[2].toInt() : 90;
-  
+  int speed = (paramCount > 1) ? parameters[1].toInt() : 1000;
+  int steps = (paramCount > 2) ? parameters[2].toInt() : 1;
+  int way = (direction == "Left") ? -1 : 1;
+
+  turn_to_line(speed, way, dir, steps);
+
   // Andrew's Job
   SendData("Turning " + direction + " speed " + String(speed));
+}
+
+void handlePidCommand() {
+  if (paramCount == 0) {
+    SendData("Error: No direction specified");
+    return;
+  }
+
+  String direction = parameters[0];
+  int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
+  int speed = (paramCount > 2) ? parameters[2].toInt() : 900;
+
+  int way = (direction == "Forward") ? 1 : -1;
+
+  pidXN(speed * way, steps);
+
+  // Andrew's Job
+  SendData("Moving " + direction + " with speed " + String(speed));
 }
 
 void handleButtonSkipCommand() {
@@ -122,26 +152,26 @@ int findCommandIndex(const String& command, const String commands[], int size) {
   return -1;
 }
 
-void splitIntoParameters(const String &data, String* parameters, int &count) {
+void splitIntoParameters(const String& data, String* parameters, int& count) {
   count = 0;
   int startPos = data.indexOf(' ');
-  
+
   if (startPos == -1) {
     return;
   }
-  
+
   startPos++;
   int spacePos = startPos;
 
 
   while (spacePos < data.length() && count < 10) {
     spacePos = data.indexOf(' ', startPos);
-    
+
     if (spacePos == -1) {
       parameters[count++] = data.substring(startPos);
       break;
     }
-    
+
     parameters[count++] = data.substring(startPos, spacePos);
     startPos = spacePos + 1;
   }
