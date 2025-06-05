@@ -42,12 +42,12 @@ void setup() {
 }
 
 void loop() {
-  buttonWait(0);
+//  buttonWait(0);
 //  arm(3);
 //  cam(1, 9);
 //  delay(500);
 //
-  pidXN(1000, 1);
+//  pidXN(1000, 1);
 //
 //  turn_to_line(1000, -1, 1, 1);
 //  pidXN(1000, 3);
@@ -64,9 +64,9 @@ void loop() {
 //
 //  turn_to_line(1000, -1, 1, 1);
 //
-  go_up(1);
-//
-  pidXN(1000, 1);
+//  go_up(1);
+////
+//  pidXN(1000, 1);
 //  // buttonWait(0);
 //
 //  go_down(1);

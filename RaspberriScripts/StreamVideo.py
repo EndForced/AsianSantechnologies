@@ -71,7 +71,7 @@ class RobotAPI:
             if len(commands[i]) == 2:
                 if commands[i][0] != "F":
                     command = commands[i][0]
-                    num = commands[i][1]
+                    num = commands[i][1] if commands[i][1] else ""
                     commands[i] = f"{commands_dict[command]} {num}"
 
                 elif commands[i][0] == "F":
@@ -81,7 +81,6 @@ class RobotAPI:
         print(commands)
         for i in commands:
             self.do(i)
-
 
 
     def do(self, args):
