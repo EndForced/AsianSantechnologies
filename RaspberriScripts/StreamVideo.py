@@ -99,7 +99,7 @@ class RobotAPI:
                     time.sleep(0.1)
                     _ += 1
                     if _ == 50: break
-                print(f"\n res")
+                print(f"\n {res}")
 
 
             if self.socket:
