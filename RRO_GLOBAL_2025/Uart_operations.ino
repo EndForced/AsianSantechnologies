@@ -1,4 +1,4 @@
-const String commands[] = { "Beep", "Reset", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Button_skip", "Mode_swap", "Elevation_swap", "Tubes" };
+const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Button_skip", "Dir_swap", "Elevation_swap", "Tubes" };
 const int commandsCount = 12;
 String parameters[10];
 int paramCount = 0;
@@ -25,19 +25,20 @@ void uartProcessing() {
     splitIntoParameters(uart_data, parameters, paramCount);
     if (ramp_last and commandIndex != 4 and commandIndex != 5) ramp_last = 0;
     switch (commandIndex) {
-      case 0: handleBeepCommand(); break;   // "Beep"
-      case 1: handleResetCommand(); break;  // "Reset"
+      case 0: handleResetCommand(); break;  // "Reset"
+      case 1: handleBeepCommand(); break;   // "Beep"
 
       case 2: handleTurnCommand(); break;  // "Turn"
       case 3: handlePidCommand(); break;   // "Pid"
       case 4: handleUpCommand(); break;    // "Up"
       case 5: handleDownCommand(); break;  // "Down"
       case 6: handleGrabCommand(); break;  // "Grab"
-      // case 7: handlePutCommand(); break;   // "Put"
+      case 7: handlePutCommand(); break;   // "Put"
 
       case 8: handleButtonSkipCommand(); break;  // "Button_skip"
-      case 9: handleBeepCommand(); break;        // "Beep"
-      case 10: handleBeepCommand(); break;       // "Beep"
+      case 9: handleDirCommand(); break;         // "Dir_swap"
+      case 10: handleElevationCommand(); break;  // "Elevation_swap"
+      case 11: handleTubesCommand(); break;      // "Tubes"
 
 
       default:  // we fucking dont know whut is it
@@ -45,7 +46,7 @@ void uartProcessing() {
         break;
     }
   }
-  delay(150);
+  delay(50);
 }
 
 // command holders
@@ -82,6 +83,12 @@ void handleGrabCommand() {
   Serial.println("Grab");
 }
 
+void handlePutCommand() {
+  lay();
+  SendData("Put");
+  Serial.println("Put");
+}
+
 void handleUpCommand() {
   go_up(dir * (ramp_last + 1));
   SendData("Up");
@@ -101,8 +108,8 @@ void handleTurnCommand() {
   }
 
   String direction = parameters[0];
-  int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
-  int speed = (paramCount > 2) ? parameters[2].toInt() : 1000;
+  int speed = (paramCount > 1) ? parameters[1].toInt() : 1000;
+  int steps = (paramCount > 2) ? parameters[2].toInt() : 1;
   int way = (direction == "Left") ? -1 : 1;
 
   turn_to_line(speed, way, dir, steps);
@@ -136,6 +143,71 @@ void handleButtonSkipCommand() {
   //btn flag change
   SendData("Button activated");
 }
+
+void handleDirCommand() {
+  if (paramCount == 0) {
+    SendData("Error: No mode specified");
+    return;
+  }
+
+  int new_dir = parameters[0].toInt();
+  if (new_dir == 1 or new_dir == -1)
+    dir = new_dir;
+  else {
+    SendData("Error: direction non-existant (dir must be a 1 or -1)");
+    return;
+  }
+
+  SendData("Direction swiched to " + String(dir));
+}
+
+void handleElevationCommand() {
+  if (paramCount == 0) {
+    SendData("Error: No level specified");
+    return;
+  }
+
+  int new_level = parameters[0].toInt();
+  if (new_level == 1 or new_level == 2)
+    inverse = new_level - 1;
+  else {
+    SendData("Error: level non-existant (level must be a 1 or 2)");
+    return;
+  }
+
+  SendData("Level swiched to " + String(inverse + 1));
+}
+
+void handleTubesCommand() {
+  if (paramCount == 0) {
+    SendData("Error: No tubes count specified");
+    return;
+  }
+
+  int new_tubes = parameters[0].toInt();
+  if (new_tubes >= 0 and new_tubes <= 3)
+    collected_tubes = new_tubes;
+  else {
+    SendData("Error: tubes number non-existant (must be between 0 or 3)");
+    return;
+  }
+
+  SendData("Tubes swiched to " + collected_tubes);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // dont touch bro!!
 String readUntilSpace(const String& input) {
