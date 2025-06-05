@@ -99,6 +99,7 @@ class RobotAPI:
                     time.sleep(0.1)
                     _ += 1
                     if _ == 50: break
+                print(f"\n res")
 
 
             if self.socket:
@@ -107,7 +108,7 @@ class RobotAPI:
                     'type': 'received'
                 })
 
-            print(f"done {args}, res: {res} ... ")
+            # print(f"done {args}, res: {res} ... ")
 
     def set_frame(self, frame=None):
         if frame is None:
