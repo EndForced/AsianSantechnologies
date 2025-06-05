@@ -89,8 +89,10 @@ class RobotAPI:
 
         if args == "Reset":
             args = ""
-            self.conn.sendall(b"ARDUINO_RESET")
-            time.sleep(1.1)
+            conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            conn.connect(('localhost', 65432))
+            conn.sendall(b"ARDUINO_RESET")
+            conn.close()
 
 
         _ = 0
