@@ -231,6 +231,8 @@ if mc.OS == "Linux":
         # mc.robot.set_frame(frames[0])
         # print(np.median(frames[0]))
         # print(mc.robot.read())
+        msg = input()
+        mc.robot.do(msg)
         pass
 else:
     # print(type(res))
