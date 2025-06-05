@@ -237,7 +237,7 @@ if mc.OS == "Linux":
     # commands = ["X3", "R1", "X1", "F0", "X1", "R2", "X1", "F1", "L1", "X3"]
     commands = ["X2", "R1", "F0", "X1"]
     mc.robot.do("Direction 1")
-    mc.robot.do("Elevaion 1")
+    mc.robot.do("Elevation 1")
     mc.robot.do("Tubes 0")
     mc.robot.drive_through_roadmap(commands)
     time.sleep(1000)
