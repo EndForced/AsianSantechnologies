@@ -295,6 +295,7 @@ class PattersSolver(WaveCreator):
         self.holders = self.find_holders()
         self.pick_up = self.pick_tubes_cords()
         self.floor = 1
+        self.robot_cord = (8,8)
         # print(tubes)
 
 
@@ -482,6 +483,7 @@ class PattersSolver(WaveCreator):
 
     def solve(self):
         start = self.find_robot()
+        self.robot_cord = start
         self._matrix[start[0]][start[1]] = 10 if self._matrix[start[0]][start[1]] in [71,72,73,74] else 20
         self.tubes = self.find_tubes()
         self.holders = self.find_holders()
@@ -491,6 +493,11 @@ class PattersSolver(WaveCreator):
         combs = self.generate_combinations(start)
         d = self.process_combinations(combs)
         return d
+
+    # def detect_unload_type(self):
+    #     cells = self.get_relative_cells(self.robot_cord)
+    #     for i in cells.items():
+
 
 
 if __name__ == "__main__":
