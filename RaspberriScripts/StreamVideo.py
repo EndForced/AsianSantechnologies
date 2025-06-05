@@ -75,7 +75,7 @@ class RobotAPI:
                 elif commands[i][0] == "F":
                     command = commands[i]
                     commands[i] = f"{commands_dict[command]}"
-
+        print(commands)
         for i in commands:
             self.do(i)
 
