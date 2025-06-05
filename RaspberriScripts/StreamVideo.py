@@ -80,7 +80,7 @@ class RobotAPI:
                     'type': 'received'
                 })
 
-            print(f"done {args} ... ")
+            print(f"done {args}, res: {res} ... ")
 
     def set_frame(self, frame=None):
         if frame is None:
