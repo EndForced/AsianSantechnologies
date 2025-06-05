@@ -86,9 +86,10 @@ class RobotAPI:
 
     def do(self, args):
         self.ser.reset_input_buffer()
+
         if args == "Reset":
             args = ""
-            self.conn.sendall(b"GET_FRAMES")
+            self.conn.sendall(b"ARDUINO_RESET")
             time.sleep(1.1)
 
 
