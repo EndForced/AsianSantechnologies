@@ -70,6 +70,7 @@ class RobotAPI:
         if args:
             res = ""
             self.send(args)
+            print(f"doing {args} ... ")
             while not res:
                 res = self.read()
 
