@@ -98,9 +98,9 @@ class RobotAPI:
 
             while not res:
                 res = self.read()
-                time.sleep(0.1)
+                time.sleep(0.01)
                 _ += 1
-                if _ == 50: break
+                if _ == 5000: break
 
                 # print(f"\n {res}")
 
@@ -112,7 +112,7 @@ class RobotAPI:
                 })
 
             print(f"done {args}, res: {res} ... ")
-            time.sleep(0.1)
+            # time.sleep(0.1)
 
     def set_frame(self, frame=None):
         if frame is None:
