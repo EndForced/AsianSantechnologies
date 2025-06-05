@@ -94,11 +94,13 @@ class RobotAPI:
             print(f"doing {args} ... ")
 
             for __ in range(2):
+
                 while not res:
                     res = self.read()
                     time.sleep(0.1)
                     _ += 1
                     if _ == 50: break
+
                 print(f"\n {res}")
 
 
