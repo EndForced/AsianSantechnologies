@@ -15,10 +15,15 @@ import cv2
 class RobotAPI:
     #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
 
+
+
     def __init__(self, position, orientation, serial, socketio = None):
         self.telemetryQuality = 15
         self.mapQuality = 40
+        from gpiozero import OutputDevice
 
+        self.PIN = 23
+        self.gpio_pin = OutputDevice(self.PIN, active_high=True, initial_value=False)
         self.ser = serial
         self.ser.flush()
         self.socket = socketio
@@ -84,6 +89,12 @@ class RobotAPI:
 
     def do(self, args):
         self.ser.reset_input_buffer()
+        if args == "Reset":
+            args = ""
+            self.gpio_pin.on()
+            time.sleep(1)
+            self.gpio_pin.off()
+
         _ = 0
         if args:
             res = ""
@@ -93,7 +104,7 @@ class RobotAPI:
                 res = self.read()
                 time.sleep(0.1)
                 _ += 1
-                if _ == 100: return
+                if _ == 50: return
 
             if self.socket:
                 self.socket.emit('uart_message', {
