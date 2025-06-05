@@ -102,8 +102,7 @@ class RobotAPI:
                 res = self.read()
                 time.sleep(0.1)
                 _ += 1
-                if _ == 50: return
-
+                if _ == 50: break
             if self.socket:
                 self.socket.emit('uart_message', {
                     'message': res,
