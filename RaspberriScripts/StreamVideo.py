@@ -76,6 +76,9 @@ class RobotAPI:
                     command = commands[i]
                     commands[i] = f"{commands_dict[command]}"
 
+        for i in commands:
+            self.do(i)
+
 
 
     def do(self, args):
