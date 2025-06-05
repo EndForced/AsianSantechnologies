@@ -232,10 +232,10 @@ if mc.OS == "Linux":
         # print(np.median(frames[0]))
         # print(mc.robot.read())
         msg = input()
-        mc.robot.do(msg)
-        print("starting roadmap")
-        # commands = ["X3", "R1", "X1", "F0", "X1", "R2", "X1", "F1", "L1", "X3"]
-        # mc.robot.drive_through_roadmap(commands)
+        # mc.robot.do(msg)
+        # print("starting roadmap")
+        commands = ["X3", "R1", "X1", "F0", "X1", "R2", "X1", "F1", "L1", "X3"]
+        mc.robot.drive_through_roadmap(commands)
         pass
 else:
     # print(type(res))
