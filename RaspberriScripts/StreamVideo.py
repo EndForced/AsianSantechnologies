@@ -58,14 +58,14 @@ class RobotAPI:
 
     def read(self):
         line = self.ser.readline().decode('utf-8').strip()
-        if line is not None:
+        if line and len(line)>0:
             lines = line.split("*")
             return lines
 
     def drive_through_roadmap(self, roadmap):
         pass
 
-    def handle_website_commands(self, args):
+    def do(self, args):
         self.ser.reset_input_buffer()
         if args:
             res = ""
@@ -255,7 +255,6 @@ class WebsiteHolder:
         self.robot = RobotAPI((8, 8), 1, uart_port, self.socketio)
 
 
-        # Установка маршрутов и обработчиков SocketIO
         self._set_routes()
         self._set_socketio_handlers()
 
@@ -267,7 +266,7 @@ class WebsiteHolder:
 
         @self.app.route('/raw_cameras')
         def get_raw():
-            self.robot.handle_website_commands("Reset")
+            self.robot.do("Reset")
             return render_template('raw_cameras.html',
                                    qualities=['low', 'medium', 'high', 'max'])
 
@@ -284,7 +283,7 @@ class WebsiteHolder:
         def handle_uart_command(data):
             command = data.get('command', '')
             self.logger.info(f"Received UART command: {command}")
-            self.robot.handle_website_commands(command)
+            self.robot.do(command)
 
         @self.socketio.on('start_stream')
         def handle_start_stream(data=None):
