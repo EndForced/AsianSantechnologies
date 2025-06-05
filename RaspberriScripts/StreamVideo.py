@@ -63,7 +63,7 @@ class RobotAPI:
             return lines
 
     def drive_through_roadmap(self, commands):
-        commands_dict = {"R" : "Turn Left", "L": "Turn Right", "X": "Pid Forward", "x": "Pid Backwards", "F0": "Up", "F1": "Down"}
+        commands_dict = {"L" : "Turn Left", "R": "Turn Right", "X": "Pid Forward", "x": "Pid Backwards", "F0": "Up", "F1": "Down"}
 
         for i in range(len(commands)):
             if len(commands[i]) == 2:
