@@ -211,9 +211,15 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         return res, rob_dir
 
+    def qualifiction(self):
+        moves = self.solve()
+        self.robot.do("Direction 1")
+        self.robot.do(f"Elevation {self.floor}")
+        self.robot.drive_through_roadmap(moves)
+
 
 mat = [[64, 10, 10, 10, 42, 10, 20, 10], [64, 10, 20, 20, 20, 34, 10, 10], [64, 10, 32, 20, 81, 52, 34, 10], [42, 10, 10, 10, 10, 10, 10, 20], [20, 20, 34, 10, 20, 10, 20, 20], [10, 10, 10, 10, 10, 10, 20, 20], [31, 20, 10, 32, 20, 20, 34, 33], [33, 10, 10, 10, 20, 20, 34, 42]]
-
+mat = [[10, 10, 20, 20, 20, 34, 10, 62], [10, 52, 20, 20, 34, 20, 10, 62], [10, 20, 20, 20, 34, 10, 10, 62], [32, 20, 20, 20, 34, 10, 10, 20], [20, 10, 10, 10, 10, 10, 31, 20], [20, 32, 20, 20, 34, 10, 33, 20], [33, 10, 10, 10, 10, 10, 10, 10], [42, 10, 10, 71, 10, 10, 42, 10]]
 
 # mat = [[10]*15]*15
 mc = MainComputer(mat, serial)
@@ -222,24 +228,8 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
-    # frames = mc.robot.get_uncompressed_frames(0)
-    # frame = cv2.resize(frames[0], (600,600))
-    # # time.sleep(1)
-    # mc.send_map()
-    # mc.robot.set_frame(frames[0])
-    # print(np.median(frames[0]))
-    # print(mc.robot.read())
-    # while 1:
-    #     msg = input()
-    #     mc.robot.do(msg)
-    # print("starting roadmap")
-    msg = input()
-    # commands = ["X3", "R1", "X1", "F0", "X1", "R2", "X1", "F1", "L1", "X3"]
-    commands = ["X2", "R1", "F0", "X1"]
-    mc.robot.do("Direction 1")
-    mc.robot.do("Elevation 1")
-    mc.robot.do("Tubes 0")
-    mc.robot.drive_through_roadmap(commands)
+    _ = input()
+    mc.qualifiction()
     time.sleep(1000)
 else:
     # print(type(res))

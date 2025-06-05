@@ -294,6 +294,7 @@ class PattersSolver(WaveCreator):
         self.tubes = self.find_tubes()
         self.holders = self.find_holders()
         self.pick_up = self.pick_tubes_cords()
+        self.floor = 1
         # print(tubes)
 
 
@@ -397,6 +398,7 @@ class PattersSolver(WaveCreator):
             for j in range(len(self.matrix[i])):
                 if str(self.matrix[i][j])[0] in ["7","8"]:
                     robot_cord = (i,j)
+                    self.floor = 1 if str(self.matrix[i][j])[0] == "7" else 2
                     return robot_cord
 
     def generate_combinations(self,start):
