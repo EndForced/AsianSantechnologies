@@ -213,7 +213,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def qualifiction(self):
         moves = self.solve()
-        moves = self.way_to_commands(moves, "U")
+        moves = self.way_to_commands(moves, "D")
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves[0])
@@ -223,9 +223,9 @@ mat = [[64, 10, 10, 10, 42, 10, 20, 10], [64, 10, 20, 20, 20, 34, 10, 10], [64, 
 mat = [[10, 10, 20, 20, 20, 34, 10, 62],
        [10, 52, 20, 20, 34, 20, 10, 62],
        [10, 20, 20, 20, 34, 10, 10, 62],
-       [32, 20, 20, 20, 34, 10, 10, 20],
+       [32, 83, 20, 20, 34, 10, 10, 20],
        [20, 10, 10, 10, 10, 10, 31, 20],
-       [20, 32, 81, 20, 34, 10, 33, 20],
+       [20, 32, 20, 20, 34, 10, 33, 20],
        [33, 10, 10, 10, 10, 10, 10, 10],
        [42, 10, 10, 10, 10, 10, 42, 10]]
 
