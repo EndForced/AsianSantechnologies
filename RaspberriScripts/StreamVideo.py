@@ -92,11 +92,15 @@ class RobotAPI:
             res = ""
             self.send(args)
             print(f"doing {args} ... ")
-            while not res:
-                res = self.read()
-                time.sleep(0.1)
-                _ += 1
-                if _ == 50: break
+
+            for __ in range(2):
+                while not res:
+                    res = self.read()
+                    time.sleep(0.1)
+                    _ += 1
+                    if _ == 50: break
+
+
             if self.socket:
                 self.socket.emit('uart_message', {
                     'message': res,
