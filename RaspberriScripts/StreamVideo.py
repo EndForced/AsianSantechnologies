@@ -62,8 +62,21 @@ class RobotAPI:
             lines = line.split("*")
             return lines
 
-    def drive_through_roadmap(self, roadmap):
-        pass
+    def drive_through_roadmap(self, commands):
+        commands_dict = {"R" : "Turn Left", "L": "Turn Right", "X": "Pid Forward", "x": "Pid Backwards", "F0": "Up", "F1": "Down"}
+
+        for i in range(len(commands)):
+            if len(commands[i]) == 2:
+                if commands[i][0] != "F":
+                    command = commands[i][0]
+                    num = commands[i][1]
+                    commands[i] = f"{commands_dict[command]} {num}"
+
+                elif commands[i][0] == "F":
+                    command = commands[i]
+                    commands[i] = f"{commands_dict[command]}"
+
+
 
     def do(self, args):
         self.ser.reset_input_buffer()

@@ -1,5 +1,5 @@
 const String commands[] = { "Beep", "Reset", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Button_skip", "Mode_swap", "Elevation_swap", "Tubes" };
-const int commandsCount = 4;
+const int commandsCount = 12;
 String parameters[10];
 int paramCount = 0;
 
