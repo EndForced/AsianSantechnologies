@@ -40,6 +40,10 @@ class RobotAPI:
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.conn.connect(('localhost', 65432))
         self.conn.sendall(b"UNCOMPRESSED_API")
+
+        self.do("Direction 1")
+        self.do("Elevaion 1")
+        self.do("Tubes 0")
         # time.sleep(0.1)
 
     @staticmethod
@@ -79,9 +83,9 @@ class RobotAPI:
                     commands[i] = f"{commands_dict[command]}"
 
         print(commands)
+
         for i in commands:
             self.do(i)
-            time.sleep(0.1)
 
 
     def do(self, args):
@@ -111,6 +115,7 @@ class RobotAPI:
                 })
 
             print(f"done {args}, res: {res} ... ")
+            time.sleep(0.1)
 
     def set_frame(self, frame=None):
         if frame is None:
