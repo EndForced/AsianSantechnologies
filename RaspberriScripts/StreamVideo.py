@@ -41,9 +41,6 @@ class RobotAPI:
         self.conn.connect(('localhost', 65432))
         self.conn.sendall(b"UNCOMPRESSED_API")
 
-        self.do("Direction 1")
-        self.do("Elevaion 1")
-        self.do("Tubes 0")
         # time.sleep(0.1)
 
     @staticmethod
