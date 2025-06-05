@@ -20,10 +20,7 @@ class RobotAPI:
     def __init__(self, position, orientation, serial, socketio = None):
         self.telemetryQuality = 15
         self.mapQuality = 40
-        from gpiozero import OutputDevice
 
-        self.PIN = 23
-        self.gpio_pin = OutputDevice(self.PIN, active_high=True, initial_value=False)
         self.ser = serial
         self.ser.flush()
         self.socket = socketio
@@ -91,9 +88,9 @@ class RobotAPI:
         self.ser.reset_input_buffer()
         if args == "Reset":
             args = ""
-            self.gpio_pin.on()
-            time.sleep(1)
-            self.gpio_pin.off()
+            self.conn.sendall(b"GET_FRAMES")
+            time.sleep(1.1)
+
 
         _ = 0
         if args:
