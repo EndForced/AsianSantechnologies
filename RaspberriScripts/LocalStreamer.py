@@ -221,7 +221,6 @@ class DualCameraServer:
                         logger.info("Reseting...")
                         threading.Thread(
                             target=self.arduino_reset,
-                            args=(conn,),
                             daemon=True
                         ).start()
 
