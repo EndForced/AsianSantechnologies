@@ -213,6 +213,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def qualifiction(self):
         moves = self.solve()
+        moves = self.way_to_commands(moves, "U")
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves)
