@@ -14,10 +14,6 @@ logger = logging.getLogger(__name__)
 
 class DualCameraServer:
     def __init__(self):
-        from gpiozero import OutputDevice
-
-        self.PIN = 23
-        self.gpio_pin = OutputDevice(self.PIN, active_high=True, initial_value=False)
 
         self.picam2_primary = Picamera2(0)
         self.picam2_secondary = Picamera2(1)
@@ -172,10 +168,6 @@ class DualCameraServer:
             self.stream_active = False
             logger.info("Connection closed")
 
-    def arduino_reset(self):
-        self.gpio_pin.on()
-        time.sleep(1)
-        self.gpio_pin.off()
 
     def start(self):
         try:
@@ -217,12 +209,6 @@ class DualCameraServer:
                             daemon=True
                         ).start()
 
-                    elif conn_type == "ARDUINO_RESET":
-                        logger.info("Reseting...")
-                        threading.Thread(
-                            target=self.arduino_reset,
-                            daemon=True
-                        ).start()
 
 
         except Exception as e:

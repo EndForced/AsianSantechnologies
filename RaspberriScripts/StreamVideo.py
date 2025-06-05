@@ -87,15 +87,8 @@ class RobotAPI:
     def do(self, args):
         self.ser.reset_input_buffer()
 
-        if args == "Reset":
-            args = ""
-            conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            conn.connect(('localhost', 65432))
-            conn.sendall(b"ARDUINO_RESET")
-            conn.close()
-
-
         _ = 0
+
         if args:
             res = ""
             self.send(args)

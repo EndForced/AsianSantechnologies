@@ -3,12 +3,12 @@
 
 
 void go_up(int way) {
+  inverse = 1;
   if (abs(way) == 1) {
     pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 400, 0);
     MoveSync(way * PWM_MAX, way * PWM_MAX, 50, 0);
   }
-  inverse = 1;
-  pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 2900 - (abs(way) == 1) * 400, 0);
+  pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 2600 - (abs(way) == 1) * 400, 0);
 }
 
 
@@ -18,7 +18,7 @@ void grab_from_ramp(int way) {
     MoveSync(way * PWM_MAX, way * PWM_MAX, 50, 0);
   }
   inverse = 1;
-  pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 2800 - (abs(way) == 1) * 400, 0);
+  pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 2600 - (abs(way) == 1) * 400, 0);
 }
 
 
