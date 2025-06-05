@@ -8,7 +8,7 @@ void go_up(int way) {
     MoveSync(way * PWM_MAX, way * PWM_MAX, 50, 0);
   }
   inverse = 1;
-  pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 2800 - (abs(way) == 1) * 400, 1);
+  pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 2900 - (abs(way) == 1) * 400, 0);
 }
 
 

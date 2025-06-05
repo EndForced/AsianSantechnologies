@@ -222,21 +222,18 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
-    # time.sleep(10)
-    while 1:
-        # frames = mc.robot.get_uncompressed_frames(0)
-        # frame = cv2.resize(frames[0], (600,600))
-        # # time.sleep(1)
-        # mc.send_map()
-        # mc.robot.set_frame(frames[0])
-        # print(np.median(frames[0]))
-        # print(mc.robot.read())
-        msg = input()
-        # mc.robot.do(msg)
-        # print("starting roadmap")
-        commands = ["X3", "R1", "X1", "F0", "X1", "R2", "X1", "F1", "L1", "X3"]
-        mc.robot.drive_through_roadmap(commands)
-        pass
+    # frames = mc.robot.get_uncompressed_frames(0)
+    # frame = cv2.resize(frames[0], (600,600))
+    # # time.sleep(1)
+    # mc.send_map()
+    # mc.robot.set_frame(frames[0])
+    # print(np.median(frames[0]))
+    # print(mc.robot.read())
+    msg = input()
+    # mc.robot.do(msg)
+    # print("starting roadmap")
+    commands = ["X3", "R1", "X1", "F0", "X1", "R2", "X1", "F1", "L1", "X3"]
+    mc.robot.drive_through_roadmap(commands)
 else:
     # print(type(res))
     #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)

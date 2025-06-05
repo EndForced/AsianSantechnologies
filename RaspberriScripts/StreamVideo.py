@@ -84,12 +84,16 @@ class RobotAPI:
 
     def do(self, args):
         self.ser.reset_input_buffer()
+        _ = 0
         if args:
             res = ""
             self.send(args)
             print(f"doing {args} ... ")
             while not res:
                 res = self.read()
+                time.sleep(0.1)
+                _ += 1
+                if _ == 100: break
 
             if self.socket:
                 self.socket.emit('uart_message', {

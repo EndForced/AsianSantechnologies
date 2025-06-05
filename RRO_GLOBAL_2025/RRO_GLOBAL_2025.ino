@@ -38,7 +38,7 @@ void setup() {
   beep(900, 150);
 
 
-  // buttonWait(0);
+   buttonWait(0);
 }
 
 void loop() {
@@ -47,7 +47,7 @@ void loop() {
 //  cam(1, 9);
 //  delay(500);
 //
-//  pidXN(1000, 2);
+//  pidXN(1000, 1);
 //
 //  turn_to_line(1000, -1, 1, 1);
 //  pidXN(1000, 3);

@@ -2,13 +2,26 @@
 #define BZ1_PIN 10
 #define BTN_PIN 21
 
-void buzzer_init(){
-  pinMode(BZ1_PIN,OUTPUT);
-  pinMode(BTN_PIN,INPUT_PULLUP);
+void buzzer_init() {
+  pinMode(BZ1_PIN, OUTPUT);
+  pinMode(BTN_PIN, INPUT_PULLUP);
 }
 
-bool button(){
-  return digitalRead(BTN_PIN);
+bool button() {
+  if (Serial1.available()) {
+    String input = Serial1.readStringUntil('\n');
+    input.trim();
+    Serial.println(input);
+    if (input.equals("Button_skip")) {
+      return false;
+    }
+  }
+  
+  if (digitalRead(BTN_PIN) == HIGH) {
+    return true;
+  }
+  
+  return false;
 }
 
 // у меня не сделаны асинхронные бипы
