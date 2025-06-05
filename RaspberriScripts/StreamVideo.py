@@ -80,6 +80,8 @@ class RobotAPI:
                     'type': 'received'
                 })
 
+            print(f"done {args} ... ")
+
     def set_frame(self, frame=None):
         if frame is None:
             print("FAIL: No image to send")
