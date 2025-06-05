@@ -81,6 +81,7 @@ class RobotAPI:
         print(commands)
         for i in commands:
             self.do(i)
+            time.sleep(0.1)
 
 
     def do(self, args):
