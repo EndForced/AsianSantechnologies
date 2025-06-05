@@ -216,7 +216,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         moves = self.way_to_commands(moves, "U")
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
-        self.robot.drive_through_roadmap(moves)
+        self.robot.drive_through_roadmap(moves[0])
 
 
 mat = [[64, 10, 10, 10, 42, 10, 20, 10], [64, 10, 20, 20, 20, 34, 10, 10], [64, 10, 32, 20, 81, 52, 34, 10], [42, 10, 10, 10, 10, 10, 10, 20], [20, 20, 34, 10, 20, 10, 20, 20], [10, 10, 10, 10, 10, 10, 20, 20], [31, 20, 10, 32, 20, 20, 34, 33], [33, 10, 10, 10, 20, 20, 34, 42]]
