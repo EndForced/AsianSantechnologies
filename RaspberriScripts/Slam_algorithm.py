@@ -169,20 +169,20 @@ else:
                    "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
                    "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
 
-    # moves =mc.solve()
-    # unload_type = mc.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
-    # # print("un", unload_type)
-    # moves1 = mc.way_to_commands(moves, "D") #return - путь, направление робота в конце
-    #
-    # # print("dirs", unload_type[1], moves[1])
-    # if unload_type[1] != moves1[1]:
-    #     moves1[0].append(mc.get_rotation_direction(moves1[1], unload_type[1]))
-    #
-    # type_u = unload_type[0]
-    # moves1[0].extend(unload_dict[type_u])
-    # print(moves1)
-    #
-    # mc.draw_multiple_paths(moves)
+    moves =mc.solve()
+    unload_type = mc.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
+    # print("un", unload_type)
+    moves1 = mc.way_to_commands(moves, "D") #return - путь, направление робота в конце
+
+    # print("dirs", unload_type[1], moves[1])
+    if unload_type[1] != moves1[1]:
+        moves1[0].append(mc.get_rotation_direction(moves1[1], unload_type[1]))
+
+    type_u = unload_type[0]
+    moves1[0].extend(unload_dict[type_u])
+    print(moves1)
+
+    mc.draw_multiple_paths(moves)
     m = mc.create_way((6,1),(6,5))
     mc.draw_path(m)
     mc.show()

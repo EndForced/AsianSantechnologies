@@ -33,7 +33,7 @@ void go_down(int way) {
   }
 
   pidEnc(0.7, 0.03, 0.6, way * 680, 1000, 0);
-  pidEnc(0.7, 0.03, 0.6, way * 400, 1650 - deg, 1);
+  pidEnc(0.7, 0.03, 0.6, way * 400, 1450 - deg, 1);
   inverse = 0;
 }
 

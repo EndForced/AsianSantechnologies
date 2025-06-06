@@ -574,7 +574,7 @@ class PattersSolver(WaveCreator):
                 else:
                     start = way_single[-1]
 
-                print("\n\n",123)
+                # print("\n\n",123)
                 # print(start, self.choose_tube(start, comb[cell_num+1]))
                 way_single = self.create_way(start, self.choose_tube(comb[cell_num+1], start))
                 # print(way_single)
