@@ -38,47 +38,89 @@ void go_down(int way) {
 }
 
 
-void turn_to_line(int speed, int side_of_turn, int way_to_drive, int number) {
+void turn_to_line(int speed, int side_of_turn, int way_to_drive, int number, bool smooth_turn = false) {
   all_diagonal();
   delay(200);
 
+  // Калибровочные коэффициенты для разных направлений
+  float left_correction = 1.4;
+  float right_correction = 1.2;
+  
+  // Коэффициенты для разных режимов поворота
+  float aggressive_factor = 1.0;    // Максимальная мощность для грубого поворота
+  float smooth_factor = 0.5;        // Пониженная мощность для аккуратного поворота
+  float brake_factor = smooth_turn ? 0.4 : 0.6;  // Разные коэффициенты торможения
+  float align_factor = smooth_turn ? 0.3 : 0.6;  // Разные коэффициенты выравнивания
+
   int dat1 = 0;
-
   if (side_of_turn == 1) {
-    if (way_to_drive == 1)
-      dat1 = 3;
-    else
-      dat1 = 1;
-  } else if (side_of_turn == -1) {
-    if (way_to_drive == 1)
-      dat1 = 2;
-    else
-      dat1 = 4;
+    if (way_to_drive == 1) dat1 = 3;
+    else dat1 = 1;
+  } else {
+    if (way_to_drive == 1) dat1 = 2;
+    else dat1 = 4;
   }
+
   for (int i = 0; i < number; i++) {
-
+    float correction = (side_of_turn == 1) ? left_correction : right_correction;
+    float power_factor = smooth_turn ? smooth_factor : aggressive_factor;
+    
     if (inverse) {
-
-      while (sensor(dat1) > 400)
-        drive(side_of_turn * speed, side_of_turn * speed, -side_of_turn * speed, -side_of_turn * speed);
-
-      while (sensor(dat1) < 880)
-        drive(side_of_turn * speed * 0.8, side_of_turn * speed * 0.8, -side_of_turn * speed * 0.8, -side_of_turn * speed * 0.8);
-
-      while (sensor(dat1) > 220)
-        drive(side_of_turn * speed * 0.6, side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6);
+      // Фаза 1: Основной поворот
+      while (sensor(dat1) > 400) {
+        drive(side_of_turn * speed * power_factor * correction, 
+              side_of_turn * speed * power_factor * correction, 
+              -side_of_turn * speed * power_factor * correction, 
+              -side_of_turn * speed * power_factor * correction);
+        delay(10);
+      }
+      
+      // Фаза 2: Торможение
+      while (sensor(dat1) < 880) {
+        drive(side_of_turn * speed * brake_factor * correction, 
+              side_of_turn * speed * brake_factor * correction, 
+              -side_of_turn * speed * brake_factor * correction, 
+              -side_of_turn * speed * brake_factor * correction);
+        delay(10);
+      }
+      
+      // Фаза 3: Выравнивание
+      while (sensor(dat1) > 220) {
+        drive(side_of_turn * speed * align_factor * correction, 
+              side_of_turn * speed * align_factor * correction, 
+              -side_of_turn * speed * align_factor * correction, 
+              -side_of_turn * speed * align_factor * correction);
+        delay(10);
+      }
     } else {
-
-      while (sensor(dat1) < 640)
-        drive(side_of_turn * speed, side_of_turn * speed, -side_of_turn * speed, -side_of_turn * speed);
-
-      while (sensor(dat1) > 220)
-        drive(side_of_turn * speed * 0.8, side_of_turn * speed * 0.8, -side_of_turn * speed * 0.8, -side_of_turn * speed * 0.8);
-
-      while (sensor(dat1) < 880)
-        drive(side_of_turn * speed * 0.6, side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6);
+      // Обратная логика для inverse == false
+      while (sensor(dat1) < 640) {
+        drive(side_of_turn * speed * power_factor * correction, 
+              side_of_turn * speed * power_factor * correction, 
+              -side_of_turn * speed * power_factor * correction, 
+              -side_of_turn * speed * power_factor * correction);
+        delay(10);
+      }
+      
+      while (sensor(dat1) > 220) {
+        drive(side_of_turn * speed * brake_factor * correction, 
+              side_of_turn * speed * brake_factor * correction, 
+              -side_of_turn * speed * brake_factor * correction, 
+              -side_of_turn * speed * brake_factor * correction);
+        delay(10);
+      }
+      
+      while (sensor(dat1) < 880) {
+        drive(side_of_turn * speed * align_factor * correction, 
+              side_of_turn * speed * align_factor * correction, 
+              -side_of_turn * speed * align_factor * correction, 
+              -side_of_turn * speed * align_factor * correction);
+        delay(10);
+      }
     }
   }
+  
+  // Торможение и завершение маневра
   int tormoz_speed = -side_of_turn * (1023);
   drive(tormoz_speed, tormoz_speed, -tormoz_speed, -tormoz_speed);
   delay(10);
