@@ -136,8 +136,11 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
-    mc.qualifiction()
-    time.sleep(1000)
+    # mc.qualifiction()
+    # time.sleep(1000)
+    while 1:
+        command = input()
+        mc.robot.do(command)
 else:
     # print(type(res))
     #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)

@@ -28,6 +28,39 @@ void servos_init() {
   delay(900);
 }
 
+const byte claw_nums[] = { 2, 4 };
+const byte claw_open[] = { 120, 61 };
+const byte claw_closed[] = { 52, 129 };
+
+void open_claws(bool smooth = false, int steps = 10, int delay_ms = 30) {
+  Wire.beginTransmission(I2C_ADDRESS);  // Slave address
+  char cmd[] = { 'S', 'E', 'R', 'V' };
+  
+  if (smooth) {
+    // Плавное открытие
+    byte start_pos1 = claw_closed[0];
+    byte start_pos2 = claw_closed[1];
+    byte end_pos1 = claw_open[0];
+    byte end_pos2 = claw_open[1];
+    
+    for (int i = 0; i <= steps; i++) {
+      byte current_pos1 = map(i, 0, steps, start_pos1, end_pos1);
+      byte current_pos2 = map(i, 0, steps, start_pos2, end_pos2);
+      
+      send_command(cmd, claw_nums[0], current_pos1);
+      send_command(cmd, claw_nums[1], current_pos2);
+      Wire.endTransmission();
+      delay(delay_ms);
+      Wire.beginTransmission(I2C_ADDRESS);  // Начинаем новую передачу
+    }
+  } else {
+    // Мгновенное открытие (оригинальное поведение)
+    send_command(cmd, claw_nums[0], claw_open[0]);
+    send_command(cmd, claw_nums[1], claw_open[1]);
+    Wire.endTransmission();
+  }
+}
+
 const byte arm_num = 3;
 const byte arm_positions[] = { 102, 98, 80, 60, 40, 22, 5 };  // from stand to last tube
 const byte max_pos = sizeof(arm_positions) / sizeof(byte) - 1;
@@ -98,7 +131,7 @@ void put() {
   arm(0);
   delay(time_calc(0));
   delay(200);
-  open_claws();
+  open_claws(true);
   delay(100);
   arm(2, 8);
   // podexatb
@@ -111,17 +144,8 @@ void put() {
   arm(3);
 }
 
-const byte claw_nums[] = { 2, 4 };
-const byte claw_open[] = { 120, 61 };
-const byte claw_closed[] = { 52, 129 };
 
-void open_claws() {
-  Wire.beginTransmission(I2C_ADDRESS);  // Slave address
-  char cmd[] = { 'S', 'E', 'R', 'V' };
-  send_command(cmd, claw_nums[0], claw_open[0]);
-  send_command(cmd, claw_nums[1], claw_open[1]);
-  Wire.endTransmission();
-}
+
 void close_claws() {
   Wire.beginTransmission(I2C_ADDRESS);  // Slave address
   char cmd[] = { 'S', 'E', 'R', 'V' };
