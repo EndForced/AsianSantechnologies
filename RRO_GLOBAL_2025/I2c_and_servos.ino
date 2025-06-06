@@ -133,11 +133,11 @@ void put() {
   delay(time_calc(0));
   delay(200);
   open_claws(true);
-  delay(100);
+  delay(150);
   arm(2, 8);
   // podexatb
-  pidEnc(0.4, 0.01, 0.5, 850, 1050, 0);
-  pidEnc(0.4, 0.01, 0.5, 450, 220, 1);
+  pidEnc(0.4, 0.01, 0.5, 650, 1050, 0);
+  pidEnc(0.4, 0.03, 0.5, 370, 220, 1);
   arm(0, 9);
   delay(200);
   // ot'exatb
