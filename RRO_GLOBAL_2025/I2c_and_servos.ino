@@ -28,6 +28,21 @@ void servos_init() {
   delay(900);
 }
 
+const byte arm_num = 3;
+const byte arm_positions[] = { 102, 98, 80, 60, 40, 22, 5 };  // from stand to last tube
+const byte max_pos = sizeof(arm_positions) / sizeof(byte) - 1;
+
+byte last_arm_pos = 10;
+byte last2_arm_pos = 10;
+
+void arm(byte num_of_pos) {
+  last2_arm_pos = last_arm_pos;
+  byte distance = abs(arm_positions[num_of_pos] - last_arm_pos);
+  send_servo(arm_num, arm_positions[num_of_pos]);
+  last_arm_pos = arm_positions[num_of_pos];
+}
+
+
 const byte claw_nums[] = { 2, 4 };
 const byte claw_open[] = { 120, 61 };
 const byte claw_closed[] = { 52, 129 };
@@ -59,20 +74,6 @@ void open_claws(bool smooth = false, int steps = 10, int delay_ms = 30) {
     send_command(cmd, claw_nums[1], claw_open[1]);
     Wire.endTransmission();
   }
-}
-
-const byte arm_num = 3;
-const byte arm_positions[] = { 102, 98, 80, 60, 40, 22, 5 };  // from stand to last tube
-const byte max_pos = sizeof(arm_positions) / sizeof(byte) - 1;
-
-byte last_arm_pos = 10;
-byte last2_arm_pos = 10;
-
-void arm(byte num_of_pos) {
-  last2_arm_pos = last_arm_pos;
-  byte distance = abs(arm_positions[num_of_pos] - last_arm_pos);
-  send_servo(arm_num, arm_positions[num_of_pos]);
-  last_arm_pos = arm_positions[num_of_pos];
 }
 
 void arm(byte num_of_pos, int del) {
@@ -135,7 +136,7 @@ void put() {
   delay(100);
   arm(2, 8);
   // podexatb
-  pidEnc(0.4, 0.01, 0.5, 650, 1050, 0);
+  pidEnc(0.4, 0.01, 0.5, 850, 1050, 0);
   pidEnc(0.4, 0.01, 0.5, 450, 220, 1);
   arm(0, 9);
   delay(200);
@@ -143,7 +144,6 @@ void put() {
   pidXN(-800, 1);
   arm(3);
 }
-
 
 
 void close_claws() {

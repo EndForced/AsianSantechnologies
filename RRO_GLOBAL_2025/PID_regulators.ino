@@ -21,8 +21,8 @@ void pidX(float kp, float ki, float kd, float sped, int overdrive, int stopp) {
     datx1 = 2;  // B
     datx2 = 3;  // C
   } else {
-    datx1 = 1;  // A
-    datx2 = 4;  // D
+    datx1 = 4;  // A
+    datx2 = 1;  // D
   }
 
   err_i = 0;
