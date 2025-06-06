@@ -60,123 +60,6 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         except Exception as e:
             print(f"FAIL: Socket emit failed: {e}")
 
-    @staticmethod
-    def optimize_commands(res):
-
-        seen = ""
-        count = 1
-        res_optimized = []
-        for i in range(len(res)):
-            if seen == "":
-                seen = res[i]
-            elif res[i] == seen:
-                count += 1
-            else:
-                seen = seen.replace('1', str(count))
-                res_optimized.append(seen)
-                seen = res[i]
-                count = 1
-        seen = seen.replace('1', str(count))
-        res_optimized.append(seen)
-
-        return res_optimized
-
-    @staticmethod
-    def get_rotation_direction(start, finish):
-        dirs = {"U": 1, "R": 2, "D": 3, "L":4}
-        start = dirs[start]
-        finish = dirs[finish]
-
-        diff = (finish - start)%4
-
-        if diff == 0: return "skip"
-        elif diff == 1: return "R1"
-        elif diff == 2: return "R2"
-        elif diff == 3: return "L1"
-
-    def way_to_commands_single(self, path, my_dir):
-        mat = np.array(self._matrix)
-        res = []
-        floor = 1 if mat[path[0]] == 10 else 2
-
-        for i in range(len(path)):
-
-            res_prev = ""
-            current_cell = mat[path[i]]
-            if i + 1 < len(path):
-                next_cell = mat[path[i + 1]]
-
-                if current_cell == 10:
-                    if next_cell == 10:
-                        res_prev += "X1"
-                    elif next_cell // 10 == 3:
-                        res_prev += "F1"
-                        floor = 2
-
-                    else:
-                        print("ERROR", current_cell, next_cell)
-
-                if current_cell == 20:
-                    if next_cell == current_cell:
-                        res_prev += "X1"
-                    elif next_cell // 10 == 3:
-                        res_prev += "F0"
-                        floor = 1
-                    else:
-                        print("ERROR", current_cell, next_cell)
-
-                if current_cell // 10 == 3:
-                    if next_cell // 10 == 3:
-                        res_prev += f'F{2 - floor}'
-                        floor = 3 - floor
-                    else:
-                        # pass
-                        res_prev += "X1"
-
-                if path[i][1] == path[i + 1][1] + 1:  # если некст клетка слева, то едем налево
-                    res_prev += "L"
-                elif path[i][1] == path[i + 1][1] - 1:
-                    res_prev += "R"
-                elif path[i][0] == path[i + 1][0] + 1:
-                    res_prev += "U"
-                elif path[i][0] == path[i + 1][0] - 1:
-                    res_prev += "D"
-
-            if res_prev != "" and res_prev:
-                res.append(res_prev)
-
-        res_optimized = self.optimize_commands(res)
-        # print(res_optimized)
-
-        res_relative = []
-        for i in res_optimized:
-            if i[-1] != my_dir:
-                res_relative.append(self.get_rotation_direction(my_dir, i[-1]))
-                # print(self.get_rotation_direction(my_dir, i[-1]), my_dir, i[-1])
-                my_dir = i[-1]
-
-                i = i[0:2]
-                res_relative.append(i)
-
-            else:
-                i = i[0:2]
-                res_relative.append(i)
-
-        return res_relative, my_dir
-
-    @staticmethod
-    def get_relative_direction(pos1, pos2):
-        x1, y1 = pos1
-        x2, y2 = pos2
-
-        if abs(x1 - x2) + abs(y1 - y2) != 1:
-            return None
-
-        if x1 == x2:
-            return "R" if y2 > y1 else "L"
-        else:
-            return "D" if x2 > x1 else "U"
-
     def way_to_commands(self, path, dir):
         used_tubes = []
         rob_dir = dir
@@ -187,7 +70,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         for i in range(len(path)):
             if len(path[i]) > 1:
-                s_way = self.way_to_commands_single(path[i],rob_dir)
+                s_way = self.way_to_commands_single(path[i], rob_dir)
 
                 res += s_way[0]
                 rob_dir = s_way[1]
@@ -212,8 +95,23 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         return res, rob_dir
 
     def qualifiction(self):
+        unload_dict = {"right": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
+                       "left": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
+                       "center": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
+
         moves = self.solve()
-        moves = self.way_to_commands(moves, "D")
+        unload_type = self.detect_unload_type(moves[-1][-1]) #тип разгрузки, сторона с трубами
+        moves = self.way_to_commands(moves, "U")
+
+        if unload_type[1] != moves[1]:
+            moves[0].append(self.get_rotation_direction(moves[1], unload_type[1]))
+
+        type_u = unload_type[0]
+        moves[0].extend(unload_dict[type_u])
+
+        print(moves[0])
+
+        _ = input()
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves[0])
@@ -228,6 +126,7 @@ mat = [[10, 10, 20, 20, 20, 34, 10, 62],
        [20, 32, 20, 20, 34, 10, 33, 20],
        [33, 10, 10, 10, 10, 10, 10, 10],
        [42, 10, 10, 10, 10, 10, 42, 10]]
+mat = [[41, 20, 20, 10, 10, 10, 10, 10], [10, 10, 10, 20, 10, 10, 10, 41], [10, 10, 10, 10, 10, 10, 20, 20], [10, 10, 20, 20, 20, 34, 20, 20], [64, 10, 71, 10, 10, 31, 20, 33], [64, 10, 10, 20, 10, 33, 33, 10], [64, 10, 32, 20, 20, 52, 34, 20], [32, 20, 20, 34, 20, 20, 34, 10]]
 
 # mat = [[10]*15]*15
 mc = MainComputer(mat, serial)
@@ -236,7 +135,6 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
-    _ = input()
     mc.qualifiction()
     time.sleep(1000)
 else:
@@ -252,9 +150,29 @@ else:
     robot = mc.find_robot()
     waves = mc.create_wave(robot)
     mc.visualize_wave(waves)
-    res = mc.solve()
-    # print(res)
-    mc.draw_multiple_paths(res)
-    # print(mc.way_to_commands_single(res[2], "U"))
-    print(mc.way_to_commands(res, "U"))
+    # res = mc.solve()
+    # # print(res)
+    # mc.draw_multiple_paths(res)
+    # # print(mc.way_to_commands_single(res[2], "U"))
+    # print(mc.way_to_commands(res, "D"))
+    # mc.show()
+    unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
+                   "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
+                   "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
+
+    moves =mc.solve()
+    unload_type = mc.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
+    # print("un", unload_type)
+    moves1 = mc.way_to_commands(moves, "D") #return - путь, направление робота в конце
+
+    # print("dirs", unload_type[1], moves[1])
+    if unload_type[1] != moves1[1]:
+        moves1[0].append(mc.get_rotation_direction(moves1[1], unload_type[1]))
+
+    type_u = unload_type[0]
+    moves1[0].extend(unload_dict[type_u])
+    print(moves1)
+
+    mc.draw_multiple_paths(moves)
     mc.show()
+
