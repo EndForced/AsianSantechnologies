@@ -112,7 +112,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         print(moves[0])
 
         _ = input()
-        self.robot.do("Tubes 3")
+        self.robot.do("Tubes 2")
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(task)
