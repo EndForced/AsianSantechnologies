@@ -95,9 +95,9 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         return res, rob_dir
 
     def qualifiction(self):
-        unload_dict = {"right": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
-                       "left": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
-                       "center": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
+        unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
+                       "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
+                       "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
 
         moves = self.solve()
         unload_type = self.detect_unload_type(moves[-1][-1]) #тип разгрузки, сторона с трубами
