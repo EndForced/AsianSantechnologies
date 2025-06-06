@@ -115,12 +115,10 @@ void handleTurnCommand() {
 
   String direction = parameters[0];
   int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
-  int speed = 1000;
-  int smooth = (paramCount > 2) ? parameters[2].toInt() : 0;
-  
+  int speed = (paramCount > 2) ? parameters[2].toInt() : 900;
   int way = (direction == "Left") ? -1 : 1;
 
-  turn_to_line(speed, way, dir, steps, smooth);
+  turn_to_line(speed, way, dir, steps);
 
   // Andrew's Job
   SendData("Turning " + direction + " speed " + String(speed));
