@@ -26,9 +26,9 @@ class WaveCreator:
                                  20:{"up":[33,20, ], "left":[32,20, ], "down":[31,20, ], "right":[34,20, ]},
 
                                  31:{"up":[33,20], "left":[None], "down":[33,10], "right":[None]},
-                                 32:{"up":[None], "left":[10], "down":[None], "right":[20, 34]},
+                                 32:{"up":[None], "left":[10, 34], "down":[None], "right":[20, 34]},
                                  33:{"up":[31, 10], "left":[None], "down":[31,20], "right":[None]},
-                                 34:{"up":[None], "left":[20,32], "down":[None], "right":[10]},
+                                 34:{"up":[None], "left":[20,32], "down":[None], "right":[10, 32]},
 
                                  71:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
                                  72:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
@@ -574,7 +574,11 @@ class PattersSolver(WaveCreator):
                 else:
                     start = way_single[-1]
 
+                print("\n\n",123)
+                # print(start, self.choose_tube(start, comb[cell_num+1]))
                 way_single = self.create_way(start, self.choose_tube(comb[cell_num+1], start))
+                # print(way_single)
+
 
 
                 if way_single == "No way":
@@ -598,6 +602,7 @@ class PattersSolver(WaveCreator):
         combs = self.generate_combinations(start)
         d = self.process_combinations(combs)
         return d
+
 
     def detect_unload_type(self, cord):
         cells = self.get_relative_cells(cord)
