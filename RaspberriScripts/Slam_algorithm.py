@@ -136,7 +136,7 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
-    # mc.qualifiction()
+    mc.qualifiction()
     time.sleep(1000)
 else:
     # print(type(res))
