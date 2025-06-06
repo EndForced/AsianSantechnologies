@@ -1,5 +1,6 @@
 /*-----------------------------BUZZERS-----------------------------*/
 #define BZ1_PIN 10
+#define BZ2_PIN 35
 #define BTN_PIN 21
 
 void buzzer_init() {
@@ -13,17 +14,17 @@ bool button() {
     input.trim();
     Serial.println(input);
     if (input.equals("Button_skip")) {
+      SendData("Button Activated");
       return false;
     }
   }
-  
+
   if (digitalRead(BTN_PIN) == HIGH) {
     return true;
   }
-  
+
   return false;
 }
-
 // у меня не сделаны асинхронные бипы
 // скорее всего сделаю через микрос
 void beep(int freq, int dur) {

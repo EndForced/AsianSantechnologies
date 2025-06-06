@@ -1,5 +1,5 @@
-const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Button_skip", "Dir_swap", "Elevation_swap", "Tubes" };
-const int commandsCount = 12;
+const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Servo", "Button_skip", "Direction", "Elevation", "Tubes" };
+const int commandsCount = 13;
 String parameters[10];
 int paramCount = 0;
 
@@ -15,6 +15,8 @@ void uartProcessing() {
     String command = readUntilSpace(uart_data);
     int commandIndex = findCommandIndex(command, commands, commandsCount);
 
+    // SendData("Received: " + uart_data);
+
     Serial.print("Received: ");
     Serial.println(uart_data);
     Serial.print("Command: ");
@@ -23,6 +25,7 @@ void uartProcessing() {
     Serial.println(commandIndex);
 
     splitIntoParameters(uart_data, parameters, paramCount);
+
     if (ramp_last and commandIndex != 4 and commandIndex != 5) ramp_last = 0;
     switch (commandIndex) {
       case 0: handleResetCommand(); break;  // "Reset"
@@ -35,10 +38,12 @@ void uartProcessing() {
       case 6: handleGrabCommand(); break;  // "Grab"
       case 7: handlePutCommand(); break;   // "Put"
 
-      case 8: handleButtonSkipCommand(); break;  // "Button_skip"
-      case 9: handleDirCommand(); break;         // "Dir_swap"
-      case 10: handleElevationCommand(); break;  // "Elevation_swap"
-      case 11: handleTubesCommand(); break;      // "Tubes"
+      case 8: handleServoCommand(); break;  // "Servo"
+
+      case 9: handleButtonSkipCommand(); break;  // "Button_skip"
+      case 10: handleDirCommand(); break;        // "Dir_swap"
+      case 11: handleElevationCommand(); break;  // "Elevation_swap"
+      case 12: handleTubesCommand(); break;      // "Tubes"
 
 
       default:  // we fucking dont know whut is it
@@ -91,6 +96,7 @@ void handlePutCommand() {
 
 void handleUpCommand() {
   go_up(dir * (ramp_last + 1));
+  // stop();
   SendData("Up");
   Serial.println("Up");
 }
@@ -108,8 +114,8 @@ void handleTurnCommand() {
   }
 
   String direction = parameters[0];
-  int speed = (paramCount > 1) ? parameters[1].toInt() : 1000;
-  int steps = (paramCount > 2) ? parameters[2].toInt() : 1;
+  int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
+  int speed = (paramCount > 2) ? parameters[2].toInt() : 1000;
   int way = (direction == "Left") ? -1 : 1;
 
   turn_to_line(speed, way, dir, steps);
@@ -135,6 +141,25 @@ void handlePidCommand() {
   // Andrew's Job
   SendData("Moving " + direction + " with speed " + String(speed));
 }
+
+void handleServoCommand() {
+  if (paramCount == 0) {
+    SendData("Error: No Servo specified");
+    return;
+  }
+
+  // String identifier = parameters[0];
+  // if (isdigit(identifier[0])){}
+  // int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
+
+  // int way = (direction == "Forward") ? 1 : -1;
+
+  // pidXN(speed * way, steps);
+
+  // Andrew's Job
+  // SendData("Moving " + direction + " with speed " + String(speed));
+}
+
 
 void handleButtonSkipCommand() {
   if (paramCount > 0) {

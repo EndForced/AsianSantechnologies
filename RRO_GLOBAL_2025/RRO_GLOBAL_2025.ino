@@ -37,90 +37,14 @@ void setup() {
   delay(10);
   beep(900, 150);
 
+  cam(1,10);
+  buttonWait(0);
 
-   buttonWait(0);
+  
 }
 
 void loop() {
-//  buttonWait(0);
-//  arm(3);
-//  cam(1, 9);
-//  delay(500);
-//
-//  pidXN(1000, 1);
-//
-//  turn_to_line(1000, -1, 1, 1);
-//  pidXN(1000, 3);
-//  turn_to_line(1000, -1, 1, 1);
-//
-//  grab();
-//
-//  turn_to_line(1000, -1, 1, 1);
-//  pidXN(1000, 2);
-//
-//  turn_to_line(1000, -1, 1, 1);
-//
-//  pidXN(1000, 4);
-//
-//  turn_to_line(1000, -1, 1, 1);
-//
-//  go_up(1);
-////
-//  pidXN(1000, 1);
-//  // buttonWait(0);
-//
-//  go_down(1);
-//
-//  pidXN(1000, 2);
-//
-//  turn_to_line(1000, 1, 1, 1);
-//
-//  grab();
-//
-//  turn_to_line(1000, 1, 1, 1);
-//  pidXN(1000, 1);
-//  turn_to_line(1000, 1, 1, 1);
-//  pidXN(1000, 6);
-//  turn_to_line(1000, 1, 1, 1);
-//  pidXN(1000, 1);
-//  turn_to_line(1000, 1, 1, 1);
-//
-//  go_up(1);
-//  pidXN(1000, 1);
-//  grab();
-//  go_down(-1);
-//  pidXN(-1000, 1);
-//  turn_to_line(1000, 1, 1, 1);
-//  pidXN(900, 1);
-//  turn_to_line(1000, -1, 1, 1);
-//  pidXN(1000, 6);
-//  turn_to_line(1000, 1, 1, 1);
-//  go_up(1);
-//
-//  pidXN(1000, 2);
-//  // buttonWait(0);
-//
-//  go_down(1);
-//  pidXN(1000, 1);
-//  turn_to_line(1000, -1, 1, 1);
-//  pidXN(900, 1);
-//  turn_to_line(1000, 1, 1, 1);
-//  put();
-//  turn_to_line(1000, 1, 1, 1);
-//  pidXN(1000, 1);
-//  turn_to_line(1000, -1, 1, 1);
-//  put();
-//  turn_to_line(1000, 1, 1, 1);
-//  pidXN(1000, 1);
-//  turn_to_line(1000, -1, 1, 1);
-//  put();
-
-
-
-
-
-
-   uartProcessing();
+  uartProcessing();
 }
 
 
