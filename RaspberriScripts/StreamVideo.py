@@ -112,7 +112,7 @@ class RobotAPI:
                 })
 
             print(f"done {args}, res: {res} ... ")
-            # time.sleep(0.1)
+            time.sleep(0.1)
 
     def set_frame(self, frame=None):
         if frame is None:
