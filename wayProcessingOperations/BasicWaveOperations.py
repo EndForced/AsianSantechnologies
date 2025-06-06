@@ -333,8 +333,8 @@ class WaveCreator:
                     if next_cell == current_cell:
                         res_prev += "X1"
                     elif next_cell // 10 == 3:
-                        res_prev += "F0"
                         res_prev+= "X1"
+                        res_prev += "F0"
                         floor = 1
                     else:
                         print("ERROR", current_cell, next_cell)
