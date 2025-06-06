@@ -108,13 +108,14 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         type_u = unload_type[0]
         moves[0].extend(unload_dict[type_u])
-
+        task = ["P1", "R1", "X1", "L1", "P1"]
         print(moves[0])
 
         _ = input()
+        self.robot.do("Tubes 3")
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
-        self.robot.drive_through_roadmap(moves[0])
+        self.robot.drive_through_roadmap(task)
 
 
 mat = [[64, 10, 10, 10, 42, 10, 20, 10], [64, 10, 20, 20, 20, 34, 10, 10], [64, 10, 32, 20, 81, 52, 34, 10], [42, 10, 10, 10, 10, 10, 10, 20], [20, 20, 34, 10, 20, 10, 20, 20], [10, 10, 10, 10, 10, 10, 20, 20], [31, 20, 10, 32, 20, 20, 34, 33], [33, 10, 10, 10, 20, 20, 34, 42]]
@@ -135,7 +136,7 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
-    mc.qualifiction()
+    # mc.qualifiction()
     time.sleep(1000)
 else:
     # print(type(res))
