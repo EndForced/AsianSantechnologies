@@ -8,7 +8,7 @@ import numpy as np
 
 def update_frame(frame):
     for pt1, pt2 in cam2_floor1:
-        cv2.rectangle(frame, (77, 200), (246, 347), (0, 0, 0))
+        cv2.rectangle(frame, pt1, pt2, (0, 0, 0), thickness=4)
         part = frame[pt1[1]:pt2[1], pt1[0]:pt2[0]].copy()
         part = lead_color(part)[0]
         frame[pt1[1]:pt2[1], pt1[0]:pt2[0]] = part
