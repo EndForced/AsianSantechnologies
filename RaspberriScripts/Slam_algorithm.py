@@ -150,7 +150,7 @@ mc = MainComputer(mat, serial)
 # print(mc.resizedPicture.dtype)
 
 if mc.OS == "Linux":
-    mc.start_website()
+    # mc.start_website()
     # mc.robot.get_uncompressed_frames(1)
     # exit()
     # p = input()
