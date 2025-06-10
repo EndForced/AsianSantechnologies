@@ -2,7 +2,7 @@
 import sys, os, platform, math
 
 import numpy as np
-from cv import update_frame
+from cv import update_frame_smart
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
@@ -158,8 +158,11 @@ if mc.OS == "Linux":
     # time.sleep(1000)
     while 1:
         frame = mc.robot.get_uncompressed_frames(0)[1].copy()
-        frame = update_frame(frame)
-        # print("upd!!")
+        frame, slices = update_frame_smart(frame)
+        for i in slices:
+            cv2.imwrite(f"{slices.index(i)}.jpg", i)
+        print("upd!!")
+        exit()
         # cv2.imwrite("testing.jpg", frame)
         mc.robot.set_frame(frame)
 else:

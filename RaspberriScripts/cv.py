@@ -10,28 +10,29 @@ import cv2
 import numpy as np
 
 
-def update_frame(frame):
-    # Создаем копию изображения для работы
+def update_frame_smart(frame):
     result_frame = frame.copy()
+    list_of_slices = [[],
+                      []]
 
     for i, ((pt1_floor1, pt2_floor1), (pt1_floor2, pt2_floor2)) in enumerate(zip(cam2_floor1, cam2_floor2)):
-        # 1. Анализируем область с первого этажа
         floor1_slice = frame[pt1_floor1[1]:pt2_floor1[1], pt1_floor1[0]:pt2_floor1[0]].copy()
+        floor2_slice = frame[pt1_floor2[1]:pt2_floor2[1], pt1_floor2[0]:pt2_floor2[0]].copy()
         _, dominant_color = lead_color(floor1_slice)
 
-        # 2. Если доминирующий цвет черный - рисуем прямоугольник с второго этажа
         if dominant_color == "black":
-            cv2.rectangle(result_frame, pt1_floor2, pt2_floor2, (0, 0, 255), 4)  # Красный прямоугольник
-            # Добавляем текст "floor2"
+            cv2.rectangle(result_frame, pt1_floor2, pt2_floor2, (0, 0, 255), 4)
             cv2.putText(result_frame, f"floor2_{i}", (pt1_floor2[0], pt1_floor2[1] - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            list_of_slices.append(floor2_slice)
+
         else:
-            cv2.rectangle(result_frame, pt1_floor1, pt2_floor1, (0, 255, 0), 2)  # Зеленый прямоугольник
-            # Добавляем текст "floor1"
+            cv2.rectangle(result_frame, pt1_floor1, pt2_floor1, (0, 255, 0), 2)
             cv2.putText(result_frame, f"floor1_{i}", (pt1_floor1[0], pt1_floor1[1] - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            list_of_slices.append(floor1_slice)
 
-    return result_frame
+    return result_frame, list_of_slices
 
 
 def lead_color(img_slice, threshold=0.5):
@@ -39,13 +40,11 @@ def lead_color(img_slice, threshold=0.5):
     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
     white_pixels = np.sum(binary == 255)
-    black_pixels = np.sum(binary == 0)
     total_pixels = binary.size
 
     white_ratio = white_pixels / total_pixels
     result = "white" if white_ratio > threshold else "black"
 
-    # Добавляем текст на слайс
     cv2.putText(img_slice, result, (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
