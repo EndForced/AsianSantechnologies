@@ -4,6 +4,7 @@ cam2_floor1 = [[(74,226),(247,410)], [(269,240),(449,388)],
                [(4,408),(267,624)], [(278,430),(474,594)]]
 
 import cv2
+import numpy as np
 
 def update_frame(frame):
     for pt1, pt2 in cam2_floor1:
