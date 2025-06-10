@@ -21,15 +21,17 @@ def update_frame_smart(frame):
 
         if dominant_color == "black":
             cv2.rectangle(result_frame, pt1_floor2, pt2_floor2, (0, 0, 255), 4)
+            list_of_slices.append(floor2_slice)
             cv2.putText(result_frame, f"floor2_{i}", (pt1_floor2[0], pt1_floor2[1] - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            list_of_slices.append(floor2_slice)
+
 
         else:
             cv2.rectangle(result_frame, pt1_floor1, pt2_floor1, (0, 255, 0), 2)
+            list_of_slices.append(floor1_slice)
             cv2.putText(result_frame, f"floor1_{i}", (pt1_floor1[0], pt1_floor1[1] - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            list_of_slices.append(floor1_slice)
+
 
     return result_frame, list_of_slices
 
