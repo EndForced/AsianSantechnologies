@@ -159,9 +159,9 @@ if mc.OS == "Linux":
     while 1:
         frame = mc.robot.get_uncompressed_frames(0)[1].copy()
         frame, slices = update_frame_smart(frame)
-        for i in slices:
+        for i in range(len(slices)):
             print(i)
-            cv2.imwrite(f"{slices.index(i)}.jpg", i)
+            cv2.imwrite(f"{i}.jpg", slices[i])
 
         print("upd!!")
         exit()
