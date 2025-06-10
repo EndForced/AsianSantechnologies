@@ -3,7 +3,7 @@ void pidXN(float sped, int n) {
     for (int i = 1; i < n; i++) {
       pidX(0.5, 0.01, 0.4, sped, 150, 0);
     }
-  int overdrive = 585;
+  int overdrive = 505;
   pidX(0.5, 0.02, 0.5, sped, 0, 0);
   pidEnc(0.5, 0.02, 0.5, sped * 0.6, overdrive, 1);
 }
