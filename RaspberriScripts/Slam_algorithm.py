@@ -157,7 +157,7 @@ if mc.OS == "Linux":
     # mc.qualifiction()
     # time.sleep(1000)
     while 1:
-        frame = mc.robot.get_uncompressed_frames(0)[1].copy()
+        frame = mc.robot.get_uncompressed_frames(1)[1].copy()
         frame, slices = update_frame_smart(frame)
         for i in range(len(slices)):
             print(i)
