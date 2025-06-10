@@ -150,14 +150,15 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
-    mc.robot.get_uncompressed_frames(1)
-    exit()
-    p = input()
-    mc.qualifiction()
-    time.sleep(1000)
+    # mc.robot.get_uncompressed_frames(1)
+    # exit()
+    # p = input()
+    # mc.qualifiction()
+    # time.sleep(1000)
     while 1:
-        command = input()
-        mc.robot.do(command)
+        frame = mc.robot.get_uncompressed_frames()[1]
+        cv2.rectangle(frame, (77,200),(246,347))
+        mc.robot.set_frame(frame)
 else:
     # print(type(res))
     #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
