@@ -10,7 +10,7 @@ float e_old = 0;
 int err_i = 0;
 float sum = 0;
 float errors[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-float dat1, dat2;
+float dat1, dat2 = 0;
 
 byte collected_tubes = 0;
 
@@ -37,13 +37,24 @@ void setup() {
   delay(10);
   beep(900, 150);
 
-  cam(1,10);
+  cam(1, 10);
   buttonWait(0);
 
-  
+
 }
 
 void loop() {
+//  turn_to_line(900, -1, 1, 1);
+//  buttonWait(0);
+//  pidXN(900, 1);
+//  buttonWait(0);
+//  turn_to_line(900, 1, 1, 1);
+//  go_up(1);
+//  buttonWait(0);
+//
+//  pidXN(-900, 1);
+//  grab();
+
   uartProcessing();
 }
 

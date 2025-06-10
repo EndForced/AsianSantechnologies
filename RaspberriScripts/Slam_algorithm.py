@@ -78,7 +78,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             if i != len(path) - 1:
 
                 for j in tubes_cords:
-                    if math.dist(j, path[i][-1]) <= 1 and j not in used_tubes:
+                    # if math.dist(j, path[i][-1]) <= 1 and j not in used_tubes: print(123)
+                    if math.dist(j, path[i][-1]) <= 1 and j not in used_tubes and ((np.array(self._matrix)[path[i][-1]] in [20, 31,32,33,34] and np.array(self._matrix)[j] in [51,52]) or (np.array(self._matrix)[path[i][-1]] in [10, 31,32,33,34] and np.array(self._matrix)[j] in [41,42]) ):
                         cell_with_tube = j
                         used_tubes.append(j)
                         break
