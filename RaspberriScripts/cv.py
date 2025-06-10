@@ -12,8 +12,7 @@ import numpy as np
 
 def update_frame_smart(frame):
     result_frame = frame.copy()
-    list_of_slices = [[],
-                      []]
+    list_of_slices = []
 
     for i, ((pt1_floor1, pt2_floor1), (pt1_floor2, pt2_floor2)) in enumerate(zip(cam2_floor1, cam2_floor2)):
         floor1_slice = frame[pt1_floor1[1]:pt2_floor1[1], pt1_floor1[0]:pt2_floor1[0]].copy()
