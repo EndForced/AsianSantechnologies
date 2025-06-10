@@ -157,7 +157,7 @@ if mc.OS == "Linux":
     # mc.qualifiction()
     # time.sleep(1000)
     while 1:
-        frame = mc.robot.get_uncompressed_frames(1)[1].copy()
+        frame = mc.robot.get_uncompressed_frames()[1].copy()
         frame = update_frame(frame)
         cv2.imwrite("testing.jpg", frame)
         mc.robot.set_frame(frame)
