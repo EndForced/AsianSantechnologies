@@ -71,7 +71,9 @@ class DualCameraServer:
                     if command == "GET_FRAMES":
 
                         primary_frame = self.picam2_primary.capture_array("main")
+                        primary_frame = cv2.rotate(primary_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
                         secondary_frame = self.picam2_secondary.capture_array("main")
+                        secondary_frame = cv2.rotate(secondary_frame, cv2.ROTATE_90_CLOCKWISE)
 
                         primary_bytes = primary_frame.tobytes()
                         secondary_bytes = secondary_frame.tobytes()
