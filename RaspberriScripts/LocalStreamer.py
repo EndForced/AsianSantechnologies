@@ -145,6 +145,7 @@ class DualCameraServer:
         try:
             while 1:
                 primary_frame = self.picam2_primary.capture_array("main")
+                primary_frame = cv2.rotate(primary_frame,cv2.ROTATE_90_COUNTERCLOCKWISE)
                 secondary_frame = self.picam2_secondary.capture_array("main")
 
                 primary_buffer, _ = self.process_frame(primary_frame, 1)
