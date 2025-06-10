@@ -193,7 +193,7 @@ if mc.OS == "Linux":
     pt1 = (77,200)
     pt2 = (246,347)
     while 1:
-        frame = mc.robot.get_uncompressed_frames()[1].copy()
+        frame = mc.robot.get_uncompressed_frames(1)[1].copy()
         cv2.rectangle(frame, (77,200),(246,347),(0,0,0))
         part = frame[pt1[1]:pt2[1], pt1[0]:pt2[0]].copy()
         # print(part)
