@@ -159,7 +159,8 @@ if mc.OS == "Linux":
     while 1:
         frame = mc.robot.get_uncompressed_frames()[1].copy()
         frame = update_frame(frame)
-        cv2.imwrite("testing.jpg", frame)
+        print("upd!!")
+        # cv2.imwrite("testing.jpg", frame)
         mc.robot.set_frame(frame)
 else:
     # print(type(res))
