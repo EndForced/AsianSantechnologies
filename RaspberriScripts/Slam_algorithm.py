@@ -156,7 +156,7 @@ if mc.OS == "Linux":
     # mc.qualifiction()
     # time.sleep(1000)
     while 1:
-        frame = mc.robot.get_uncompressed_frames()[1]
+        frame = mc.robot.get_uncompressed_frames()[1].copy()
         cv2.rectangle(frame, (77,200),(246,347),(0,0,0))
         mc.robot.set_frame(frame)
 else:
