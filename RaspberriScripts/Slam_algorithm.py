@@ -134,6 +134,14 @@ mat = [[41, 20, 20, 10, 10, 10, 10, 10],
        [64, 10, 32, 34, 32, 20, 52, 20],
        [32, 20, 20, 34, 20, 20, 34, 10]]
 
+mat = [[10, 10, 10, 10, 10, 10, 10, 10],
+       [10, 10, 10, 10, 10, 10, 10, 10],
+       [10, 10, 10, 0, 0, 0, 0, 0],
+       [10, 10, 10, 0, 0, 0, 0, 0],
+       [10, 10, 10, 0, 41, 20, 52, 10],
+       [10, 10, 10, 0, 10, 31, 10, 10],
+       [10, 10, 10, 0, 10, 10, 10, 71],
+       [10, 10, 10, 0, 10, 63, 63, 63]]
 # mat = [[10]*15]*15
 mc = MainComputer(mat, serial)
 # res = mc.show()
@@ -141,6 +149,7 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
+    p = input()
     mc.qualifiction()
     time.sleep(1000)
     while 1:
@@ -183,7 +192,7 @@ else:
     print(moves1)
 
     mc.draw_multiple_paths(moves)
-    m = mc.create_way((6,1),(6,5))
-    mc.draw_path(m)
+    # m = mc.create_way((6,1),(6,5))
+    # mc.draw_path(m)
     mc.show()
 

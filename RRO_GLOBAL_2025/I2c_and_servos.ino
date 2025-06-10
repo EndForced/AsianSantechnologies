@@ -98,11 +98,11 @@ void grab() {
   open_claws();
   arm(1);
   delay((time_calc(1) * 3) / 4);
-  pidEnc(0.7, 0.07, 0.8, 850, 350, 0);
-  pidEnc(0.7, 0.07, 0.8, 450, 220, 1);
+  pidEnc(0.7, 0.07, 0.8, 650, 350, 0);
+  pidEnc(0.7, 0.07, 0.8, 400, 220, 1);
   delay(200);
-  arm(2);
-  delay(time_calc(2) + 150);
+  arm(2, 10);
+  delay(time_calc(2) + 250);
   close_claws();
   delay(250);
   lay();

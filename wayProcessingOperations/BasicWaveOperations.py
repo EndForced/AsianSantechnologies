@@ -616,26 +616,21 @@ class PattersSolver(WaveCreator):
                 cord_to_detect = item[0]
                 break
 
-        # Получаем соседние клетки для текущей позиции держателя
         neighbor_cells = self.get_relative_cells(cord_to_detect)[0]
 
-        # Проверяем правую сторону
         right_cell = neighbor_cells["right"]
         if right_cell and np.array(self._matrix)[right_cell[0]] not in [61, 62, 63, 64]:
             return "R", unload_direction  # Разгрузка справа
 
-        # Проверяем левую сторону
         left_cell = neighbor_cells["left"]
         if left_cell and np.array(self._matrix)[left_cell[0]] not in [61, 62, 63, 64]:
             return "L", unload_direction  # Разгрузка слева
 
-        # Если обе стороны заняты держателями
         if (right_cell and left_cell and
                 np.array(self._matrix)[right_cell[0]] in [61, 62, 63, 64] and
                 np.array(self._matrix)[left_cell[0]] in [61, 62, 63, 64]):
-            return "C", unload_direction  # Разгрузка по центру
+            return "C", unload_direction
 
-        # Если ни один вариант не подошел
         else: return "idktbh"
 
 
