@@ -158,118 +158,221 @@
 #     calibration_file = None  # Или укажите путь к файлу калибровки "calibration_data.npz"
 #
 #     undistort_image(input_image, output_image, calibration_file)
-import cv2
+# # import cv2
+#
+# # import cv2
+# import numpy as np
+#
+# # Исходное изображение
+# img = cv2.imread("frame_2.png")
+# if img is None:
+#     print("Ошибка: не удалось загрузить изображение")
+#     exit()
+#
+# # Копия изображения для работы
+# working_img = img.copy()
+#
+# # Начальные координаты прямоугольника
+# x1, y1 = 40, 200  # Левый верхний угол
+# x2, y2 = 300, 450  # Правый нижний угол
+#
+# # Создаем окно
+# cv2.namedWindow("Управление прямоугольником", cv2.WINDOW_NORMAL)
+#
+#
+# # Функция обновления изображения
+# def update_image():
+#     global working_img
+#
+#     # Создаем копию исходного изображения
+#     working_img = img.copy()
+#
+#     # Рисуем прямоугольник
+#     cv2.rectangle(working_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+#
+#     # Создаем правую панель с информацией
+#     info_panel = np.full((img.shape[0], 300, 3), 240, dtype=np.uint8)
+#
+#     # Добавляем текст с координатами
+#     font = cv2.FONT_HERSHEY_SIMPLEX
+#     scale = 0.7
+#     color = (0, 0, 0)
+#     thickness = 1
+#
+#     text = [
+#         "Координаты прямоугольника:",
+#         "",
+#         f"Левый верхний: ({x1}, {y1})",
+#         f"Правый нижний: ({x2}, {y2})",
+#         "",
+#         "Для копирования:",
+#         f"({x1}, {y1}, {x2}, {y2})",
+#         "",
+#         "Управление:",
+#         "ESC - выход",
+#         "'s' - сохранить",
+#         "'c' - скопировать в буфер"
+#     ]
+#
+#     y_pos = 40
+#     for i, line in enumerate(text):
+#         if i in [2, 3, 6]:  # Выделяем важные строки
+#             cv2.putText(info_panel, line, (20, y_pos), font, scale, (0, 0, 255), thickness)
+#         else:
+#             cv2.putText(info_panel, line, (20, y_pos), font, scale, color, thickness)
+#         y_pos += 30
+#
+#     # Объединяем изображение и панель информации
+#     combined = np.hstack((working_img, info_panel))
+#     cv2.imshow("Управление прямоугольником", combined)
+#
+#
+# # Функция обновления координат
+# def update_coord(coord, value):
+#     global x1, y1, x2, y2
+#
+#     if coord == 'x1':
+#         x1 = value
+#     elif coord == 'y1':
+#         y1 = value
+#     elif coord == 'x2':
+#         x2 = value
+#     elif coord == 'y2':
+#         y2 = value
+#
+#     # Гарантируем, что x2 > x1 и y2 > y1
+#     if x2 <= x1: x2 = x1 + 1
+#     if y2 <= y1: y2 = y1 + 1
+#
+#     update_image()
+#
+#
+# # Создаем trackbars
+# cv2.createTrackbar("X1", "Управление прямоугольником", x1, img.shape[1], lambda x: update_coord('x1', x))
+# cv2.createTrackbar("Y1", "Управление прямоугольником", y1, img.shape[0], lambda x: update_coord('y1', x))
+# cv2.createTrackbar("X2", "Управление прямоугольником", x2, img.shape[1], lambda x: update_coord('x2', x))
+# cv2.createTrackbar("Y2", "Управление прямоугольником", y2, img.shape[0], lambda x: update_coord('y2', x))
+#
+# # Первоначальное отображение
+# update_image()
+#
+# # Основной цикл
+# while True:
+#     key = cv2.waitKey(1) & 0xFF
+#     if key == 27:  # ESC для выхода
+#         break
+#     elif key == ord('s'):  # Сохранить координаты
+#         print(f"Координаты для копирования: ({x1}, {y1}, {x2}, {y2})")
+#     elif key == ord('c'):  # Копировать в буфер обмена (требуется pyperclip)
+#         try:
+#             import pyperclip
+#
+#             pyperclip.copy(f"({x1}, {y1}, {x2}, {y2})")
+#             print("Координаты скопированы в буфер обмена!")
+#         except:
+#             print("Установите pyperclip для копирования в буфер: pip install pyperclip")
+#
+# cv2.destroyAllWindows()
 
 import cv2
 import numpy as np
 
-# Исходное изображение
-img = cv2.imread("frame_2.png")
-if img is None:
-    print("Ошибка: не удалось загрузить изображение")
-    exit()
+# Параметры камеры
+fov = 175  # Угол обзора в градусах
+tilt_angle = 15  # Угол наклона камеры в градусах
+distance_to_floor = 40  # Расстояние от камеры до пола в см
 
-# Копия изображения для работы
-working_img = img.copy()
+# Разрешение изображения (замените реальными значениями)
+image_width = 640
+image_height = 480
 
-# Начальные координаты прямоугольника
-x1, y1 = 40, 200  # Левый верхний угол
-x2, y2 = 300, 450  # Правый нижний угол
+def undistort_image(image, fov, tilt_angle, distance_to_floor, image_width, image_height):
+    """
+    Устраняет подушкообразное искажение и эффект перспективы.
 
-# Создаем окно
-cv2.namedWindow("Управление прямоугольником", cv2.WINDOW_NORMAL)
+    Args:
+        image: Исходное изображение (numpy.ndarray).
+        fov: Угол обзора камеры (в градусах).
+        tilt_angle: Угол наклона камеры (в градусах).
+        distance_to_floor: Расстояние от камеры до пола (в см).
+        image_width: Ширина изображения.
+        image_height: Высота изображения.
 
+    Returns:
+        undistorted_image: Изображение с устраненными искажениями (numpy.ndarray).
+    """
 
-# Функция обновления изображения
-def update_image():
-    global working_img
+    # 1. Расчет параметров камеры (в предположении pinhole модели)
+    focal_length = (image_width / 2) / np.tan(np.radians(fov / 2))
 
-    # Создаем копию исходного изображения
-    working_img = img.copy()
+    # Матрица intrinsics (внутренних параметров) камеры
+    camera_matrix = np.array([
+        [focal_length, 0, image_width / 2],
+        [0, focal_length, image_height / 2],
+        [0, 0, 1]
+    ])
 
-    # Рисуем прямоугольник
-    cv2.rectangle(working_img, (x1, y1), (x2, y2), (0, 0, 255), 2)
+    # Коэффициенты искажения (предполагаем, что у нас только радиальные искажения, k1, k2, k3)
+    # Для камеры с углом 175 градусов подушкообразное искажение может быть значительным,
+    # поэтому потребуется точная калибровка.  В этом примере предполагаем, что они известны
+    # (получены в результате калибровки).
+    # ВНИМАНИЕ: Эти значения нужно откалибровать для ВАШЕЙ камеры!
+    distortion_coefficients = np.array([0.1, -0.3, 0, 0, 0]) # k1, k2, p1, p2, k3
 
-    # Создаем правую панель с информацией
-    info_panel = np.full((img.shape[0], 300, 3), 240, dtype=np.uint8)
+    # 2.  Устранение искажений (дисторсии)
+    undistorted_image = cv2.undistort(image, camera_matrix, distortion_coefficients)
 
-    # Добавляем текст с координатами
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    scale = 0.7
-    color = (0, 0, 0)
-    thickness = 1
+    # 3. Коррекция перспективы (Bird's Eye View) - делает вид сверху вниз
+    #    Этот шаг преобразует изображение так, как будто камера находится прямо над полом.
+    #    Чтобы это сделать, нужно определить точки соответствия на исходном изображении и на виде сверху.
 
-    text = [
-        "Координаты прямоугольника:",
-        "",
-        f"Левый верхний: ({x1}, {y1})",
-        f"Правый нижний: ({x2}, {y2})",
-        "",
-        "Для копирования:",
-        f"({x1}, {y1}, {x2}, {y2})",
-        "",
-        "Управление:",
-        "ESC - выход",
-        "'s' - сохранить",
-        "'c' - скопировать в буфер"
-    ]
+    # Определяем координаты углов пола на искаженном изображении (ЭТО ПРИБЛИЗИТЕЛЬНЫЕ ЗНАЧЕНИЯ)
+    # ВНИМАНИЕ:  Эти точки нужно подобрать для ВАШЕЙ установки! Это зависит от угла наклона,
+    # расстояния до пола, угла обзора и разрешения камеры.
+    # Чем точнее будут эти точки, тем лучше будет результат.
+    source_points = np.float32([
+        [0, image_height],  # Левый нижний угол
+        [image_width, image_height],  # Правый нижний угол
+        [0, 0],  # Левый верхний угол
+        [image_width, 0]  # Правый верхний угол
+    ])
 
-    y_pos = 40
-    for i, line in enumerate(text):
-        if i in [2, 3, 6]:  # Выделяем важные строки
-            cv2.putText(info_panel, line, (20, y_pos), font, scale, (0, 0, 255), thickness)
-        else:
-            cv2.putText(info_panel, line, (20, y_pos), font, scale, color, thickness)
-        y_pos += 30
+    # Определяем соответствующие координаты на виде сверху (в метрах или сантиметрах)
+    # Выберите масштаб, подходящий для ваших измерений
+    # ВНИМАНИЕ: Эти значения также нужно настроить! Они определяют "область обзора" сверху вниз.
+    floor_width = 100  # Ширина пола в "виде сверху" (см)
+    floor_length = 100  # Длина пола в "виде сверху" (см)
 
-    # Объединяем изображение и панель информации
-    combined = np.hstack((working_img, info_panel))
-    cv2.imshow("Управление прямоугольником", combined)
+    destination_points = np.float32([
+        [0, floor_length],  # Левый нижний угол
+        [floor_width, floor_length],  # Правый нижний угол
+        [0, 0],  # Левый верхний угол
+        [floor_width, 0]  # Правый верхний угол
+    ])
 
+    # Вычисляем матрицу преобразования перспективы
+    perspective_matrix = cv2.getPerspectiveTransform(source_points, destination_points)
 
-# Функция обновления координат
-def update_coord(coord, value):
-    global x1, y1, x2, y2
+    # Применяем преобразование перспективы
+    bird_eye_view = cv2.warpPerspective(undistorted_image, perspective_matrix, (floor_width, floor_length))
 
-    if coord == 'x1':
-        x1 = value
-    elif coord == 'y1':
-        y1 = value
-    elif coord == 'x2':
-        x2 = value
-    elif coord == 'y2':
-        y2 = value
-
-    # Гарантируем, что x2 > x1 и y2 > y1
-    if x2 <= x1: x2 = x1 + 1
-    if y2 <= y1: y2 = y1 + 1
-
-    update_image()
+    return bird_eye_view  # Возвращаем вид сверху
 
 
-# Создаем trackbars
-cv2.createTrackbar("X1", "Управление прямоугольником", x1, img.shape[1], lambda x: update_coord('x1', x))
-cv2.createTrackbar("Y1", "Управление прямоугольником", y1, img.shape[0], lambda x: update_coord('y1', x))
-cv2.createTrackbar("X2", "Управление прямоугольником", x2, img.shape[1], lambda x: update_coord('x2', x))
-cv2.createTrackbar("Y2", "Управление прямоугольником", y2, img.shape[0], lambda x: update_coord('y2', x))
+# Пример использования
+if __name__ == '__main__':
+    # 1. Загрузите изображение (замените "your_image.jpg" на имя вашего файла)
+    image = cv2.imread("frame_1.png")
 
-# Первоначальное отображение
-update_image()
+    if image is None:
+        print("Ошибка: Не удалось загрузить изображение.")
+    else:
+        # 2. Устранение искажений и коррекция перспективы
+        undistorted_bird_eye_view = undistort_image(image, fov, tilt_angle, distance_to_floor, image_width,
+                                                    image_height)
 
-# Основной цикл
-while True:
-    key = cv2.waitKey(1) & 0xFF
-    if key == 27:  # ESC для выхода
-        break
-    elif key == ord('s'):  # Сохранить координаты
-        print(f"Координаты для копирования: ({x1}, {y1}, {x2}, {y2})")
-    elif key == ord('c'):  # Копировать в буфер обмена (требуется pyperclip)
-        try:
-            import pyperclip
-
-            pyperclip.copy(f"({x1}, {y1}, {x2}, {y2})")
-            print("Координаты скопированы в буфер обмена!")
-        except:
-            print("Установите pyperclip для копирования в буфер: pip install pyperclip")
-
-cv2.destroyAllWindows()
+        # 3. Отображение результатов
+        cv2.imshow("Original Image", image)
+        cv2.imshow("Undistorted Bird's Eye View", undistorted_bird_eye_view)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
