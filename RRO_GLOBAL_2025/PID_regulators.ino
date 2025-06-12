@@ -3,7 +3,7 @@ void pidXN(float sped, int n) {
     for (int i = 1; i < n; i++) {
       pidX(0.5, 0.01, 0.4, sped, 150, 0);
     }
-  int overdrive = 505;
+  int overdrive = 585;
   pidX(0.5, 0.02, 0.5, sped, 0, 0);
   pidEnc(0.5, 0.02, 0.5, sped * 0.6, overdrive, 1);
 }
@@ -21,8 +21,8 @@ void pidX(float kp, float ki, float kd, float sped, int overdrive, int stopp) {
     datx1 = 2;  // B
     datx2 = 3;  // C
   } else {
-    datx1 = 4;  // A
-    datx2 = 1;  // D
+    datx1 = 1;  // A
+    datx2 = 4;  // D
   }
 
   err_i = 0;

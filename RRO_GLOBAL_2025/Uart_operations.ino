@@ -89,7 +89,7 @@ void handleGrabCommand() {
 }
 
 void handlePutCommand() {
-  put();
+  lay();
   SendData("Put");
   Serial.println("Put");
 }

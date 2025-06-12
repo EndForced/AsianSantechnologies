@@ -66,7 +66,7 @@ void turn_to_line(int speed, int side_of_turn, int way_to_drive, int number) {
         drive(side_of_turn * speed * 0.8, side_of_turn * speed * 0.8, -side_of_turn * speed * 0.8, -side_of_turn * speed * 0.8);
 
       while (sensor(dat1) > 220)
-        drive(side_of_turn * speed * 0.7, side_of_turn * speed * 0.7, -side_of_turn * speed * 0.7, -side_of_turn * speed * 0.7);
+        drive(side_of_turn * speed * 0.6, side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6);
     } else {
 
       while (sensor(dat1) < 640)
@@ -76,7 +76,7 @@ void turn_to_line(int speed, int side_of_turn, int way_to_drive, int number) {
         drive(side_of_turn * speed * 0.8, side_of_turn * speed * 0.8, -side_of_turn * speed * 0.8, -side_of_turn * speed * 0.8);
 
       while (sensor(dat1) < 880)
-        drive(side_of_turn * speed * 0.7, side_of_turn * speed * 0.7, -side_of_turn * speed * 0.7, -side_of_turn * speed * 0.7);
+        drive(side_of_turn * speed * 0.6, side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6);
     }
   }
   int tormoz_speed = -side_of_turn * (1023);
