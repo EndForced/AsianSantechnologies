@@ -92,6 +92,8 @@ class RobotAPI:
 
         if args:
             res = ""
+            if args == "Reset":
+                return
             self.send(args)
             print(f"doing {args} ... ")
 
