@@ -150,23 +150,24 @@ mc = MainComputer(mat, serial)
 # print(mc.resizedPicture.dtype)
 
 if mc.OS == "Linux":
-    # mc.start_website()
+    mc.start_website()
     # mc.robot.get_uncompressed_frames(1)
     # exit()
     # p = input()
     # mc.qualifiction()
     # time.sleep(1000)
     while 1:
-        frame = mc.robot.get_uncompressed_frames(1)[1].copy()
-        frame, slices = update_frame_smart(frame)
-        for i in range(len(slices)):
-            print(i)
-            cv2.imwrite(f"{i}.jpg", slices[i])
-
-        print("upd!!")
-        exit()
-        # cv2.imwrite("testing.jpg", frame)
-        mc.robot.set_frame(frame)
+        # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
+        # frame, slices = update_frame_smart(frame)
+        # for i in range(len(slices)):
+        #     print(i)
+        #     cv2.imwrite(f"{i}.jpg", slices[i])
+        #
+        # print("upd!!")
+        # exit()
+        # # cv2.imwrite("testing.jpg", frame)
+        # mc.robot.set_frame(frame)
+        pass
 else:
     # print(type(res))
     #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
