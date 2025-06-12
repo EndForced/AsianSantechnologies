@@ -20,18 +20,18 @@ void servos_init() {
 
   send_rgb(0, 0, 0);
   delay(20);
-  arm(7);
+  arm(6, 10);
   delay(150);
   close_claws();
   cam(0);
-  
+
   // open_claws();
   all_forward();
   delay(300);
 }
 
 const byte arm_num = 3;
-const byte arm_positions[] = { 102, 98, 80, 60, 40, 22, 5 };  // from stand to last tube
+const byte arm_positions[] = { 102, 98, 93, 60, 40, 22, 5 };  // from stand to last tube
 const byte max_pos = sizeof(arm_positions) / sizeof(byte) - 1;
 
 byte last_arm_pos = 10;
@@ -57,6 +57,26 @@ void arm(byte num_of_pos, int del) {
   last_arm_pos = arm_positions[num_of_pos];
 }
 
+void arm_deg(byte deg) {
+  last2_arm_pos = last_arm_pos;
+  byte distance = abs(deg - last_arm_pos);
+  send_servo(arm_num, deg);
+  last_arm_pos = deg;
+}
+
+void arm_deg(byte deg, int del) {
+  last2_arm_pos = last_arm_pos;
+  byte distance = abs(deg - last_arm_pos);
+  for (int i = last_arm_pos; i != deg; deg > last_arm_pos ? i++ : i--) {
+    send_servo(arm_num, i);
+    float dist = distance;
+    delay(del);
+  }
+  // send_servo(arm_num, arm_positions[num_of_pos]);
+
+  last_arm_pos = deg;
+}
+
 int time_calc(byte new_pos) {
   byte distance = abs(arm_positions[new_pos] - last2_arm_pos);
   return distance * 10 + 100;
@@ -67,14 +87,14 @@ void grab() {
   arm(1);
   delay((time_calc(1) * 3) / 4);
   pidEnc(0.7, 0.07, 0.8, 850, 350, 0);
-  pidEnc(0.7, 0.07, 0.8, 450, 220, 1);
+  pidEnc(0.7, 0.07, 0.8, 450, 200, 1);
   delay(200);
   arm(2);
   delay(time_calc(2) + 150);
   close_claws();
   delay(250);
   lay();
-  pidEnc(1.5, 0.1, 1, -750, 570, 1);
+  pidEnc(0.5, 0.04, 0.5, -750, 580, 1);
   delay(50);
 }
 
@@ -100,9 +120,9 @@ void put() {
   arm(0);
   delay(time_calc(0));
   delay(200);
-  open_claws();
+  open_claws(8);
   delay(100);
-  arm(2, 8);
+  arm_deg(82, 8);
   // podexatb
   pidEnc(0.4, 0.01, 0.5, 850, 1050, 0);
   pidEnc(0.4, 0.01, 0.5, 450, 220, 1);
@@ -114,8 +134,8 @@ void put() {
 }
 
 const byte claw_nums[] = { 2, 4 };
-const byte claw_open[] = { 120, 61 };
-const byte claw_closed[] = { 52, 129 };
+const byte claw_open[] = { 124, 61 };
+const byte claw_closed[] = { 58, 129 };
 
 void open_claws() {
   Wire.beginTransmission(I2C_ADDRESS);  // Slave address
@@ -124,6 +144,29 @@ void open_claws() {
   send_command(cmd, claw_nums[1], claw_open[1]);
   Wire.endTransmission();
 }
+
+void open_claws(int delay_ms) {
+  Wire.beginTransmission(I2C_ADDRESS);  // Slave address
+  char cmd[] = { 'S', 'E', 'R', 'V' };
+
+  // Плавное открытие
+  byte start_pos1 = claw_closed[0];
+  byte start_pos2 = claw_closed[1];
+  byte end_pos1 = claw_open[0];
+  byte end_pos2 = claw_open[1];
+
+  for (int i = 0; i <= 66; i++) {
+    byte current_pos1 = map(i, 0, 66, start_pos1, end_pos1);
+    byte current_pos2 = map(i, 0, 66, start_pos2, end_pos2);
+
+    send_command(cmd, claw_nums[0], current_pos1);
+    send_command(cmd, claw_nums[1], current_pos2);
+    Wire.endTransmission();
+    delay(delay_ms);
+    Wire.beginTransmission(I2C_ADDRESS);  // Начинаем новую передачу
+  }
+}
+
 void close_claws() {
   Wire.beginTransmission(I2C_ADDRESS);  // Slave address
   char cmd[] = { 'S', 'E', 'R', 'V' };
@@ -133,7 +176,7 @@ void close_claws() {
   Wire.endTransmission();
 }
 
-const byte cam_pos[] = { 153, 50 };
+const byte cam_pos[] = { 153, 35 };
 const byte cam_num = 5;
 byte last_cam = 0;
 

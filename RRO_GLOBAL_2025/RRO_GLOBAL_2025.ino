@@ -37,23 +37,32 @@ void setup() {
   delay(10);
   beep(900, 150);
 
-  
+  close_claws();
+
   buttonWait(0);
-  cam(1,10);
+  cam(1, 10);
   open_claws();
   delay(100);
-  
 }
 
 void loop() {
-  uartProcessing();
+  for (int i = 0; i < 3; i++) {
+    buttonWait(0);
+    grab();
+  }
+  for (int i = 0; i < 3; i++) {
+    buttonWait(0);
+    put();
+  }
+
+  // uartProcessing();
 }
 
 
 uint32_t tim = 0;
 void buttonWait(int flag) {
   while (1) {
-     Serial.println(button());
+    //  Serial.println(button());
     if (button() == 0)
       break;
     else if (millis() - tim > 200) {

@@ -138,6 +138,6 @@ void stop_after_pid(float sped) {
   drive(tormoz_speed, tormoz_speed, tormoz_speed, tormoz_speed);
   delay(10);
   all_forward();
-  delay((abs(sped) / 1023.0 * 40) - 10);
+  delay((abs(sped) / 1023.0 * 30) - 10);
   stop();
 }
