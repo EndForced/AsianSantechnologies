@@ -158,6 +158,7 @@ if mc.OS == "Linux":
         mc.robot.get_uncompressed_frames(1)
     #
         print("yep")
+        time.sleep(5)
     # exit()
     # p = input()
     mc.qualifiction()
