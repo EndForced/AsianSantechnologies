@@ -55,7 +55,10 @@ void loop() {
   //    put();
   //  }
 
-  uartProcessing();
+//  uartProcessing();
+buttonWait(0);
+//
+grab_from_ramp_up();
 }
 
 

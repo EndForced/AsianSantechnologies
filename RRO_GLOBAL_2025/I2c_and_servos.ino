@@ -31,7 +31,7 @@ void servos_init() {
 }
 
 const byte arm_num = 3;
-const byte arm_positions[] = { 102, 98, 93, 60, 40, 22, 5 };  // from stand to last tube
+const byte arm_positions[] = { 102, 98, 93, 60, 40, 22, 5};  // from stand to last tube
 const byte max_pos = sizeof(arm_positions) / sizeof(byte) - 1;
 
 byte last_arm_pos = 10;

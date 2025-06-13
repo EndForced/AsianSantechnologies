@@ -9,7 +9,7 @@ void go_up(int way) {
   }
   inverse = 1;
   pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 2000 - (abs(way) == 1) * 400, 0);
-  drive(way*700);
+  drive(way * 700);
 }
 
 
@@ -22,6 +22,35 @@ void grab_from_ramp(int way) {
   pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 2800 - (abs(way) == 1) * 400, 0);
 }
 
+void grab_from_ramp_up() {
+  open_claws();
+  pidX(0.7, 0.03, 0.6, 900, 400, 1);
+  arm(0);
+//  buttonWait(0);
+//  pidX(0.7, 0.03, 0.6, PWM_MAX*0.8, 400, 1);
+  inverse = 1;
+//  buttonWait(0);
+  pidEnc(0.7, 0.03, 0.6,PWM_MAX, 1800, 1);
+  arm_deg(106);
+//  buttonWait(0);
+  pidX(0.7, 0.03, 0.6, PWM_MAX*0.72, 50, 1);
+  arm(2);
+  delay(100);
+  close_claws();
+  delay(250);
+  
+  lay();
+  delay(100);
+//  buttonWait(0);
+  go_down(-1);
+  inverse = 0;
+  pidX(0.7, 0.03, 0.6, -PWM_MAX*0.75, 0, 0);
+  pidEnc(0.7, 0.03, 0.6,-PWM_MAX*0.70, 585, 1);
+   
+  
+
+}
+
 
 void go_down(int way) {
   int deg = 0;
@@ -29,7 +58,7 @@ void go_down(int way) {
     way /= 2;
     deg = 1400;
     beep(200, 200);
-    pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 400, 0);
+    pidEnc(0.7, 0.03, 0.6, way * PWM_MAX*0.85, 400, 0);
   }
 
   pidEnc(0.7, 0.03, 0.6, way * 680, 1000, 0);
