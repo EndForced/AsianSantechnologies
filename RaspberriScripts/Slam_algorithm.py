@@ -154,10 +154,11 @@ mc = MainComputer(mat, serial)
 if mc.OS == "Linux":
     # mc.start_website()
     # time.sleep(3)
-    mc.robot.get_uncompressed_frames(1)
+    while 1:
+        mc.robot.get_uncompressed_frames(1)
     #
-    print("Started")
-    exit()
+        print("yep")
+    # exit()
     # p = input()
     mc.qualifiction()
     # time.sleep(1000)
