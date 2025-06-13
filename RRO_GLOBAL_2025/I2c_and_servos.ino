@@ -134,7 +134,7 @@ void put() {
 }
 
 const byte claw_nums[] = { 2, 4 };
-const byte claw_open[] = { 124, 61 };
+const byte claw_open[] = { 124, 55 };
 const byte claw_closed[] = { 58, 129 };
 
 void open_claws() {
@@ -175,7 +175,6 @@ void close_claws() {
   }
   Wire.endTransmission();
 }
-
 const byte cam_pos[] = { 153, 42 };
 const byte cam_num = 5;
 byte last_cam = 0;

@@ -23,15 +23,18 @@ void grab_from_ramp(int way) {
 }
 
 void grab_from_ramp_up() {
-  open_claws();
+  
   pidX(0.7, 0.03, 0.6, 900, 400, 1);
-  arm(0);
+//  arm(0);
 //  buttonWait(0);
 //  pidX(0.7, 0.03, 0.6, PWM_MAX*0.8, 400, 1);
   inverse = 1;
 //  buttonWait(0);
-  pidEnc(0.7, 0.03, 0.6,PWM_MAX, 1800, 1);
+  pidEnc(0.7, 0.03, 0.6,PWM_MAX, 1650, 1);
+  open_claws();
+  delay(250);
   arm_deg(106);
+  delay(200);
 //  buttonWait(0);
   pidX(0.7, 0.03, 0.6, PWM_MAX*0.72, 50, 1);
   arm(2);
