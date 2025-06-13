@@ -46,16 +46,16 @@ void setup() {
 }
 
 void loop() {
-  for (int i = 0; i < 3; i++) {
-    buttonWait(0);
-    grab();
-  }
-  for (int i = 0; i < 3; i++) {
-    buttonWait(0);
-    put();
-  }
+  //  for (int i = 0; i < 3; i++) {
+  //    buttonWait(0);
+  //    grab();
+  //  }
+  //  for (int i = 0; i < 3; i++) {
+  //    buttonWait(0);
+  //    put();
+  //  }
 
-  // uartProcessing();
+  uartProcessing();
 }
 
 

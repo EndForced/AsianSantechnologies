@@ -144,6 +144,8 @@ mat = [[10, 10, 10, 10, 10, 10, 10, 10],
        [10, 10, 10, 0, 10, 31, 10, 0],
        [10, 10, 10, 0, 10, 10, 71, 0],
        [10, 10, 10, 0, 63, 63, 63, 0]]
+
+mat = [[41, 20, 20, 10, 20, 10, 10, 62], [10, 10, 20, 33, 20, 10, 10, 62], [10, 10, 31, 31, 20, 10, 10, 62], [10, 10, 33, 33, 20, 10, 10, 42], [10, 10, 20, 20, 20, 10, 20, 34], [10, 32, 20, 10, 10, 10, 10, 10], [10, 10, 10, 10, 10, 20, 20, 10], [71, 10, 32, 20, 52, 20, 20, 20]]
 # mat = [[10]*15]*15
 mc = MainComputer(mat, serial)
 # res = mc.show()
@@ -154,9 +156,9 @@ if mc.OS == "Linux":
     # time.sleep(3)
     # mc.robot.get_uncompressed_frames(1)
     # exit()
-    print("Done")
+    print("Started")
     # p = input()
-    # mc.qualifiction()
+    mc.qualifiction()
     # time.sleep(1000)
     while 1:
         # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
