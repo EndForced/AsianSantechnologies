@@ -18,7 +18,7 @@ if platform.system() == "Windows":
 if platform.system() == "Linux":
     from StreamVideo import WebsiteHolder
     import serial
-    serial = serial.Serial('/dev/ttyAMA10', 115200, timeout=1)
+    serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
 
 #ты ему клетки со фрейма, а он тебе все остальное
 class MainComputer(VisualizePaths, WebsiteHolder):
