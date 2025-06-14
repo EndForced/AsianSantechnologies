@@ -155,8 +155,8 @@ if mc.OS == "Linux":
     mc.start_website()
     # time.sleep(3)
     while 1:
-        frame = mc.robot.get_uncompressed_frames(1)[1]
-        frame = update_frame_smart(frame)[0]
+        frame = mc.robot.get_uncompressed_frames(0)[1]
+        frame = update_frame_smart(frame, 1)[0]
         mc.robot.set_frame(frame)
         # print("yep")
         # time.sleep(1)
