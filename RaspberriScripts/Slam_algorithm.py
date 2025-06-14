@@ -155,9 +155,10 @@ if mc.OS == "Linux":
     mc.start_website()
     time.sleep(3)
     while 1:
-        frame = mc.robot.get_uncompressed_frames(1)[0]
+        frame = mc.robot.get_uncompressed_frames(0)[0]
         frame= fix_perspct(frame)
         mc.robot.set_frame(frame)
+        cv2.imwrite("warped", frame)
 
     mc.qualifiction()
     # time.sleep(1000)
