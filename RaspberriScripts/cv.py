@@ -20,7 +20,8 @@ import numpy as np
 
 def update_frame_smart(frame, floor):
     result_frame = frame.copy()
-    list_of_slices = []
+    list_of_slices = [[],
+                      []]
 
     if floor == 1:
         slices = [extract_polygon_with_white_bg(frame, cam1floor1[i]) for i in range(8)]
@@ -41,8 +42,13 @@ def update_frame_smart(frame, floor):
 
             if lead == "white" and flag:
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
+                index = 0 if i < 2 else 1
+                list_of_slices[index].append(list_of_slices[i])
 
-            elif lead == "black": result_frame = draw_on_image(result_frame, cam1floor1[i+4])
+            elif lead == "black":
+                result_frame = draw_on_image(result_frame, cam1floor1[i+4], color = (0,0,255))
+                index = 0 if i < 2 else 1
+                list_of_slices[index].append(list_of_slices[i+4])
 
 
 
