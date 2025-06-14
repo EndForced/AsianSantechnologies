@@ -20,7 +20,7 @@ class DualCameraServer:
         self.stream_active = False
         self.conn = None
         self.lock = threading.Lock()
-        self.quality = 15
+        self.quality = 50
 
         self.primary_config = self.picam2_primary.create_video_configuration(
             main={
