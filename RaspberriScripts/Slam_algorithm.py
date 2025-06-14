@@ -2,7 +2,7 @@
 import sys, os, platform, math
 
 import numpy as np
-from cv import update_frame_smart
+from cv import update_frame_smart, fix_perspct
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
@@ -156,7 +156,7 @@ if mc.OS == "Linux":
     # time.sleep(3)
     while 1:
         frame = mc.robot.get_uncompressed_frames(1)[0]
-        frame, slices = update_frame_smart(frame, 1)
+        frame, slices = fix_perspct(frame)
         mc.robot.set_frame(frame)
 
         # for i in range(len(slices)):

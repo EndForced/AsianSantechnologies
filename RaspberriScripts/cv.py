@@ -67,6 +67,47 @@ def update_frame_smart(frame, floor):
 
     return result_frame, list_of_slices
 
+
+def fix_perspct(frame):
+    K = np.array([[386.26166874, 8.86539874, 278.66589351],
+                  [0., 407.63805824, 219.29121805],
+                  [0., 0., 1.]])
+    D = np.array([[-0.17621875],
+                  [-0.15100755],
+                  [0.66708108],
+                  [-0.61169934]])
+
+    # Загрузка изображения
+    img = cv2.imread("chess_frames/frame_test.png")
+    if img is None:
+        raise ValueError("Не удалось загрузить изображение! Проверьте путь.")
+
+    # 1. Добавляем 50-пиксельные поля вокруг изображения
+    border_size = 100
+    img_with_border = cv2.copyMakeBorder(
+        img,
+        border_size, border_size, border_size, border_size,
+        cv2.BORDER_CONSTANT,
+        value=(0, 0, 0)  # Черный цвет фона
+    )
+
+    # 2. Обновляем параметры камеры для увеличенного изображения
+    h, w = img_with_border.shape[:2]
+    K_border = K.copy()
+    K_border[0, 2] += border_size  # Сдвигаем центр по x
+    K_border[1, 2] += border_size  # Сдвигаем центр по y
+
+    # 3. Устранение дисторсии
+    undistorted = cv2.fisheye.undistortImage(
+        img_with_border,
+        K=K_border,
+        D=D,
+        Knew=K_border,
+        new_size=(w, h)
+    )
+
+    return undistorted
+
 def lead_color(img_slice, threshold=0.5,
                ignore_white=True,
                white_hsv_base=(83, 47, 120),
