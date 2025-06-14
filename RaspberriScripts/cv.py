@@ -13,9 +13,17 @@ first_left1f = [(123, 58), (258, 49), (238, 189), (58, 183), (121, 58)]
 
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
 
+hsv_white = (83.05,47.49,120.47)
+hsw_red = (83.32,193.15,129.74)
+hsw_blue  = (114.08,178.85,68.38)
+hsw_range = (5,15,15)
+
+
+
 
 import cv2
 import numpy as np
+from collections import defaultdict
 
 
 def update_frame_smart(frame, floor):
@@ -27,7 +35,7 @@ def update_frame_smart(frame, floor):
         leads = []
         for i in range(4):
             slice_to_check = slices[i][0:50,::]
-            lead = lead_color(slice_to_check)[1]
+            lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
             leads.append(lead)
 
             if i == 2 and leads[0] == "black":
@@ -59,7 +67,6 @@ def update_frame_smart(frame, floor):
 
     return result_frame, list_of_slices
 
-#H: 83.05, S: 47.49, V: 120.47
 def lead_color(img_slice, threshold=0.5,
                ignore_white=True,
                white_hsv_base=(83, 47, 120),
@@ -248,6 +255,91 @@ def extract_polygon_with_white_bg(image, points):
     return cropped
 
 
+def analyze_color_shape(image, target_hsv, hsv_range=(10, 50, 50), min_area=100):
+    """
+    Анализирует цветовые области и определяет их форму
+
+    Параметры:
+    - image: исходное изображение (BGR)
+    - target_hsv: целевой цвет в HSV (H, S, V)
+    - hsv_range: допустимый диапазон (H_range, S_range, V_range)
+    - min_area: минимальная площадь для анализа формы
+
+    Возвращает:
+    - Словарь с результатами анализа для каждой найденной области
+    - Изображение с разметкой
+    """
+    # Конвертируем в HSV и создаем маску
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    lower_bound = np.array([max(0, target_hsv[0] - hsv_range[0]),
+                            max(0, target_hsv[1] - hsv_range[1]),
+                            max(0, target_hsv[2] - hsv_range[2])])
+    upper_bound = np.array([min(179, target_hsv[0] + hsv_range[0]),
+                            min(255, target_hsv[1] + hsv_range[1]),
+                            min(255, target_hsv[2] + hsv_range[2])])
+    color_mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
+
+    # Находим контуры
+    contours, _ = cv2.findContours(color_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    results = defaultdict(dict)
+    marked_image = image.copy()
+
+    for idx, cnt in enumerate(contours):
+        area = cv2.contourArea(cnt)
+        if area < min_area:
+            continue
+
+        # Основные параметры контура
+        perimeter = cv2.arcLength(cnt, True)
+        approx = cv2.approxPolyDP(cnt, 0.04 * perimeter, True)
+        num_sides = len(approx)
+
+        # Определяем форму по количеству сторон
+        if num_sides == 3:
+            shape = "triangle"
+        elif num_sides == 4:
+            # Проверяем, насколько близок к прямоугольнику
+            x, y, w, h = cv2.boundingRect(cnt)
+            aspect_ratio = float(w) / h
+            shape = "square" if 0.95 <= aspect_ratio <= 1.05 else "rectangle"
+        elif num_sides == 5:
+            shape = "pentagon"
+        elif num_sides == 6:
+            shape = "hexagon"
+        elif num_sides > 12:
+            # Проверяем круглость
+            (x, y), radius = cv2.minEnclosingCircle(cnt)
+            circle_area = np.pi * (radius ** 2)
+            circularity = area / circle_area
+            shape = "circle" if circularity > 0.85 else "oval"
+        else:
+            shape = f"polygon_{num_sides}sides"
+
+        # Вычисляем моменты для центра масс
+        M = cv2.moments(cnt)
+        if M["m00"] != 0:
+            cX = int(M["m10"] / M["m00"])
+            cY = int(M["m01"] / M["m00"])
+        else:
+            cX, cY = 0, 0
+
+        # Сохраняем результаты
+        results[idx] = {
+            "shape": shape,
+            "area": area,
+            "perimeter": perimeter,
+            "center": (cX, cY),
+            "num_sides": num_sides,
+            "contour": cnt
+        }
+
+        # Рисуем разметку
+        cv2.drawContours(marked_image, [cnt], -1, (0, 255, 0), 2)
+        cv2.putText(marked_image, shape, (cX - 20, cY - 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+    return dict(results), marked_image
 if __name__ == "__main__":
     fr, slices = update_frame_smart(cv2.imread("frame_1.png"), 1)
     # cv2.imshow("o", slices[0][0])
@@ -255,6 +347,10 @@ if __name__ == "__main__":
 
     for i in range(len(slices)):
         if str(slices[i]) != "unr":
-            cv2.imshow(f"{i}", slices[i])
+            slices[i] = cv2.resize(slices[i],(300,300))
+            count, mask = analyze_color_shape(slices[i], hsw_blue, hsw_range)
+            print(count)
+            cv2.imshow(f"{i}", mask)
+            cv2.waitKey(0)
 
     cv2.waitKey(0)
