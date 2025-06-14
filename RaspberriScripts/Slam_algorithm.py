@@ -158,7 +158,7 @@ if mc.OS == "Linux":
         frame = mc.robot.get_uncompressed_frames(0)[0]
         frame= fix_perspct(frame)
         mc.robot.set_frame(frame)
-        cv2.imwrite("warped", frame)
+        cv2.imwrite("warped.png", frame)
 
     mc.qualifiction()
     # time.sleep(1000)
