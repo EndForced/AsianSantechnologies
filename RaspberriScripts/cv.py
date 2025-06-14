@@ -381,17 +381,17 @@ def analyze_color_shape(image, target_hsv, hsv_range=(10, 50, 50), min_area=100)
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
     return dict(results), marked_image
-if __name__ == "__main__":
-    fr, slices = update_frame_smart(cv2.imread("frame_1.png"), 1)
-    # cv2.imshow("o", slices[0][0])
-    cv2.imshow("p", fr)
-
-    for i in range(len(slices)):
-        if str(slices[i]) != "unr":
-            slices[i] = cv2.resize(slices[i],(300,300))
-            count, mask = analyze_color_shape(slices[i], hsw_blue, hsw_range)
-            print(count)
-            cv2.imshow(f"{i}", mask)
-            cv2.waitKey(0)
-
-    cv2.waitKey(0)
+# if __name__ == "__main__":
+#     fr, slices = update_frame_smart(cv2.imread("frame_1.png"), 1)
+#     # cv2.imshow("o", slices[0][0])
+#     cv2.imshow("p", fr)
+#
+#     for i in range(len(slices)):
+#         if str(slices[i]) != "unr":
+#             slices[i] = cv2.resize(slices[i],(300,300))
+#             count, mask = analyze_color_shape(slices[i], hsw_blue, hsw_range)
+#             print(count)
+#             cv2.imshow(f"{i}", mask)
+#             cv2.waitKey(0)
+#
+#     cv2.waitKey(0)
