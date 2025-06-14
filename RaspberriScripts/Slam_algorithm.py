@@ -156,10 +156,10 @@ if mc.OS == "Linux":
     # time.sleep(3)
     while 1:
         frame = mc.robot.get_uncompressed_frames(1)[1]
-        # frame = update_frame_smart(frame)[0]
-        # mc.robot.set_frame(frame)
-        print("yep")
-        time.sleep(1)
+        frame = update_frame_smart(frame)[0]
+        mc.robot.set_frame(frame)
+        # print("yep")
+        # time.sleep(1)
     # exit()
     # p = input()
     mc.qualifiction()
