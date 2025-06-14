@@ -165,7 +165,7 @@ if mc.OS == "Linux":
         #             print(i)
         #             cv2.imwrite(f"{i}{j}.jpg", slices[i][j])
 
-        time.sleep(1)
+        # time.sleep(1)
         # print("yep")
         # time.sleep(1)
     # exit()
