@@ -48,7 +48,7 @@ def update_frame_smart(frame, floor):
             elif lead == "black":
                 result_frame = draw_on_image(result_frame, cam1floor1[i+4], color = (0,0,255))
                 index = 0 if i < 2 else 1
-                list_of_slices[index].append(list_of_slices[i+4])
+                list_of_slices[index].append(slices[i+4])
 
 
 
