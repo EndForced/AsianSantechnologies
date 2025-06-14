@@ -161,7 +161,7 @@ if mc.OS == "Linux":
 
         for i in range(len(slices)):
             for j in range(len(slices[i])):
-            # print(i)
+                print(i)
                 cv2.imwrite(f"{i}{j}.jpg", slices[i][j])
 
         time.sleep(1)
