@@ -78,7 +78,7 @@ def fix_perspct(frame):
                   [-0.61169934]])
 
     # Загрузка изображения
-    img = cv2.imread("chess_frames/frame_test.png")
+    img = frame
     if img is None:
         raise ValueError("Не удалось загрузить изображение! Проверьте путь.")
 
