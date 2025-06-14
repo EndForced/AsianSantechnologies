@@ -153,23 +153,12 @@ mc = MainComputer(mat, serial)
 
 if mc.OS == "Linux":
     mc.start_website()
-    # time.sleep(3)
+    time.sleep(3)
     while 1:
         frame = mc.robot.get_uncompressed_frames(1)[0]
         frame= fix_perspct(frame)
         mc.robot.set_frame(frame)
 
-        # for i in range(len(slices)):
-        #     for j in range(len(slices[i])):
-        #         if list(slices[i][j]):
-        #             print(i)
-        #             cv2.imwrite(f"{i}{j}.jpg", slices[i][j])
-
-        # time.sleep(1)
-        # print("yep")
-        # time.sleep(1)
-    # exit()
-    # p = input()
     mc.qualifiction()
     # time.sleep(1000)
     while 1:
