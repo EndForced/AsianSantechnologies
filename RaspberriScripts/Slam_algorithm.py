@@ -155,10 +155,11 @@ if mc.OS == "Linux":
     # mc.start_website()
     # time.sleep(3)
     while 1:
-        mc.robot.get_uncompressed_frames(1)
-    #
+        frame = mc.robot.get_uncompressed_frames(0)[1]
+        frame = update_frame_smart(frame)[0]
+        mc.robot.set_frame(frame)
         print("yep")
-        time.sleep(5)
+        # time.sleep(5)
     # exit()
     # p = input()
     mc.qualifiction()
