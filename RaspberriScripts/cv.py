@@ -20,8 +20,7 @@ import numpy as np
 
 def update_frame_smart(frame, floor):
     result_frame = frame.copy()
-    list_of_slices = [[],
-                      []]
+    list_of_slices = []
 
     if floor == 1:
         slices = [extract_polygon_with_white_bg(frame, cam1floor1[i]) for i in range(8)]
@@ -31,8 +30,13 @@ def update_frame_smart(frame, floor):
             lead = lead_color(slice_to_check)[1]
             leads.append(lead)
 
-            if i == 2 and leads[0] == "black": flag = 0
-            elif i == 3 and leads[1] == "black": flag = 0
+            if i == 2 and leads[0] == "black":
+                flag = 0
+                list_of_slices.append("unr")
+            elif i == 3 and leads[1] == "black":
+                flag = 0
+                list_of_slices.append("unr")
+
             else: flag = 1
 
             # print(i, flag)
@@ -42,13 +46,11 @@ def update_frame_smart(frame, floor):
 
             if lead == "white" and flag:
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
-                index = 0 if i < 2 else 1
-                list_of_slices[index].append(list_of_slices[i])
+                list_of_slices.append(slices[i])
 
             elif lead == "black":
                 result_frame = draw_on_image(result_frame, cam1floor1[i+4], color = (0,0,255))
-                index = 0 if i < 2 else 1
-                list_of_slices[index].append(slices[i+4])
+                list_of_slices.append(slices[i+4])
 
 
 
@@ -247,6 +249,12 @@ def extract_polygon_with_white_bg(image, points):
 
 
 if __name__ == "__main__":
-    fr = update_frame_smart(cv2.imread("frame_1.png"), 1)[0]
-    cv2.imshow("o", fr)
+    fr, slices = update_frame_smart(cv2.imread("frame_1.png"), 1)
+    # cv2.imshow("o", slices[0][0])
+    cv2.imshow("p", fr)
+
+    for i in range(len(slices)):
+        if str(slices[i]) != "unr":
+            cv2.imshow(f"{i}", slices[i])
+
     cv2.waitKey(0)

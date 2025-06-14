@@ -155,15 +155,15 @@ if mc.OS == "Linux":
     mc.start_website()
     # time.sleep(3)
     while 1:
-        frame = mc.robot.get_uncompressed_frames(0)[0]
+        frame = mc.robot.get_uncompressed_frames(1)[0]
         frame, slices = update_frame_smart(frame, 1)
         mc.robot.set_frame(frame)
 
-        for i in range(len(slices)):
-            for j in range(len(slices[i])):
-                if list(slices[i][j]):
-                    print(i)
-                    cv2.imwrite(f"{i}{j}.jpg", slices[i][j])
+        # for i in range(len(slices)):
+        #     for j in range(len(slices[i])):
+        #         if list(slices[i][j]):
+        #             print(i)
+        #             cv2.imwrite(f"{i}{j}.jpg", slices[i][j])
 
         time.sleep(1)
         # print("yep")
