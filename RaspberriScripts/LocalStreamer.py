@@ -58,10 +58,13 @@ class DualCameraServer:
                     if command == "GET_FRAMES":
 
                         primary_frame = self.picam2_primary.capture_array("main")
+                        primary_frame = cv2.cvtColor(primary_frame, cv2.COLOR_RGB2BGR)
                         # primary_frame = cv2.rotate(primary_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+
                         secondary_frame = self.picam2_secondary.capture_array("main")
                         # secondary_frame = cv2.rotate(secondary_frame, cv2.ROTATE_90_CLOCKWISE)
-
+                        secondary_frame = cv2.cvtColor(secondary_frame, cv2.COLOR_RGB2BGR)
                         primary_bytes = primary_frame.tobytes()
                         secondary_bytes = secondary_frame.tobytes()
 
@@ -134,9 +137,13 @@ class DualCameraServer:
         try:
             while 1:
                 primary_frame = self.picam2_primary.capture_array("main")
-                # primary_frame = cv2.rotate(primary_frame,cv2.ROTATE_90_COUNTERCLOCKWISE)
+                primary_frame = cv2.cvtColor(primary_frame, cv2.COLOR_RGB2BGR)
+                # primary_frame = cv2.rotate(primary_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+
                 secondary_frame = self.picam2_secondary.capture_array("main")
                 # secondary_frame = cv2.rotate(secondary_frame, cv2.ROTATE_90_CLOCKWISE)
+                secondary_frame = cv2.cvtColor(secondary_frame, cv2.COLOR_RGB2BGR)
 
                 primary_buffer, _ = self.process_frame(primary_frame, 1)
                 secondary_buffer, _ = self.process_frame(secondary_frame, 2)
