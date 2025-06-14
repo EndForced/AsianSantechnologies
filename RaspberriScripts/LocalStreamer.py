@@ -25,37 +25,12 @@ class DualCameraServer:
         self.primary_config = self.picam2_primary.create_video_configuration(
             main={
                 "size": (640, 480),
-                "format": "RGB888",
             },
-            controls={
-                "FrameRate": 15,
-                "ExposureTime": 10000,  # Можно настроить динамически под освещение
-                "AnalogueGain": 1.0,  # Можно увеличить до 2.0-3.0 для слабого света
-                "AwbMode": 0,  # 0 = Auto White Balance (лучше для цветопередачи)
-                "ColourGains": (1.5, 1.5),  # Ручная настройка баланса белого (красный, синий)
-                "Brightness": 0.1,  # Увеличивает яркость без пересветов
-                "Contrast": 1.2,  # Улучшает контрастность цветов
-                "Saturation": 1.3,  # Увеличивает насыщенность цветов
-                "Sharpness": 1.0,  # Сохраняет детализацию
-            },
-            buffer_count=6
         )
 
         self.secondary_config = self.picam2_secondary.create_video_configuration(
             main={
                 "size": (640, 480),
-                "format": "RGB888",
-            },
-            controls={
-                "FrameRate": 15,
-                "ExposureTime": 10000,
-                "AnalogueGain": 1.0,
-                "AwbMode": 0,
-                "ColourGains": (1.5, 1.5),
-                "Brightness": 0.1,
-                "Contrast": 1.2,
-                "Saturation": 1.3,
-                "Sharpness": 1.0,
             },
             buffer_count=6
         )
