@@ -24,7 +24,7 @@ hsw_red = (83.32,193.15,129.74)
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
 
-
+mean_const = 180
 
 
 import cv2
@@ -34,14 +34,18 @@ from collections import defaultdict
 
 def update_frame_smart(frame, floor):
     result_frame = frame.copy()
+    slice_to_check = frame
     list_of_slices = []
 
     if floor == 1:
-        # slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
+        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
         for i in range(4):
-            slice_to_check = extract_polygon_with_white_bg(frame,dats1[i])
-            lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
+            print("mean", np.mean(frame))
+            if np.mean(slices[i]) < 160: lead = "black"
+            else: lead = "white"
+            # lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
+            # if np.mean()
             leads.append(lead)
 
             if i == 2 and leads[0] == "black":
@@ -57,8 +61,8 @@ def update_frame_smart(frame, floor):
             # cv2.imshow("o", slice_to_check)
             # print(lead)
             # cv2.waitKey(0)
-
-            # cv2.imshow("o", slices[i])
+            #
+            # # cv2.imshow("o", slices[i])
             # print(lead)
             # cv2.waitKey(0)
 
