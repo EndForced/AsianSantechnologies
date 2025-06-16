@@ -13,7 +13,7 @@ first_left1f = [(323, 300), (297, 599), (13, 597), (96, 314), (323, 300)]#
 
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
 
-hsv_white = (83.05,47.49,120.47)
+hsv_white = (104.05,11.49,230.47)
 hsw_red = (83.32,193.15,129.74)
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
