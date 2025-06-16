@@ -175,11 +175,16 @@ if __name__ == "__main__":
             # c+=1
             frame= fix_perspct(frame)
             # mc.robot.set_frame(frame)
-            cv2.imwrite("warped.png", frame)
+            # cv2.imwrite("warped.png", frame)
             # time.sleep(0.2)
-            frame = update_frame_smart(frame, 1)[0]
+            frames, slices = update_frame_smart(frame, 1)
             mc.robot.set_frame(frame)
+            for i in frames:
+                if i !="unr":
+                    cv2.imwrite(f"{c}.png")
+                    c+=1
 
+            _ = input()
 
 
         # mc.qualifiction()

@@ -68,18 +68,18 @@ def update_frame_smart(frame, floor):
 
             if lead == "white" and flag:
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
-                # list_of_slices.append(slices[i])
+                list_of_slices.append(slices[i])
 
             elif lead == "black" and flag:
                 result_frame = draw_on_image(result_frame, cam1floor1[i+4], color = (0,0,255))
-                # list_of_slices.append(slices[i+4])
+                list_of_slices.append(slices[i+4])
 
 
 
 
 
 
-    return result_frame, 1
+    return result_frame, list_of_slices
 
 
 def fix_perspct(frame):
