@@ -50,10 +50,10 @@ def update_frame_smart(frame, floor):
 
             if i == 2 and leads[0] == "black":
                 flag = 0
-                # list_of_slices.append("unr")
+                list_of_slices.append("unr")
             elif i == 3 and leads[1] == "black":
                 flag = 0
-                # list_of_slices.append("unr")
+                list_of_slices.append("unr")
 
             else: flag = 1
 
@@ -70,7 +70,7 @@ def update_frame_smart(frame, floor):
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
                 # list_of_slices.append(slices[i])
 
-            elif lead == "black":
+            elif lead == "black" and flag:
                 result_frame = draw_on_image(result_frame, cam1floor1[i+4], color = (0,0,255))
                 # list_of_slices.append(slices[i+4])
 
