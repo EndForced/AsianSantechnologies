@@ -41,7 +41,7 @@ def update_frame_smart(frame, floor):
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
         for i in range(4):
-            # print("mean", np.mean(frame))
+            print("mean", np.mean(slices[i]))
             if np.mean(slices[i]) < mean_const: lead = "black"
             else: lead = "white"
             # lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
