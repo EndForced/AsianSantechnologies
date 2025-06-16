@@ -1,15 +1,29 @@
 from flask import Flask, request, jsonify
 from Slam_algorithm import  MainComputer
 import serial
+import ast
 serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
 
 app = Flask(__name__)
+import ast
 
+
+def string2list(matrix_string):
+    try:
+        # Используем ast.literal_eval для безопасного преобразования строки в список
+        result = ast.literal_eval(matrix_string)
+        if isinstance(result, list):
+            return result
+        else:
+            raise ValueError("Input string is not a list representation")
+    except (SyntaxError, ValueError) as e:
+        print(f"Error converting string to list: {e}")
+        return []
 
 @app.route('/data', methods=['POST'])
 def handle_data():
     # Получаем данные из POST-запроса
-    mat = request.get_json()  # для JSON данных
+    mat = request.get_json()["mat"]  # для JSON данных
     # или data = request.form  # для form-data
 
     # Проверяем, есть ли данные
@@ -25,7 +39,7 @@ def handle_data():
         'message': 'Data received successfully',
         'received_data': mat
     }
-
+    mat = string2list(mat)
     mc = MainComputer(serial, mat)
     while mc.robot.read() != "Activated":
         pass
