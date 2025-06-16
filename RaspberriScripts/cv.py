@@ -31,10 +31,10 @@ def update_frame_smart(frame, floor):
     list_of_slices = []
 
     if floor == 1:
-        slices = [extract_polygon_with_white_bg(frame, cam1floor1[i]) for i in range(8)]
+        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
         for i in range(4):
-            slice_to_check = slices[i][0:50,::]
+            slice_to_check = slices[i][20:50,20:50]
             lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
             leads.append(lead)
 
@@ -47,10 +47,10 @@ def update_frame_smart(frame, floor):
 
             else: flag = 1
 
-            # print(i, flag)
-            # cv2.imshow("o", slice_to_check)
-            # print(lead)
-            # cv2.waitKey(0)
+            print(i, flag)
+            cv2.imshow("o", slice_to_check)
+            print(lead)
+            cv2.waitKey(0)
 
             if lead == "white" and flag:
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
@@ -387,17 +387,19 @@ def analyze_color_shape(image, target_hsv, hsv_range=(10, 50, 50), min_area=100)
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
     return dict(results), marked_image
-# if __name__ == "__main__":
-#     fr, slices = update_frame_smart(cv2.imread("frame_1.png"), 1)
-#     # cv2.imshow("o", slices[0][0])
-#     cv2.imshow("p", fr)
-#
-#     for i in range(len(slices)):
-#         if str(slices[i]) != "unr":
-#             slices[i] = cv2.resize(slices[i],(300,300))
-#             count, mask = analyze_color_shape(slices[i], hsw_blue, hsw_range)
-#             print(count)
-#             cv2.imshow(f"{i}", mask)
-#             cv2.waitKey(0)
-#
-#     cv2.waitKey(0)
+
+
+if __name__ == "__main__":
+    fr, slices = update_frame_smart(cv2.imread("warped.png"), 1)
+    # cv2.imshow("o", slices[0][0])
+    cv2.imshow("p", fr)
+
+    # for i in range(len(slices)):
+    #     if str(slices[i]) != "unr":
+    #         slices[i] = cv2.resize(slices[i],(300,300))
+    #         count, mask = analyze_color_shape(slices[i], hsw_blue, hsw_range)
+    #         print(count)
+    #         cv2.imshow(f"{i}", mask)
+    #         cv2.waitKey(0)
+
+    cv2.waitKey(0)
