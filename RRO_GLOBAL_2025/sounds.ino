@@ -28,7 +28,7 @@ bool button() {
     }
 
     if (input.equals("Button_skip")) {
-//      SendData("Button Activated");
+      SendData("Button Activated");
       return false;
     }
   }

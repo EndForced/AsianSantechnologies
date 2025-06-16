@@ -70,6 +70,7 @@ void buttonWait(int flag) {
       while (Serial1.readStringUntil('\n') != "OK"){
       SendData("Activated");
       }
+      SendData("OK Accepted!");
       break;
     }
     else if (millis() - tim > 200) {
