@@ -42,7 +42,7 @@ def update_frame_smart(frame, floor):
         leads = []
         for i in range(4):
             print("mean", np.mean(frame))
-            if np.mean(slices[i]) < 160: lead = "black"
+            if np.mean(slices[i]) < 170: lead = "black"
             else: lead = "white"
             # lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
             # if np.mean()
