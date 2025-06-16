@@ -123,7 +123,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         type_u = unload_type[0]
         moves[0].extend(unload_dict[type_u])
 
-        _ = input()
+        # _ = input()
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves[0])

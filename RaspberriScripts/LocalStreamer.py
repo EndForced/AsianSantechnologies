@@ -28,7 +28,7 @@ class DualCameraServer:
             },
         )
 
-        self.secondary_config = self.picam2_secondary.create_video_configurgitation(
+        self.secondary_config = self.picam2_secondary.create_video_configuration(
             main={
                 "size": (640, 480),
             },
