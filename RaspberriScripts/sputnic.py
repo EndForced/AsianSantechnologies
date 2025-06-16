@@ -35,8 +35,8 @@ def process_matrix_in_background(mat, serial_conn):
 
         # Ожидаем активации робота с таймаутом
         start_time = time.time()
-        while mc.robot.read() != "Activated":
-            if time.time() - start_time > 10:  # 10 секунд таймаут
+        while not mc.robot.read() and str(mc.robot.read()[0]) != "Activated":
+            if time.time() - start_time > 100:  # 10 секунд таймаут
                 print("Activation timeout")
                 return
             time.sleep(0.1)
