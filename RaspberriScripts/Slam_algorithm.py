@@ -181,7 +181,7 @@ if __name__ == "__main__":
             mc.robot.set_frame(frame)
             for i in frames:
                 if str(i) != "unr":
-                    cv2.imwrite(f"{c}.png")
+                    cv2.imwrite(f"{c}.png", i)
                     c+=1
                     print(c)
 
