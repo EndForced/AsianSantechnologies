@@ -8,7 +8,7 @@ sec_fl_left1f = [(158, 101), (59, 238), (328, 226), (347, 93), (158, 98)]#
 
 first_right1c = [(714, 599), (361, 597), (359, 301), (596, 306)]#
 first_left1c = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)] #
-first_right1f = [(366, 151), (360, 285), (601, 288), (539, 153), (367, 149)]#
+first_right1f = [(369, 143), (356, 241), (663, 245), (606, 144), (373, 138)]#
 first_left1f = [(190, 153), (359, 144), (350, 271), (128, 278), (188, 154)] #
 
 dat_l_f = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)]
@@ -41,8 +41,8 @@ def update_frame_smart(frame, floor):
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
         for i in range(4):
-            print("mean", np.mean(frame))
-            if np.mean(slices[i]) < 180: lead = "black"
+            # print("mean", np.mean(frame))
+            if np.mean(slices[i]) < mean_const: lead = "black"
             else: lead = "white"
             # lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
             # if np.mean()
