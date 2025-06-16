@@ -72,6 +72,7 @@ def handle_data():
         thread = threading.Thread(
             target=process_matrix_in_background,
             args=(mat, serial_conn)
+        )
         thread.daemon = True  # Поток завершится при завершении основного
         thread.start()
 
