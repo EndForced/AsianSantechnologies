@@ -98,9 +98,9 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def qualifiction(self):
         print("Starting qualification...")
-        while robot.read() != "Activated":
+        while self.robot.read() != "Activated":
             pass
-        mc.robot.do("Beep")
+        self.robot.do("Beep")
 
         unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
                        "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
