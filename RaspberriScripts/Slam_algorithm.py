@@ -168,12 +168,13 @@ if __name__ == "__main__":
         mc.start_website()
         time.sleep(3)
         while 1:
-            frame = mc.robot.get_uncompressed_frames(0)[0]
-            frame= fix_perspct(frame)
-            mc.robot.set_frame(frame)
-            cv2.imwrite("warped.png", frame)
+            frame = mc.robot.get_uncompressed_frames(1)[0]
+            _ = input()
+            # frame= fix_perspct(frame)
+            # mc.robot.set_frame(frame)
+            # cv2.imwrite("warped.png", frame)
 
-        mc.qualifiction()
+        # mc.qualifiction()
         # time.sleep(1000)
         while 1:
             # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
