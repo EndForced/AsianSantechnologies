@@ -1,5 +1,5 @@
-const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Servo", "Button_skip", "Direction", "Elevation", "Tubes" };
-const int commandsCount = 13;
+const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Servo", "Button_skip", "Direction", "Elevation", "Tubes", "MyFloor" };
+const int commandsCount = 14;
 String parameters[10];
 int paramCount = 0;
 
@@ -44,6 +44,7 @@ void uartProcessing() {
       case 10: handleDirCommand(); break;        // "Dir_swap"
       case 11: handleElevationCommand(); break;  // "Elevation_swap"
       case 12: handleTubesCommand(); break;      // "Tubes"
+      case 13: handleMyFloorCommand(); break;      // "Tubes"
 
 
       default:  // we fucking dont know whut is it
@@ -147,18 +148,32 @@ void handleServoCommand() {
     SendData("Error: No Servo specified");
     return;
   }
-
-  // String identifier = parameters[0];
-  // if (isdigit(identifier[0])){}
-  // int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
-
-  // int way = (direction == "Forward") ? 1 : -1;
-
-  // pidXN(speed * way, steps);
-
-  // Andrew's Job
-  // SendData("Moving " + direction + " with speed " + String(speed));
 }
+
+void handleMyFloorCommand(){
+  int datvals = 0;
+  for (int i = 1; i < 5; i ++ ) {
+    datvals += sensor_x(i);
+  }
+  if (datvals / 4 < 30) {
+    SendData("2");
+  }
+  else{
+    SendData("1");
+  }
+
+}
+
+// String identifier = parameters[0];
+// if (isdigit(identifier[0])){}
+// int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
+
+// int way = (direction == "Forward") ? 1 : -1;
+
+// pidXN(speed * way, steps);
+
+// Andrew's Job
+// SendData("Moving " + direction + " with speed " + String(speed));
 
 
 void handleButtonSkipCommand() {

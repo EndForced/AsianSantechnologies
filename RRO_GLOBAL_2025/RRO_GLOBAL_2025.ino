@@ -55,10 +55,10 @@ void loop() {
   //    put();
   //  }
 
-//  uartProcessing();
-buttonWait(0);
-//
-grab_from_ramp_up();
+  uartProcessing();
+//buttonWait(0);
+////
+//grab_from_ramp_up();
 }
 
 
@@ -66,8 +66,10 @@ uint32_t tim = 0;
 void buttonWait(int flag) {
   while (1) {
     //  Serial.println(button());
-    if (button() == 0)
+    if (button() == 0){
+      SendData("Activated");
       break;
+    }
     else if (millis() - tim > 200) {
       tim = millis();
       switch (flag) {

@@ -116,102 +116,102 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves[0])
 
+if __name__ == "__main__":
+    mat = [[64, 10, 10, 10, 42, 10, 20, 10], [64, 10, 20, 20, 20, 34, 10, 10], [64, 10, 32, 20, 81, 52, 34, 10], [42, 10, 10, 10, 10, 10, 10, 20], [20, 20, 34, 10, 20, 10, 20, 20], [10, 10, 10, 10, 10, 10, 20, 20], [31, 20, 10, 32, 20, 20, 34, 33], [33, 10, 10, 10, 20, 20, 34, 42]]
+    mat = [[10, 10, 20, 20, 20, 34, 10, 62],
+           [10, 52, 20, 20, 34, 20, 10, 62],
+           [10, 20, 20, 20, 34, 10, 10, 62],
+           [32, 83, 20, 20, 34, 10, 10, 20],
+           [20, 10, 10, 10, 10, 10, 31, 20],
+           [20, 32, 20, 20, 34, 10, 33, 20],
+           [33, 10, 10, 10, 10, 10, 10, 10],
+           [42, 10, 10, 10, 10, 10, 42, 10]]
 
-mat = [[64, 10, 10, 10, 42, 10, 20, 10], [64, 10, 20, 20, 20, 34, 10, 10], [64, 10, 32, 20, 81, 52, 34, 10], [42, 10, 10, 10, 10, 10, 10, 20], [20, 20, 34, 10, 20, 10, 20, 20], [10, 10, 10, 10, 10, 10, 20, 20], [31, 20, 10, 32, 20, 20, 34, 33], [33, 10, 10, 10, 20, 20, 34, 42]]
-mat = [[10, 10, 20, 20, 20, 34, 10, 62],
-       [10, 52, 20, 20, 34, 20, 10, 62],
-       [10, 20, 20, 20, 34, 10, 10, 62],
-       [32, 83, 20, 20, 34, 10, 10, 20],
-       [20, 10, 10, 10, 10, 10, 31, 20],
-       [20, 32, 20, 20, 34, 10, 33, 20],
-       [33, 10, 10, 10, 10, 10, 10, 10],
-       [42, 10, 10, 10, 10, 10, 42, 10]]
+    mat = [[41, 20, 20, 10, 10, 10, 10, 10],
+           [10, 10, 10, 20, 10, 10, 10, 41],
+           [10, 10, 10, 10, 10, 10, 20, 20],
+           [10, 10, 20, 20, 20, 34, 20, 20],
+           [64, 10, 71, 10, 10, 31, 20, 33],
+           [64, 10, 10, 20, 10, 33, 33, 10],
+           [64, 10, 32, 34, 32, 20, 52, 20],
+           [32, 20, 20, 34, 20, 20, 34, 10]]
 
-mat = [[41, 20, 20, 10, 10, 10, 10, 10],
-       [10, 10, 10, 20, 10, 10, 10, 41],
-       [10, 10, 10, 10, 10, 10, 20, 20],
-       [10, 10, 20, 20, 20, 34, 20, 20],
-       [64, 10, 71, 10, 10, 31, 20, 33],
-       [64, 10, 10, 20, 10, 33, 33, 10],
-       [64, 10, 32, 34, 32, 20, 52, 20],
-       [32, 20, 20, 34, 20, 20, 34, 10]]
+    mat = [[10, 10, 10, 10, 10, 10, 10, 10],
+           [10, 10, 10, 10, 10, 10, 10, 10],
+           [10, 10, 10, 0, 0, 0, 0, 0],
+           [10, 10, 10, 0, 0, 0, 0, 0],
+           [10, 10, 10, 0, 41, 20, 52, 0],
+           [10, 10, 10, 0, 10, 31, 10, 0],
+           [10, 10, 10, 0, 10, 10, 71, 0],
+           [10, 10, 10, 0, 63, 63, 63, 0]]
 
-mat = [[10, 10, 10, 10, 10, 10, 10, 10],
-       [10, 10, 10, 10, 10, 10, 10, 10],
-       [10, 10, 10, 0, 0, 0, 0, 0],
-       [10, 10, 10, 0, 0, 0, 0, 0],
-       [10, 10, 10, 0, 41, 20, 52, 0],
-       [10, 10, 10, 0, 10, 31, 10, 0],
-       [10, 10, 10, 0, 10, 10, 71, 0],
-       [10, 10, 10, 0, 63, 63, 63, 0]]
+    mat = [[41, 20, 20, 10, 20, 10, 10, 62], [10, 10, 20, 33, 20, 10, 10, 62], [10, 10, 31, 31, 20, 10, 10, 62], [10, 10, 33, 33, 20, 10, 10, 42], [10, 10, 20, 20, 20, 10, 20, 34], [10, 32, 20, 10, 10, 10, 10, 10], [10, 10, 10, 10, 10, 20, 20, 10], [71, 10, 32, 20, 52, 20, 20, 20]]
+    # mat = [[10]*15]*15
+    mc = MainComputer(mat, serial)
+    # res = mc.show()
+    # print(mc.resizedPicture.dtype)
 
-mat = [[41, 20, 20, 10, 20, 10, 10, 62], [10, 10, 20, 33, 20, 10, 10, 62], [10, 10, 31, 31, 20, 10, 10, 62], [10, 10, 33, 33, 20, 10, 10, 42], [10, 10, 20, 20, 20, 10, 20, 34], [10, 32, 20, 10, 10, 10, 10, 10], [10, 10, 10, 10, 10, 20, 20, 10], [71, 10, 32, 20, 52, 20, 20, 20]]
-# mat = [[10]*15]*15
-mc = MainComputer(mat, serial)
-# res = mc.show()
-# print(mc.resizedPicture.dtype)
+    if mc.OS == "Linux":
+        mc.start_website()
+        time.sleep(3)
+        while 1:
+            frame = mc.robot.get_uncompressed_frames(0)[0]
+            frame= fix_perspct(frame)
+            mc.robot.set_frame(frame)
+            cv2.imwrite("warped.png", frame)
 
-if mc.OS == "Linux":
-    mc.start_website()
-    time.sleep(3)
-    while 1:
-        frame = mc.robot.get_uncompressed_frames(0)[0]
-        frame= fix_perspct(frame)
-        mc.robot.set_frame(frame)
-        cv2.imwrite("warped.png", frame)
+        mc.qualifiction()
+        # time.sleep(1000)
+        while 1:
+            # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
+            # frame, slices = update_frame_smart(frame)
+            # for i in range(len(slices)):
+            #     print(i)
+            #     cv2.imwrite(f"{i}.jpg", slices[i])
+            #
+            # print("upd!!")
+            # exit()
+            # # cv2.imwrite("testing.jpg", frame)
+            # mc.robot.set_frame(frame)
+            pass
+    else:
+        # print(type(res))
+        #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
+        #mc.robot.set_frame(frames[0])...
+        #mc.send_map() no args!
 
-    mc.qualifiction()
-    # time.sleep(1000)
-    while 1:
-        # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
-        # frame, slices = update_frame_smart(frame)
-        # for i in range(len(slices)):
-        #     print(i)
-        #     cv2.imwrite(f"{i}.jpg", slices[i])
-        #
-        # print("upd!!")
-        # exit()
-        # # cv2.imwrite("testing.jpg", frame)
-        # mc.robot.set_frame(frame)
-        pass
-else:
-    # print(type(res))
-    #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
-    #mc.robot.set_frame(frames[0])...
-    #mc.send_map() no args!
+        # print(MainComputer.__mro__)
+        # while 1:
+        #     pass
 
-    # print(MainComputer.__mro__)
-    # while 1:
-    #     pass
+        robot = mc.find_robot()
+        waves = mc.create_wave(robot)
+        mc.visualize_wave(waves)
+        # res = mc.solve()
+        # # print(res)
+        # mc.draw_multiple_paths(res)
+        # # print(mc.way_to_commands_single(res[2], "U"))
+        # print(mc.way_to_commands(res, "D"))
+        # mc.show()
+        unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
+                       "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
+                       "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
 
-    robot = mc.find_robot()
-    waves = mc.create_wave(robot)
-    mc.visualize_wave(waves)
-    # res = mc.solve()
-    # # print(res)
-    # mc.draw_multiple_paths(res)
-    # # print(mc.way_to_commands_single(res[2], "U"))
-    # print(mc.way_to_commands(res, "D"))
-    # mc.show()
-    unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
-                   "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
-                   "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
+        moves =mc.solve()
+        unload_type = mc.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
+        # print("un", unload_type)
+        moves1 = mc.way_to_commands(moves, "D") #return - путь, направление робота в конце
 
-    moves =mc.solve()
-    unload_type = mc.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
-    # print("un", unload_type)
-    moves1 = mc.way_to_commands(moves, "D") #return - путь, направление робота в конце
+        # print("dirs", unload_type[1], moves[1])
+        if unload_type[1] != moves1[1]:
+            moves1[0].append(mc.get_rotation_direction(moves1[1], unload_type[1]))
 
-    # print("dirs", unload_type[1], moves[1])
-    if unload_type[1] != moves1[1]:
-        moves1[0].append(mc.get_rotation_direction(moves1[1], unload_type[1]))
+        type_u = unload_type[0]
+        moves1[0].extend(unload_dict[type_u])
+        print(moves1)
 
-    type_u = unload_type[0]
-    moves1[0].extend(unload_dict[type_u])
-    print(moves1)
-
-    mc.draw_multiple_paths(moves)
-    # m = mc.create_way((6,1),(6,5))
-    # mc.draw_path(m)
-    mc.show()
+        mc.draw_multiple_paths(moves)
+        # m = mc.create_way((6,1),(6,5))
+        # mc.draw_path(m)
+        mc.show()
 
