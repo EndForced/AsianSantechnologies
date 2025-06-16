@@ -97,6 +97,10 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         return res, rob_dir
 
     def qualifiction(self):
+        while mc.robot.read() != "Activated":
+            pass
+        mc.robot.do("Beep")
+
         unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
                        "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
                        "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}

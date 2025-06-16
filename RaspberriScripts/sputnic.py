@@ -41,9 +41,6 @@ def handle_data():
     }
     mat = string2list(mat)
     mc = MainComputer(mat, serial)
-    while mc.robot.read() != "Activated":
-        pass
-    mc.robot.do("Beep")
 
     floor = mc.robot.do("MyFloor")
     cord = mc.find_robot()
