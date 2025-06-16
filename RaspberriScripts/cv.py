@@ -11,9 +11,15 @@ first_left1c = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)] #
 first_right1f = [(366, 151), (360, 285), (601, 288), (539, 153), (367, 149)]#
 first_left1f = [(190, 153), (359, 144), (350, 271), (128, 278), (188, 154)] #
 
-cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
+dat_l_f = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)]
+dat_r_f = [(510, 238), (513, 266), (546, 261), (546, 233), (509, 238)]
+dat_l_c = [(220, 514), (213, 565), (265, 570), (269, 516), (220, 513)]
+dat_r_c = [(584, 487), (592, 577), (715, 573), (702, 479), (594, 487)]
 
-hsv_white = (86.05,27.49,218.47)
+cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
+dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
+
+hsv_white = (150,10,230)
 hsw_red = (83.32,193.15,129.74)
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
@@ -31,19 +37,19 @@ def update_frame_smart(frame, floor):
     list_of_slices = []
 
     if floor == 1:
-        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
+        # slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
         for i in range(4):
-            slice_to_check = slices[i][0:140]
+            slice_to_check = extract_polygon_with_white_bg(frame,dats1[i])
             lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
             leads.append(lead)
 
             if i == 2 and leads[0] == "black":
                 flag = 0
-                list_of_slices.append("unr")
+                # list_of_slices.append("unr")
             elif i == 3 and leads[1] == "black":
                 flag = 0
-                list_of_slices.append("unr")
+                # list_of_slices.append("unr")
 
             else: flag = 1
 
@@ -53,23 +59,23 @@ def update_frame_smart(frame, floor):
             # cv2.waitKey(0)
 
             # cv2.imshow("o", slices[i])
-            print(lead)
-            cv2.waitKey(0)
+            # print(lead)
+            # cv2.waitKey(0)
 
             if lead == "white" and flag:
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
-                list_of_slices.append(slices[i])
+                # list_of_slices.append(slices[i])
 
             elif lead == "black":
                 result_frame = draw_on_image(result_frame, cam1floor1[i+4], color = (0,0,255))
-                list_of_slices.append(slices[i+4])
+                # list_of_slices.append(slices[i+4])
 
 
 
 
 
 
-    return result_frame, list_of_slices
+    return result_frame, 1
 
 
 def fix_perspct(frame):
