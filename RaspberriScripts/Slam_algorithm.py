@@ -176,6 +176,7 @@ if __name__ == "__main__":
             frame= fix_perspct(frame)
             mc.robot.set_frame(frame)
             cv2.imwrite("warped.png", frame)
+            time.sleep(0.2)
 
         # mc.qualifiction()
         # time.sleep(1000)
