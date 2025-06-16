@@ -99,7 +99,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
     def qualifiction(self):
         print("Starting qualification...")
         res = self.robot.read()
-        while res != "Activated":
+        while res != "'Activated'":
             if res: print(res)
             res = self.robot.read()
         self.robot.do("OK")
