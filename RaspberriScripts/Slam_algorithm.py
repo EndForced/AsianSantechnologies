@@ -101,7 +101,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         while self.robot.read() != "Activated":
             pass
         self.robot.do("OK")
-        time.sleep(100)
+        time.sleep(0.1)
         self.robot.do("Beep")
 
         unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
