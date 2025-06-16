@@ -97,7 +97,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         return res, rob_dir
 
     def qualifiction(self):
-        while mc.robot.read() != "Activated":
+        print("Starting qualification...")
+        while robot.read() != "Activated":
             pass
         mc.robot.do("Beep")
 
