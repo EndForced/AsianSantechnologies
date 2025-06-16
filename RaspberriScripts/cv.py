@@ -11,13 +11,13 @@ first_left1c = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)] #
 first_right1f = [(369, 143), (356, 241), (663, 245), (606, 144), (373, 138)]#
 first_left1f = [(190, 153), (359, 144), (350, 271), (128, 278), (188, 154)] #
 
-dat_l_f = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)]
-dat_r_f = [(510, 238), (513, 266), (546, 261), (546, 233), (509, 238)]
-dat_l_c = [(220, 514), (213, 565), (265, 570), (269, 516), (220, 513)]
-dat_r_c = [(584, 487), (592, 577), (715, 573), (702, 479), (594, 487)]
+# dat_l_f = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)]
+# dat_r_f = [(510, 238), (513, 266), (546, 261), (546, 233), (509, 238)]
+# dat_l_c = [(220, 514), (213, 565), (265, 570), (269, 516), (220, 513)]
+# dat_r_c = [(584, 487), (592, 577), (715, 573), (702, 479), (594, 487)]
 
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
-dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
+# dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
 hsv_white = (150,10,230)
 hsw_red = (83.32,193.15,129.74)
@@ -25,7 +25,7 @@ hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
 
 mean_const = 180
-
+#hehehe mnogo constant
 
 import cv2
 import numpy as np
@@ -41,7 +41,7 @@ def update_frame_smart(frame, floor):
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
         for i in range(4):
-            # print("mean", np.mean(frame))
+            print("mean", np.mean(slices[i]))
             if np.mean(slices[i]) < mean_const: lead = "black"
             else: lead = "white"
             # lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]

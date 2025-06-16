@@ -7,7 +7,6 @@ import time
 
 app = Flask(__name__)
 
-# Инициализация последовательного порта
 try:
     serial_conn = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
     print("Serial port initialized successfully")
@@ -28,7 +27,6 @@ def string2list(matrix_string):
 
 
 def process_matrix_in_background(mat, serial_conn):
-    """Функция для обработки матрицы в фоновом режиме"""
     try:
         print("Background processing started")
         mc = MainComputer(mat, serial_conn)
@@ -38,7 +36,6 @@ def process_matrix_in_background(mat, serial_conn):
         cord = mc.find_robot()
         mc._matrix[cord[0]][cord[1]] = 71 if floor == 1 else 81
 
-        # Ожидаем активации робота с таймаутом
         print("Current matrix:", mc._matrix)
         mc.qualifiction()
         print("Background processing completed")
@@ -49,7 +46,6 @@ def process_matrix_in_background(mat, serial_conn):
 @app.route('/data', methods=['POST'])
 def handle_data():
     try:
-        # Получаем и проверяем данные
         data = request.get_json()
         if not data or 'mat' not in data:
             return jsonify({'error': 'No data received or invalid format'}), 400
@@ -57,20 +53,17 @@ def handle_data():
         mat_str = data['mat']
         print("Received data:", mat_str)
 
-        # Конвертируем строку в список
         mat = string2list(mat_str)
         if not mat:
             return jsonify({'error': 'Invalid matrix format'}), 400
 
-        # Запускаем обработку в фоновом потоке
         thread = threading.Thread(
             target=process_matrix_in_background,
             args=(mat, serial_conn)
         )
-        thread.daemon = True  # Поток завершится при завершении основного
+        thread.daemon = True
         thread.start()
 
-        # Немедленно отвечаем клиенту
         response = {
             'status': 'success',
             'message': 'Data received and processing started',
