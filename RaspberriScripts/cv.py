@@ -118,7 +118,7 @@ def fix_perspct(frame):
 
     return undistorted
 
-def lead_color(img_slice, threshold=0.35,
+def lead_color(img_slice, threshold=0.4,
                ignore_white=True,
                white_hsv_base=(83, 47, 120),
                white_h_range=180,
