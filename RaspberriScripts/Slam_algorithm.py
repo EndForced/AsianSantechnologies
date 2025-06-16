@@ -180,9 +180,10 @@ if __name__ == "__main__":
             frames, slices = update_frame_smart(frame, 1)
             mc.robot.set_frame(frame)
             for i in frames:
-                if i !="unr":
+                if str(i) !="unr":
                     cv2.imwrite(f"{c}.png")
                     c+=1
+                    print(c)
 
             _ = input()
 
