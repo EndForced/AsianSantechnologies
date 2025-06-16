@@ -4,16 +4,16 @@ zones = {
 sec_right1c = [(341, 250), (657, 246), (795, 602), (317, 598), (337, 254)]#
 sec_left1c = [(36, 272), (316, 253), (290, 598), (3, 601), (8, 319), (37, 271)] #
 sec_fl_right1f = [(355, 98), (334, 247), (646, 251), (561, 98), (357, 97)] #
-sec_fl_left1f = [(343, 96), (323, 250), (37, 262), (137, 112), (342, 96)]#
+sec_fl_left1f = [(158, 101), (59, 238), (328, 226), (347, 93), (158, 98)]#
 
-first_right1c = [(346, 311), (592, 310), (713, 594), (324, 597), (346, 312)]#
+first_right1c = [(714, 599), (361, 597), (359, 301), (596, 306)]#
 first_left1c = [(317, 310), (284, 601), (4, 594), (13, 321), (316, 309)] #
-first_right1f = [(340, 302), (337, 602), (708, 600), (591, 305), (341, 302)]#
-first_left1f = [(323, 300), (297, 599), (13, 597), (96, 314), (323, 300)]#
+first_right1f = [(366, 151), (360, 285), (601, 288), (539, 153), (367, 149)]#
+first_left1f = [(190, 153), (359, 144), (350, 271), (128, 278), (188, 154)] #
 
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
 
-hsv_white = (104.05,11.49,230.47)
+hsv_white = (86.05,27.49,218.47)
 hsw_red = (83.32,193.15,129.74)
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
@@ -34,7 +34,7 @@ def update_frame_smart(frame, floor):
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
         for i in range(4):
-            slice_to_check = slices[i][20:50,20:50]
+            slice_to_check = slices[i][0:140]
             lead = lead_color(slice_to_check, white_hsv_base= hsv_white)[1]
             leads.append(lead)
 
@@ -47,8 +47,12 @@ def update_frame_smart(frame, floor):
 
             else: flag = 1
 
-            print(i, flag)
-            cv2.imshow("o", slice_to_check)
+            # print(i, flag)
+            # cv2.imshow("o", slice_to_check)
+            # print(lead)
+            # cv2.waitKey(0)
+
+            # cv2.imshow("o", slices[i])
             print(lead)
             cv2.waitKey(0)
 
