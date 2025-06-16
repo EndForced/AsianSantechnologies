@@ -33,23 +33,12 @@ def process_matrix_in_background(mat, serial_conn):
         print("Background processing started")
         mc = MainComputer(mat, serial_conn)
 
-        # Ожидаем активации робота с таймаутом
-        start_time = time.time()
-        while 1:
-            if time.time() - start_time > 100:  # 10 секунд таймаут
-                print("Activation timeout")
-                return
-            res = mc.robot.read()
-
-            if res:
-                if str(res[0]) == "Activated":
-                    break
-            time.sleep(0.1)
-
         mc.robot.do("Beep")
         floor = mc.robot.do("MyFloor")
         cord = mc.find_robot()
         mc._matrix[cord[0]][cord[1]] = 71 if floor == 1 else 81
+
+        # Ожидаем активации робота с таймаутом
         print("Current matrix:", mc._matrix)
         mc.qualifiction()
         print("Background processing completed")
