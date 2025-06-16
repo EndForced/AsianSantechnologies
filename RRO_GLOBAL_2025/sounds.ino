@@ -27,6 +27,12 @@ bool button() {
       }
     }
 
+    if (input.equals("Beep")) {
+      beep(G4, 500);
+      SendData("Beeping done");
+      
+    }
+
     if (input.equals("Button_skip")) {
       SendData("Button Activated");
       return false;
