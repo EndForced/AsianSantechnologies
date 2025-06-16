@@ -169,7 +169,7 @@ if __name__ == "__main__":
         time.sleep(3)
         c = 0
         while 1:
-            frame = mc.robot.get_uncompressed_frames(0)[1]
+            frame = mc.robot.get_uncompressed_frames(1)[1]
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
