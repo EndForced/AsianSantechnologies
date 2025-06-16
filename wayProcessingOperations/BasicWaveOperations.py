@@ -527,7 +527,7 @@ class PattersSolver(WaveCreator):
         return full_combinations
 
     def weight_calculator(self, way):
-
+        #считает вес маршрута
         if len(way) == 1:
             return 0
 
@@ -558,6 +558,7 @@ class PattersSolver(WaveCreator):
         return cord_p[min(cord_p.keys())]
 
     def process_combinations(self, combs):
+        #принимает все возможные комбинации сборки труб и выбирает одну (самую короткую)
         combins = {}
 
         for comb in combs:
@@ -565,21 +566,14 @@ class PattersSolver(WaveCreator):
             way = []
             way_single = []
             for cell_num in range(len(comb)-1):
-                add = 1
-                if cell_num == 0:
-                    add = 0
 
-                if add == 0:
+                if cell_num == 0: #если это начало маршрута то обрабатываем случай так
                     start = comb[0]
+
                 else:
-                    start = way_single[-1]
+                    start = way_single[-1] # а иначе старт это последняя клетка последнего маршрута
 
-                # print("\n\n",123)
-                # print(start, self.choose_tube(start, comb[cell_num+1]))
                 way_single = self.create_way(start, self.choose_tube(comb[cell_num+1], start))
-                # print(way_single)
-
-
 
                 if way_single == "No way":
                     print("Unsolvable")
@@ -629,7 +623,7 @@ class PattersSolver(WaveCreator):
         if (right_cell and left_cell and
                 np.array(self._matrix)[right_cell[0]] in [61, 62, 63, 64] and
                 np.array(self._matrix)[left_cell[0]] in [61, 62, 63, 64]):
-            return "C", unload_direction
+            return "C", unload_direction # Разгрузка центр
 
         else: return "idktbh"
 

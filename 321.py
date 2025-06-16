@@ -69,7 +69,7 @@ def fix_perspct(frame):
                   [-0.61169934]])
 
     # Загрузка изображения
-    img = cv2.imread("chess_frames/frame_test.png")
+    img = frame
     if img is None:
         raise ValueError("Не удалось загрузить изображение! Проверьте путь.")
 
@@ -97,12 +97,14 @@ def fix_perspct(frame):
         new_size=(w, h)
     )
 
-    return undistorted
+    # return undistorted
 
-# 5. Отображение результатов
-cv2.imshow('Original', img)
-# cv2.imshow('With Border', img_with_border)
-cv2.imshow('Undistorted', undistorted)
-# cv2.imshow('Final Result', result)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    # 5. Отображение результатов
+    cv2.imshow('Original', img)
+    # cv2.imshow('With Border', img_with_border)
+    cv2.imshow('Undistorted', undistorted)
+    # cv2.imshow('Final Result', result)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+fix_perspct(cv2.imread("frame_1.png"))
