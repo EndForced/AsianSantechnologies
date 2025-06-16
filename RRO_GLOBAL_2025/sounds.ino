@@ -13,8 +13,22 @@ bool button() {
     String input = Serial1.readStringUntil('\n');
     input.trim();
     Serial.println(input);
+
+    if (input.equals("MyFloor")) {
+      int datvals = 0;
+      for (int i = 1; i < 5; i ++ ) {
+        datvals += sensor_x(i);
+      }
+      if (datvals / 4 < 30) {
+        SendData("2");
+      }
+      else {
+        SendData("1");
+      }
+    }
+
     if (input.equals("Button_skip")) {
-      SendData("Button Activated");
+//      SendData("Button Activated");
       return false;
     }
   }

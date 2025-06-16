@@ -67,7 +67,9 @@ void buttonWait(int flag) {
   while (1) {
     //  Serial.println(button());
     if (button() == 0){
+      while (Serial1.readStringUntil('\n') != "OK"){
       SendData("Activated");
+      }
       break;
     }
     else if (millis() - tim > 200) {
