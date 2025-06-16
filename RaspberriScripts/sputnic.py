@@ -34,7 +34,7 @@ def process_matrix_in_background(mat, serial_conn):
         mc = MainComputer(mat, serial_conn)
 
         # mc.robot.do("Beep")
-        floor = mc.robot.do("MyFloor")
+        floor = int(mc.robot.do("MyFloor")[0])
         cord = mc.find_robot()
         mc._matrix[cord[0]][cord[1]] = 71 if floor == 1 else 81
 
