@@ -168,8 +168,9 @@ if __name__ == "__main__":
         mc.start_website()
         time.sleep(3)
         while 1:
-            frame = mc.robot.get_uncompressed_frames(1)[0]
+            frame = mc.robot.get_uncompressed_frames(0)[1]
             a = input()
+            cv2.imwrite(f"{a}.png", frame)
             # frame= fix_perspct(frame)
             # mc.robot.set_frame(frame)
             # cv2.imwrite("warped.png", frame)
