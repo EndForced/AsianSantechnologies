@@ -1,8 +1,10 @@
+from enum import verify
+
 import requests
 import json
 
 # URL сервера (адрес Flask-приложения из предыдущего примера)
-url = 'http://localhost:5000/data'
+url = 'http://192.168.43.221:5000/data'
 mat = [[10]]
 # Данные для отправки (в формате словаря)
 data_to_send = {
@@ -15,7 +17,8 @@ try:
     response = requests.post(
         url,
         json=data_to_send,  # автоматически конвертирует в JSON и устанавливает Content-Type
-        timeout=5  # таймаут на выполнение запроса (секунды)
+        timeout=5, # таймаут на выполнение запроса (секунды)
+        verify = False
     )
 
     # Вариант 2: можно отправить как form-data (раскомментировать если нужно)
