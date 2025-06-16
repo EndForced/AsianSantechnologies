@@ -1,55 +1,93 @@
 from flask import Flask, request, jsonify
-from Slam_algorithm import  MainComputer
+from Slam_algorithm import MainComputer
 import serial
 import ast
-serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+import threading
+import time
 
 app = Flask(__name__)
-import ast
+
+# Инициализация последовательного порта
+try:
+    serial_conn = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+    print("Serial port initialized successfully")
+except serial.SerialException as e:
+    print(f"Failed to initialize serial port: {e}")
+    serial_conn = None
 
 
 def string2list(matrix_string):
     try:
-        # Используем ast.literal_eval для безопасного преобразования строки в список
         result = ast.literal_eval(matrix_string)
         if isinstance(result, list):
             return result
-        else:
-            raise ValueError("Input string is not a list representation")
+        raise ValueError("Input string is not a list representation")
     except (SyntaxError, ValueError) as e:
         print(f"Error converting string to list: {e}")
         return []
 
+
+def process_matrix_in_background(mat, serial_conn):
+    """Функция для обработки матрицы в фоновом режиме"""
+    try:
+        print("Background processing started")
+        mc = MainComputer(mat, serial_conn)
+
+        # Ожидаем активации робота с таймаутом
+        start_time = time.time()
+        while mc.robot.read() != "Activated":
+            if time.time() - start_time > 10:  # 10 секунд таймаут
+                print("Activation timeout")
+                return
+            time.sleep(0.1)
+
+        mc.robot.do("Beep")
+        floor = mc.robot.do("MyFloor")
+        cord = mc.find_robot()
+        mc._matrix[cord[0]][cord[1]] = 71 if floor == 1 else 81
+        print("Current matrix:", mc._matrix)
+        mc.qualifiction()
+        print("Background processing completed")
+    except Exception as e:
+        print(f"Error in background processing: {e}")
+
+
 @app.route('/data', methods=['POST'])
 def handle_data():
-    # Получаем данные из POST-запроса
-    mat = request.get_json()["mat"]  # для JSON данных
-    # или data = request.form  # для form-data
+    try:
+        # Получаем и проверяем данные
+        data = request.get_json()
+        if not data or 'mat' not in data:
+            return jsonify({'error': 'No data received or invalid format'}), 400
 
-    # Проверяем, есть ли данные
-    if not mat:
-        return jsonify({'error': 'No data received'}), 400
+        mat_str = data['mat']
+        print("Received data:", mat_str)
 
-    # Выводим полученные данные в консоль (для отладки)
-    print("Received data:", mat)
+        # Конвертируем строку в список
+        mat = string2list(mat_str)
+        if not mat:
+            return jsonify({'error': 'Invalid matrix format'}), 400
 
-    # Отправляем ответ
-    response = {
-        'status': 'success',
-        'message': 'Data received successfully',
-        'received_data': mat
-    }
-    mat = string2list(mat)
-    mc = MainComputer(mat, serial)
+        # Запускаем обработку в фоновом потоке
+        thread = threading.Thread(
+            target=process_matrix_in_background,
+            args=(mat, serial_conn)
+        thread.daemon = True  # Поток завершится при завершении основного
+        thread.start()
 
-    floor = mc.robot.do("MyFloor")
-    cord = mc.find_robot()
-    mc._matrix[cord[0]][cord[1]] = 71 if floor == 1 else 81
-    print(mc._matrix)
-    mc.qualifiction()
+        # Немедленно отвечаем клиенту
+        response = {
+            'status': 'success',
+            'message': 'Data received and processing started',
+            'received_data': mat_str
+        }
+        return jsonify(response), 200
 
+    except Exception as e:
+        print(f"Server error: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
-    print("starting...")
-    app.run(debug=True,host='0.0.0.0', port=5000)
+    print("Starting server...")
+    app.run(debug=True, host='0.0.0.0', port=5000)
