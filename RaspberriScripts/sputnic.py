@@ -40,7 +40,7 @@ def handle_data():
         'received_data': mat
     }
     mat = string2list(mat)
-    mc = MainComputer(serial, mat)
+    mc = MainComputer(mat, serial)
     while mc.robot.read() != "Activated":
         pass
     mc.robot.do("Beep")
