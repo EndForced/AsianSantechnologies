@@ -101,6 +101,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         res = self.robot.read()
         while res != "Activated":
             if res: print(res)
+            res = self.robot.read()
         self.robot.do("OK")
         time.sleep(0.1)
         self.robot.do("Beep")
