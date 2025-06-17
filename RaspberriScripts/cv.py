@@ -159,7 +159,7 @@ def update_frame_smart(frame, floor):
                 result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
                 list_of_slices.append(slices[i + 4])
 
-    return result_frame, list_of_slices
+    return result_frame, list_of_slices, borders
 
 def check_for_borders(frame,camnum):
     found = []
