@@ -1,6 +1,6 @@
 zones = {
 }
-#sec/first - floors, right/left - u know, 1/2 - cams, c/f - close/far
+#sec/first - floors, right/left - u know, 1/2 - floors, c/f - close/far
 sec_right1c = [(341, 250), (657, 246), (795, 602), (317, 598), (337, 254)]#
 sec_left1c = [(36, 272), (316, 253), (290, 598), (3, 601), (8, 319), (37, 271)] #
 sec_fl_right1f = [(355, 98), (334, 247), (646, 251), (561, 98), (357, 97)] #
@@ -11,15 +11,25 @@ first_left1c = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)] #
 first_right1f = [(369, 143), (356, 241), (663, 245), (606, 144), (373, 138)]#
 first_left1f = [(190, 153), (359, 144), (350, 271), (128, 278), (188, 154)] #
 
+first_right2c = [(353, 334), (333, 583), (621, 591), (557, 329), (350, 335)]#
+first_right2f = [(358, 192), (346, 313), (553, 320), (529, 186), (354, 188)]#
+first_left2_c = [(328, 602), (74, 597), (162, 362), (342, 364), (329, 601)]#
+first_left2f = [(216, 226), (169, 330), (345, 330), (352, 217), (216, 218)]#
+
+
+
+
 # dat_l_f = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)]
 # dat_r_f = [(510, 238), (513, 266), (546, 261), (546, 233), (509, 238)]
 # dat_l_c = [(220, 514), (213, 565), (265, 570), (269, 516), (220, 513)]
 # dat_r_c = [(584, 487), (592, 577), (715, 573), (702, 479), (594, 487)]
 
+cam1floor2 = [first_right1c, first_left1c, first_right1f, first_left1f,first_right2c, first_right2f, first_left2_c, first_left2f]
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
+
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
-hsw_red = [(5,83,180), (179,255,254),  ]
+hsw_red = [(5,83,180), (179,255,254)]
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
 
@@ -37,6 +47,63 @@ def update_frame_smart(frame, floor):
 
     if floor == 1:
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
+        leads = []
+        borders = check_for_borders(frame, 1)
+
+        # Обработка бордеров
+        border_flags = {
+            'fc': False,  # Близкий бордер - полный сброс
+            'ff': False,  # Дальний бордер - отключаем проверку для индексов 2 и 3
+            'sc': False,  # Близкий второй бордер
+            'sf': False  # Дальний второй бордер
+        }
+
+        if borders:
+            for border in borders:
+                if border in border_flags:
+                    border_flags[border] = True
+
+        # Если есть близкий бордер - полный сброс
+        if border_flags['fc']:
+            return frame, []
+
+        for i in range(4):
+            # Определяем цвет области
+            if np.mean(slices[i]) < mean_const:
+                lead = "black"
+            else:
+                lead = "white"
+            leads.append(lead)
+
+            # Пропускаем индексы 2 и 3 если есть дальний бордер
+            if (i == 2 or i == 3) and border_flags['ff']:
+                list_of_slices.append("unr")
+                continue
+
+            # Пропускаем индексы 1 и 3 если есть близкий второй бордер
+            if (i == 1 or i == 3) and border_flags['sc']:
+                list_of_slices.append("unr")
+                continue
+
+            # Проверка зависимостей между индексами
+            if i == 2 and leads[0] == "black":
+                list_of_slices.append("unr")
+                continue
+
+            if i == 3 and leads[1] == "black":
+                list_of_slices.append("unr")
+                continue
+
+            # Отрисовка в зависимости от цвета
+            if lead == "white":
+                result_frame = draw_on_image(result_frame, cam1floor1[i])
+                list_of_slices.append(slices[i])
+            else:
+                result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
+                list_of_slices.append(slices[i + 4])
+
+    if floor == 1:
+        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
         leads = []
         borders = check_for_borders(frame, 1)
 
