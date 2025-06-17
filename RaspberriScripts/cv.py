@@ -44,6 +44,7 @@ from collections import defaultdict
 def update_frame_smart(frame, floor):
     result_frame = frame.copy()
     list_of_slices = []
+    borders = []
 
     if floor == 1:
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
