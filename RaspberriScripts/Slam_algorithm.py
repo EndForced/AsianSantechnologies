@@ -178,7 +178,7 @@ if __name__ == "__main__":
             frame, slices = update_frame_smart(frame, 1)
 
             mc.robot.set_frame(frame)
-            # cv2.imwrite("warped.png", frame)
+            cv2.imwrite("warped.png", frame)
             # time.sleep(0.2)
             # mc.robot.set_frame(frame)
             # for i in slices:
