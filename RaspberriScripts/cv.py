@@ -36,58 +36,61 @@ def update_frame_smart(frame, floor):
     list_of_slices = []
 
     if floor == 1:
-        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
+        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
         leads = []
         borders = check_for_borders(frame, 1)
 
+        # Обработка бордеров
+        border_flags = {
+            'fc': False,  # Близкий бордер - полный сброс
+            'ff': False,  # Дальний бордер - отключаем проверку для индексов 2 и 3
+            'sc': False,  # Близкий второй бордер
+            'sf': False  # Дальний второй бордер
+        }
+
+        if borders:
+            for border in borders:
+                if border in border_flags:
+                    border_flags[border] = True
+
+        # Если есть близкий бордер - полный сброс
+        if border_flags['fc']:
+            return frame, []
+
         for i in range(4):
-            flag1 = 1
-            flag2 = 1
+            # Определяем цвет области
             if np.mean(slices[i]) < mean_const:
                 lead = "black"
             else:
                 lead = "white"
             leads.append(lead)
 
-
-            if borders:
-                if "fc" in borders:
-                    return frame, [] # близко бордер - в попу скан
-                elif "ff" in borders:
-                    flag1 = 0
-
-                if "sc" in borders:
-                    flag2 = 1
-
-                elif "sf" in borders:
-                    flag2 = 2
-
-
-            if (i == 2 or i == 3) and  not flag1:
+            # Пропускаем индексы 2 и 3 если есть дальний бордер
+            if (i == 2 or i == 3) and border_flags['ff']:
                 list_of_slices.append("unr")
                 continue
 
-            if (i == 1 or i == 3) and flag2 == 1:
+            # Пропускаем индексы 1 и 3 если есть близкий второй бордер
+            if (i == 1 or i == 3) and border_flags['sc']:
                 list_of_slices.append("unr")
                 continue
 
+            # Проверка зависимостей между индексами
             if i == 2 and leads[0] == "black":
-                flag = 0
                 list_of_slices.append("unr")
+                continue
 
-            elif i == 3 and leads[1] == "black":
-                flag = 0
+            if i == 3 and leads[1] == "black":
                 list_of_slices.append("unr")
-            else:
-                flag = 1
+                continue
 
-            if lead == "white" and flag:
+            # Отрисовка в зависимости от цвета
+            if lead == "white":
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
                 list_of_slices.append(slices[i])
-
-            elif lead == "black" and flag:
-                result_frame = draw_on_image(result_frame, cam1floor1[i+4], color=(0,0,255))
-                list_of_slices.append(slices[i+4])
+            else:
+                result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
+                list_of_slices.append(slices[i + 4])
 
     return result_frame, list_of_slices
 
