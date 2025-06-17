@@ -25,7 +25,7 @@ first_left2f = [(216, 226), (169, 330), (345, 330), (352, 217), (216, 218)]#
 # dat_r_c = [(584, 487), (592, 577), (715, 573), (702, 479), (594, 487)]
 
 cam1floor2 = [first_right1c, first_left1c, first_right1f, first_left1f,first_right2c, first_right2f, first_left2_c, first_left2f]
-cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
+cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, first_left2f, first_right2f, first_left2_c]
 
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
@@ -48,63 +48,6 @@ def update_frame_smart(frame, floor):
 
     if floor == 1:
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
-        leads = []
-        borders = check_for_borders(frame, 1)
-
-        # Обработка бордеров
-        border_flags = {
-            'fc': False,  # Близкий бордер - полный сброс
-            'ff': False,  # Дальний бордер - отключаем проверку для индексов 2 и 3
-            'sc': False,  # Близкий второй бордер
-            'sf': False  # Дальний второй бордер
-        }
-
-        # if borders:
-        #     for border in borders:
-        #         if border in border_flags:
-        #             border_flags[border] = True
-
-        # Если есть близкий бордер - полный сброс
-        if border_flags['fc']:
-            return frame, []
-
-        for i in range(4):
-            # Определяем цвет области
-            if np.mean(slices[i]) < mean_const:
-                lead = "black"
-            else:
-                lead = "white"
-            leads.append(lead)
-
-            # Пропускаем индексы 2 и 3 если есть дальний бордер
-            if (i == 2 or i == 3) and border_flags['ff']:
-                list_of_slices.append("unr")
-                continue
-
-            # Пропускаем индексы 1 и 3 если есть близкий второй бордер
-            if (i == 1 or i == 3) and border_flags['sc']:
-                list_of_slices.append("unr")
-                continue
-
-            # Проверка зависимостей между индексами
-            if i == 2 and leads[0] == "black":
-                list_of_slices.append("unr")
-                continue
-
-            if i == 3 and leads[1] == "black":
-                list_of_slices.append("unr")
-                continue
-
-            # Отрисовка в зависимости от цвета
-            if lead == "white":
-                result_frame = draw_on_image(result_frame, cam1floor1[i])
-                list_of_slices.append(slices[i])
-            else:
-                result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
-                list_of_slices.append(slices[i + 4])
-
-    if floor == 1:
-        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
         leads = []
         borders = check_for_borders(frame, 1)
 
@@ -154,6 +97,66 @@ def update_frame_smart(frame, floor):
 
             # Отрисовка в зависимости от цвета
             if lead == "white":
+                result_frame = draw_on_image(result_frame, cam1floor1[i])
+                list_of_slices.append(slices[i])
+            else:
+                result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
+                list_of_slices.append(slices[i + 4])
+
+    if floor == 2:
+        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
+        # for i in slices:
+        #     cv2.imshow("o", i)
+        #     cv2.waitKey(0)
+        leads = []
+        borders = check_for_borders(frame, 1)
+
+        # Обработка бордеров
+        border_flags = {
+            'fc': False,  # Близкий бордер - полный сброс
+            'ff': False,  # Дальний бордер - отключаем проверку для индексов 2 и 3
+            'sc': False,  # Близкий второй бордер
+            'sf': False  # Дальний второй бордер
+        }
+
+        # if borders:
+        #     for border in borders:
+        #         if border in border_flags:
+        #             border_flags[border] = True
+
+        # Если есть близкий бордер - полный сброс
+        if border_flags['fc']:
+            return frame, []
+
+        for i in range(4):
+            # Определяем цвет области
+            if np.mean(slices[i]) < mean_const:
+                lead = "black"
+            else:
+                lead = "white"
+            leads.append(lead)
+
+            # Пропускаем индексы 2 и 3 если есть дальний бордер
+            if (i == 2 or i == 3) and border_flags['ff']:
+                list_of_slices.append("unr")
+                continue
+
+            # Пропускаем индексы 1 и 3 если есть близкий второй бордер
+            if (i == 1 or i == 3) and border_flags['sc']:
+                list_of_slices.append("unr")
+                continue
+
+            # Проверка зависимостей между индексами
+            # if i == 2 and leads[0] != "black":
+            #     list_of_slices.append("unr")
+            #     continue
+            #
+            # if i == 3 and leads[1] != "black":
+            #     list_of_slices.append("unr")
+            #     continue
+
+            # Отрисовка в зависимости от цвета
+            if lead == "black":
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
                 list_of_slices.append(slices[i])
             else:
@@ -355,7 +358,7 @@ def count_pixels(image, lower_hsv, upper_hsv):
 
 
 if __name__ == "__main__":
-    fr, slices = update_frame_smart(cv2.imread("warped.png"), 1)
+    fr, slices, borders = update_frame_smart(cv2.imread("warped.png"), 2)
     # cv2.imshow("o", slices[0][0])
     cv2.imshow("p", fr)
 
