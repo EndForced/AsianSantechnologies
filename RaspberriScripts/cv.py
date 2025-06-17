@@ -39,12 +39,22 @@ def update_frame_smart(frame, floor):
     if floor == 1:
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
+        banned = []
+        borders = check_for_borders(frame, 1)
+
         for i in range(4):
-            # print("mean", np.mean(slices[i]))
-            print(check_for_borders(frame, 1))
             if np.mean(slices[i]) < mean_const: lead = "black"
             else: lead = "white"
             leads.append(lead)
+            flag1 = 1
+
+            if borders:
+                if borders[0] == "fc":
+                    return frame, [] #близко бордер - в попу скан
+                elif borders[0] == "ff":
+                    flag1 = 0
+
+
 
             if i == 2 and leads[0] == "black":
                 flag = 0
@@ -55,20 +65,11 @@ def update_frame_smart(frame, floor):
 
             else: flag = 1
 
-            # print(i, flag)
-            # cv2.imshow("o", slice_to_check)
-            # print(lead)
-            # cv2.waitKey(0)
-            #
-            # # cv2.imshow("o", slices[i])
-            # print(lead)
-            # cv2.waitKey(0)
-
-            if lead == "white" and flag:
+            if lead == "white" and flag and flag1:
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
                 list_of_slices.append(slices[i])
 
-            elif lead == "black" and flag:
+            elif lead == "black" and flag and flag1:
                 result_frame = draw_on_image(result_frame, cam1floor1[i+4], color = (0,0,255))
                 list_of_slices.append(slices[i+4])
 
@@ -85,13 +86,12 @@ def check_for_borders(frame,camnum):
         fr = frame[-70:-30, :] #close line
         red_count_close = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
         if red_count_close > 500:
-            found.append("c")#close front
+            found.append("fc")#close front
 
         fr = frame[260:330, :]  # close line
         red_count_far = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
-        # print(red_count_far)
         if red_count_far > 500:
-            found.append("f")  # close front
+            found.append("ff")  # close front
 
     return found
 
