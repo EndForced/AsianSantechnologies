@@ -174,10 +174,11 @@ if __name__ == "__main__":
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
             frame= fix_perspct(frame)
+            frame, slices = update_frame_smart(frame, 1)
+
             mc.robot.set_frame(frame)
             # cv2.imwrite("warped.png", frame)
             # time.sleep(0.2)
-            # frame, slices = update_frame_smart(frame, 1)
             # mc.robot.set_frame(frame)
             # for i in slices:
             #     if str(i) != "unr":
