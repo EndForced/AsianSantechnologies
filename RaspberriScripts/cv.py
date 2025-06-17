@@ -19,7 +19,7 @@ first_left1f = [(190, 153), (359, 144), (350, 271), (128, 278), (188, 154)] #
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
-hsw_red = [(5,83,201), (179,255,254),  ]
+hsw_red = [(5,83,180), (179,255,254),  ]
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
 
@@ -84,12 +84,13 @@ def check_for_borders(frame,camnum):
     if camnum == 1:
         fr = frame[-70:-30, :] #close line
         red_count_close = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
-        if red_count_close > 2000:
+        if red_count_close > 500:
             found.append("c")#close front
 
-        fr = frame[260:310, :]  # close line
+        fr = frame[260:330, :]  # close line
         red_count_far = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
-        if red_count_far > 2000:
+        # print(red_count_far)
+        if red_count_far > 500:
             found.append("f")  # close front
 
     return found
