@@ -355,10 +355,10 @@ def count_pixels(image, lower_hsv, upper_hsv):
     return pixel_count, mask
 
 def search_for_color(frame_, color, min_area=50):
-    hsv = {"R": [[0, 0, 0], [180, 255, 255]],
-           "R1": [[0, 0, 0], [180, 255, 255]],
-           "G": [[0, 0, 0], [180, 255, 255]],
-           "B": [[0, 0, 0], [180, 255, 255]]}
+    hsv = {"R": [[150, 100, 80], [180, 255, 255]],
+           "R1": [[0, 0, 0], [20, 255, 255]],
+           "G": [[65, 90, 90], [95, 255, 255]],
+           "B": [[110, 90, 90], [140, 255, 255]]}
 
     if color == "Red":
         frame_height, frame_width = frame_.shape[:2]
@@ -393,7 +393,7 @@ def tile_to_code(frame200x200):
         frame200x200 = cv2.resize(frame200x200, [200, 200])
         frame_height, frame_width = frame200x200.shape[:2]
 
-    frame_b = cv2.blur(frame200x200, [11, 11])
+    frame_b = cv2.blur(frame200x200, [5, 5])
 
     ImageHSV = cv2.cvtColor(frame_b, cv2.COLOR_BGR2HSV)
 
