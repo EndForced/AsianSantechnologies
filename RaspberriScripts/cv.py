@@ -19,7 +19,7 @@ first_left1f = [(190, 153), (359, 144), (350, 271), (128, 278), (188, 154)] #
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
-hsw_red = [(0,0,0), (179,109,254),  ]
+hsw_red = [(5,83,201), (179,255,254),  ]
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
 
@@ -41,7 +41,7 @@ def update_frame_smart(frame, floor):
         leads = []
         for i in range(4):
             # print("mean", np.mean(slices[i]))
-            check_for_borders(frame, 1)
+            print(check_for_borders(frame, 1))
             if np.mean(slices[i]) < mean_const: lead = "black"
             else: lead = "white"
             leads.append(lead)
@@ -84,9 +84,23 @@ def check_for_borders(frame,camnum):
     if camnum == 1:
         fr = frame[-70:-30, :] #close line
         red_count_close = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
+        print(red_count_close)
         if red_count_close > 2000:
+
+            cv2.imshow("o", fr)
+            cv2.waitKey(0)
             found.append("cf")#close front
 
+        fr = frame[260:290, :]  # close line
+        red_count_far = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
+        print(red_count_far)
+        if red_count_close > 2000:
+
+            cv2.imshow("o", fr)
+            cv2.waitKey(0)
+            found.append("cf")  # close front
+
+    return found
 
 
 def fix_perspct(frame):
@@ -134,7 +148,6 @@ def fix_perspct(frame):
     )
 
     return undistorted
-
 
 
 def draw_on_image(img, coordinates, shape_type='polygon', color=(0, 255, 0),
@@ -198,7 +211,6 @@ def draw_on_image(img, coordinates, shape_type='polygon', color=(0, 255, 0),
         print(f"Результат сохранен в {output_path}")
 
     return img
-
 
 def extract_polygon_with_white_bg(image, points):
     """
