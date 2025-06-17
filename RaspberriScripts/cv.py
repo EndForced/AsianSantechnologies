@@ -42,7 +42,7 @@ def update_frame_smart(frame, floor):
 
         for i in range(4):
             flag1 = 1
-            flaf2 = 1
+            flag2 = 1
             if np.mean(slices[i]) < mean_const:
                 lead = "black"
             else:
@@ -67,7 +67,7 @@ def update_frame_smart(frame, floor):
                 list_of_slices.append("unr")
                 continue
 
-            if (i == 0 or i == 2) and flag2 == 1:
+            if (i == 1 or i == 3) and flag2 == 1:
                 list_of_slices.append("unr")
                 continue
 
