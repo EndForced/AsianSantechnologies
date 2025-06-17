@@ -59,10 +59,10 @@ def update_frame_smart(frame, floor):
             'sf': False  # Дальний второй бордер
         }
 
-        if borders:
-            for border in borders:
-                if border in border_flags:
-                    border_flags[border] = True
+        # if borders:
+        #     for border in borders:
+        #         if border in border_flags:
+        #             border_flags[border] = True
 
         # Если есть близкий бордер - полный сброс
         if border_flags['fc']:
