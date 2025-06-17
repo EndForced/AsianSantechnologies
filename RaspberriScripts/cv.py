@@ -20,7 +20,7 @@ cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_righ
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
 hsv_white = (150,10,230)
-hsw_red = (83.32,193.15,129.74)
+hsw_red = (150.32,150.15,220.74)
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
 

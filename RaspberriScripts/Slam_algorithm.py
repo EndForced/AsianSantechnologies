@@ -173,8 +173,8 @@ if __name__ == "__main__":
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
-            frame= fix_perspct(frame)
-            cv2.imwrite("Warped.png", frame)
+            # frame= fix_perspct(frame)
+            # cv2.imwrite("Warped.png", frame)
             frame, slices = update_frame_smart(frame, 1)
 
             mc.robot.set_frame(frame)
