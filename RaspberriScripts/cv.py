@@ -33,50 +33,49 @@ from collections import defaultdict
 
 def update_frame_smart(frame, floor):
     result_frame = frame.copy()
-    slice_to_check = frame
     list_of_slices = []
 
     if floor == 1:
         slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200,200)) for i in range(8)]
         leads = []
-        banned = []
         borders = check_for_borders(frame, 1)
 
         for i in range(4):
-            if np.mean(slices[i]) < mean_const: lead = "black"
-            else: lead = "white"
-            leads.append(lead)
             flag1 = 1
+            if np.mean(slices[i]) < mean_const:
+                lead = "black"
+            else:
+                lead = "white"
+            leads.append(lead)
+
 
             if borders:
                 if borders[0] == "fc":
-                    return frame, [] #близко бордер - в попу скан
+                    return frame, [] # близко бордер - в попу скан
                 elif borders[0] == "ff":
                     flag1 = 0
 
-
+            if (i == 2 or i == 3) and  not flag1:
+                list_of_slices.append("unr")
+                continue
 
             if i == 2 and leads[0] == "black":
                 flag = 0
                 list_of_slices.append("unr")
+
             elif i == 3 and leads[1] == "black":
                 flag = 0
                 list_of_slices.append("unr")
+            else:
+                flag = 1
 
-            else: flag = 1
-
-            if lead == "white" and flag and flag1:
+            if lead == "white" and flag:
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
                 list_of_slices.append(slices[i])
 
-            elif lead == "black" and flag and flag1:
-                result_frame = draw_on_image(result_frame, cam1floor1[i+4], color = (0,0,255))
+            elif lead == "black" and flag:
+                result_frame = draw_on_image(result_frame, cam1floor1[i+4], color=(0,0,255))
                 list_of_slices.append(slices[i+4])
-
-
-
-
-
 
     return result_frame, list_of_slices
 
