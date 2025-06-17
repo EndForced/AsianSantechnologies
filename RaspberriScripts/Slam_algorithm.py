@@ -174,7 +174,7 @@ if __name__ == "__main__":
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
             frame= fix_perspct(frame)
-            # mc.robot.set_frame(frame)
+            mc.robot.set_frame(frame)
             # cv2.imwrite("warped.png", frame)
             # time.sleep(0.2)
             # frame, slices = update_frame_smart(frame, 1)
