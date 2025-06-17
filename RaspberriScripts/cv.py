@@ -25,8 +25,8 @@ first_left2f = [(216, 226), (169, 330), (345, 330), (352, 217), (216, 218)]#
 # dat_r_c = [(584, 487), (592, 577), (715, 573), (702, 479), (594, 487)]
 
 
-cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
-cam1floor2 = [first_right1c, first_left1c, first_right1f, first_left1f, first_right2c, first_left2_c, first_right2f, first_left2f]
+cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f,    sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
+cam1floor2 = [first_right1c, first_left1c, first_right1f, first_left1f,    first_right2c, first_left2_c, first_right2f, first_left2f]
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
 hsw_red = [(5,83,180), (179,255,254)]
@@ -157,10 +157,10 @@ def update_frame_smart(frame, floor):
 
             # Отрисовка в зависимости от цвета
             if lead == "black":
-                result_frame = draw_on_image(result_frame, cam1floor1[i])
+                result_frame = draw_on_image(result_frame, cam1floor2[i])
                 list_of_slices.append(slices[i])
             else:
-                result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
+                result_frame = draw_on_image(result_frame, cam1floor2[i + 4], color=(0, 0, 255))
                 list_of_slices.append(slices[i + 4])
 
     return result_frame, list_of_slices, borders
@@ -385,7 +385,6 @@ def search_for_color(frame_, color, min_area=50):
                 x, y, w, h = x1, y1, w1, h1
 
     return x, y, w, h
-
 
 def tile_to_code(frame200x200):
     frame_height, frame_width = frame200x200.shape[:2]
