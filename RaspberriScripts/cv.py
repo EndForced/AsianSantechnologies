@@ -42,6 +42,7 @@ def update_frame_smart(frame, floor):
 
         for i in range(4):
             flag1 = 1
+            flaf2 = 1
             if np.mean(slices[i]) < mean_const:
                 lead = "black"
             else:
@@ -50,12 +51,23 @@ def update_frame_smart(frame, floor):
 
 
             if borders:
-                if borders[0] == "fc":
+                if "fc" in borders:
                     return frame, [] # близко бордер - в попу скан
-                elif borders[0] == "ff":
+                elif "ff" in borders:
                     flag1 = 0
 
+                if "sc" in borders:
+                    flag2 = 1
+
+                elif "sf" in borders:
+                    flag2 = 2
+
+
             if (i == 2 or i == 3) and  not flag1:
+                list_of_slices.append("unr")
+                continue
+
+            if (i == 0 or i == 2) and flag2 == 1:
                 list_of_slices.append("unr")
                 continue
 
@@ -92,6 +104,14 @@ def check_for_borders(frame,camnum):
         if red_count_far > 1500:
             found.append("ff")  # close front
 
+        fr = frame[:,300:400]  # close line
+        red_count_far = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
+        print(red_count_far)
+        if red_count_far > 1500:
+            found.append("sc")  # side close
+
+
+    # print(found)
     return found
 
 
