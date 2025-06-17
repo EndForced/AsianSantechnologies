@@ -24,7 +24,7 @@ hsw_red = (150.32,150.15,220.74)
 hsw_blue  = (114.08,178.85,68.38)
 hsw_range = (5,15,15)
 
-mean_const = 180
+mean_const = 160
 #hehehe mnogo constant
 
 import cv2
