@@ -24,9 +24,9 @@ first_left2f = [(216, 226), (169, 330), (345, 330), (352, 217), (216, 218)]#
 # dat_l_c = [(220, 514), (213, 565), (265, 570), (269, 516), (220, 513)]
 # dat_r_c = [(584, 487), (592, 577), (715, 573), (702, 479), (594, 487)]
 
-cam1floor2 = [first_right1c, first_left1c, first_right1f, first_left1f,first_right2c, first_right2f, first_left2_c, first_left2f]
-cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, first_left2f, first_right2f, first_left2_c]
 
+cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f, sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
+cam1floor2 = [first_right1c, first_left1c, first_right1f, first_left1f, first_right2c, first_left2_c, first_right2f, first_left2f]
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
 hsw_red = [(5,83,180), (179,255,254)]
@@ -354,7 +354,94 @@ def count_pixels(image, lower_hsv, upper_hsv):
 
     return pixel_count, mask
 
+def search_for_color(frame_, color, min_area=50):
+    hsv = {"R": [[0, 0, 0], [180, 255, 255]],
+           "R1": [[0, 0, 0], [180, 255, 255]],
+           "G": [[0, 0, 0], [180, 255, 255]],
+           "B": [[0, 0, 0], [180, 255, 255]]}
 
+    if color == "Red":
+        frame_height, frame_width = frame_.shape[:2]
+        frame_ = frame_[int(frame_height * 0.1):int(frame_height * 0.9),
+                 int(frame_width * 0.1):int(frame_width * 0.9)]
+        mask1 = cv2.inRange(frame_, hsv["R"][0], hsv["R"][1])
+        mask2 = cv2.inRange(frame_, hsv["R1"][0], hsv["R1"][1])
+        mask = cv2.bitwise_or(mask1, mask2)
+    elif color == "Green":
+        mask = cv2.inRange(frame_, hsv["G"][0], hsv["G"][1])
+    elif color == "Blue":
+        mask = cv2.inRange(frame_, hsv["B"][0], hsv["B"][1])
+    else:
+        print(f"Unknown color: {color}")
+        return 0, 0, 0, 0
+
+    contours, k = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    x, y, w, h = 0, 0, 0, 0
+    for cont in contours:
+        area = cv2.contourArea(cont)
+        if area > min_area:
+            x1, y1, w1, h1 = cv2.boundingRect(cont)
+            if w1 * h1 > w * h:
+                x, y, w, h = x1, y1, w1, h1
+
+    return x, y, w, h
+
+
+def tile_to_code(frame200x200):
+    frame_height, frame_width = frame200x200.shape[:2]
+    if frame_height != 200 or frame_width != 200:
+        print("bebebe, wrong size of tile \nRESIZING...")
+        frame200x200 = cv2.resize(frame200x200, [200, 200])
+        frame_height, frame_width = frame200x200.shape[:2]
+
+    frame_b = cv2.blur(frame200x200, [11, 11])
+
+    ImageHSV = cv2.cvtColor(frame_b, cv2.COLOR_BGR2HSV)
+
+    x, y, h, w = search_for_color(ImageHSV, "Green")
+    if h * w:  # если найдена зеленая труба
+        if w > h:
+            if (y + h / 2) > frame_height / 2:
+                result = 61
+            else:
+                result = 63  # это вроде невозможный вариант (чтобы увидеть такое нужно быть вне поля)
+        else:
+            if (x + w / 2) > frame_width / 2:
+                result = 62
+            else:
+                result = 64
+        message = "stand " + str(result - 60)
+        return result
+
+    x, y, h, w = search_for_color(ImageHSV, "Blue")
+    if h * w:  # если найден синий
+        xr, yr, hr, wr = search_for_color(ImageHSV, "Red")
+        delta_x = x - xr
+        delta_y = y - yr
+        if abs(delta_x) < abs(delta_y):
+            if delta_y < 0:
+                result = 34  # рампа направо (синий ближе к роботу)
+            else:
+                result = 32  # рампа налево (красный ближе к роботу)
+        else:
+            if delta_x < 0:
+                result = 33  # рампа назад (верх ближе к роботу)
+            else:
+                result = 31  # рампа вперед (низ ближе к роботу)
+        message = "ramp " + str(result - 30)
+        return result
+
+    elevation = 1 if np.mean(frame_b) > 150 else 2
+    x, y, h, w = search_for_color(ImageHSV, "Red")
+    if h * w:  # если найден красный
+        if h / w > 1.2:
+            result = 32 + elevation * 10  # рампа направо (синий ближе к роботу)
+        else:
+            result = 31 + elevation * 10  # рампа направо (синий ближе к роботу)
+        message = "tube " + str(result - 40)
+        return result
+
+    return elevation * 10.
 
 
 if __name__ == "__main__":
@@ -371,3 +458,5 @@ if __name__ == "__main__":
     #         cv2.waitKey(0)
 
     cv2.waitKey(0)
+
+
