@@ -26,7 +26,7 @@ first_left2f = [(216, 226), (169, 330), (345, 330), (352, 217), (216, 218)]#
 
 
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f,    sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
-cam1floor2 = [first_right1c, first_left1c, first_right1f, first_left1f,    first_right2c, first_left2_c, first_right2f, first_left2f]
+cam1floor2 = [first_right1c, first_left1c, sec_fl_right1f, first_left1f,    first_right2c, first_left2_c, first_right2f, first_left2f]
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
 hsw_red = [(5,83,180), (179,255,254)]
