@@ -87,6 +87,63 @@ class RobotAPI:
 
     def do(self, args):
         self.ser.reset_input_buffer()
+        if args.find("Pid") != -1:
+            if self.Orientation == "U": self.Position = ( self.Position[0] + 1, self.Position[1] )
+            elif self.Orientation == "D": self.Position = (self.Position[0] - 1, self.Position[1])
+            elif self.Orientation == "R": self.Position = (self.Position[0], self.Position[1] + 1)
+            elif self.Orientation == "R": self.Position = (self.Position[0], self.Position[1] - 1)
+
+
+
+        elif args.find("Turn") != -1:
+
+            if "2" not in args:  # Обычный поворот (не двойной)
+
+                if "Left" in args:
+
+                    if self.Orientation == "L":
+                        self.Orientation = "D"
+
+                    elif self.Orientation == "D":
+                        self.Orientation = "R"
+
+                    elif self.Orientation == "R":
+                        self.Orientation = "U"
+
+                    elif self.Orientation == "U":
+                        self.Orientation = "L"
+
+
+                elif "Right" in args:
+
+                    if self.Orientation == "L":
+                        self.Orientation = "U"
+
+                    elif self.Orientation == "U":
+                        self.Orientation = "R"
+
+                    elif self.Orientation == "R":
+                        self.Orientation = "D"
+
+                    elif self.Orientation == "D":
+                        self.Orientation = "L"
+
+
+            else:
+
+                if self.Orientation == "L":
+                    self.Orientation = "R"
+
+                elif self.Orientation == "R":
+                    self.Orientation = "L"
+
+                elif self.Orientation == "U":
+                    self.Orientation = "D"
+
+                elif self.Orientation == "D":
+                    self.Orientation = "U"
+
+
 
         _ = 0
 
