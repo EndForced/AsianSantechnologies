@@ -189,8 +189,8 @@ if __name__ == "__main__":
                 if str(item) != "unr":
                     print(tile_to_code(item))
                     cv2.imwrite(f"{c}.png", item)
-                    c+=1
-                    print(c)
+                    # c+=1
+                    # print(c)
             #
             _ = input()
 
