@@ -184,7 +184,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
 
 if __name__ == "__main__":
-    mat = [[10]*15]*15
+    mat = [[0]*15]*15
     mc = MainComputer(mat, serial)
     # res = mc.show()
     # print(mc.resizedPicture.dtype)
