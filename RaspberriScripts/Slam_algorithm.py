@@ -131,53 +131,70 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves[0])
 
-    def insert(self,cells):
-
+    def insert_cells_into_matrix(self, cells):
         matrix = self._matrix
-        y,x = self.robot.Position
+        y,x  = self.robot.Position
         direction = self.robot.Orientation
+        """
+        Вставляет клетки в матрицу 15x15 со смещением вверх от текущей позиции
 
+        Параметры:
+        matrix - исходная матрица (список списков)
+        cells - словарь клеток {индекс: значение}
+        x, y - текущие координаты (int)
+        direction - направление вставки ('D', 'U', 'L', 'R')
 
-        # Создаем копию матрицы
+        Возвращает:
+        Модифицированную матрицу
+        """
         new_matrix = [row.copy() for row in matrix]
 
-        # Определяем порядок вставки в зависимости от направления
-        if direction == 'D':  # Вниз (вертикальная вставка)
-            # Порядок: сначала верхняя строка (индексы 1,2), потом нижняя (3,4)
-            positions = [
-                (x, y + 1, 1),  # Правая верхняя (индекс 1)
-                (x + 1, y + 1, 2),  # Левая верхняя (индекс 2)
-                (x, y + 2, 3),  # Правая нижняя (индекс 3)
-                (x + 1, y + 2, 4)  # Левая нижняя (индекс 4)
-            ]
-        elif direction == 'U':  # Вверх
-            positions = [
-                (x, y - 1, 1),
-                (x + 1, y - 1, 2),
-                (x, y - 2, 3),
-                (x + 1, y - 2, 4)
-            ]
-        elif direction == 'L':  # Влево
-            positions = [
-                (x - 1, y, 1),
-                (x - 1, y + 1, 2),
-                (x - 2, y, 3),
-                (x - 2, y + 1, 4)
-            ]
-        elif direction == 'R':  # Вправо
-            positions = [
-                (x + 1, y, 1),
-                (x + 1, y + 1, 2),
-                (x + 2, y, 3),
-                (x + 2, y + 1, 4)
-            ]
+        # Сначала вычисляем базовые координаты с учетом смещения вверх
+        if direction == 'U':
+            base_x, base_y = x - 1, y - 1  # Смещаем на 1 вверх и влево
+        elif direction == 'D':
+            base_x, base_y = x, y + 1  # Смещаем на 1 вниз
+        elif direction == 'L':
+            base_x, base_y = x - 1, y  # Смещаем на 1 влево
+        elif direction == 'R':
+            base_x, base_y = x + 1, y  # Смещаем на 1 вправо
         else:
-            raise ValueError("Неправильное направление. Допустимые значения: 'D', 'U', 'L', 'R'")
+            raise ValueError("Неправильное направление")
 
-        # Вставляем клетки
+        # Распределение клеток по направлениям
+        if direction == 'U':
+            positions = [
+                (base_x, base_y, 1),  # Левый верхний (индекс 1)
+                (base_x + 1, base_y, 2),  # Правый верхний (индекс 2)
+                (base_x, base_y + 1, 3),  # Левый нижний (индекс 3)
+                (base_x + 1, base_y + 1, 4)  # Правый нижний (индекс 4)
+            ]
+        elif direction == 'D':
+            positions = [
+                (base_x, base_y, 1),
+                (base_x + 1, base_y, 2),
+                (base_x, base_y + 1, 3),
+                (base_x + 1, base_y + 1, 4)
+            ]
+        elif direction == 'L':
+            positions = [
+                (base_x, base_y, 1),
+                (base_x, base_y + 1, 2),
+                (base_x - 1, base_y, 3),
+                (base_x - 1, base_y + 1, 4)
+            ]
+        elif direction == 'R':
+            positions = [
+                (base_x, base_y, 1),
+                (base_x, base_y + 1, 2),
+                (base_x + 1, base_y, 3),
+                (base_x + 1, base_y + 1, 4)
+            ]
+
+        # Вставляем клетки в матрицу
         for px, py, idx in positions:
-            if 0 <= px < 15 and 0 <= py < 15:  # Проверяем границы матрицы
-                if idx in cells and cells[idx] != 'unr':  # Проверяем наличие значения
+            if 0 <= px < 15 and 0 <= py < 15:  # Проверяем границы
+                if idx in cells and cells[idx] != 'unr':
                     new_matrix[py][px] = cells[idx]
 
         return new_matrix
