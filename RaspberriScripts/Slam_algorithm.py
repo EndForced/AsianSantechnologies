@@ -195,8 +195,10 @@ if __name__ == "__main__":
         mc.robot.Position = (8,8)
 
         time.sleep(3)
+        tiles = {}
         # c = 0
         while 1:
+
             frame = mc.robot.get_uncompressed_frames(0)[1]
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
@@ -207,9 +209,9 @@ if __name__ == "__main__":
 
             for key, item in slices.items():
                 if str(item) != "unr":
-                    slices[key] = int(tile_to_code(slices[key]))
+                    tiles[key+1] = int(tile_to_code(slices[key]))
 
-            mc._matrix = mc.insert(slices)
+            mc._matrix = mc.insert(tiles)
             map = mc.update_matrix()
 
 
