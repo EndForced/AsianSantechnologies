@@ -229,6 +229,7 @@ if __name__ == "__main__":
             _ = input()
 
             print(mc.robot.Position)
+            print(mc.robot.Orientation)
 
 
         # mc.qualifiction()
