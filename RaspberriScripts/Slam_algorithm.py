@@ -210,7 +210,7 @@ if __name__ == "__main__":
                     slices[key] = tile_to_code(slices[key])
 
             mc._matrix = mc.insert(slices)
-            map = mc.visualize_matrix()
+            map = mc.update_matrix()
 
 
 
