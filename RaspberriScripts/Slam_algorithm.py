@@ -306,6 +306,8 @@ if __name__ == "__main__":
         mat = [[0]*15]*15
         cells = {1:20, 2:20, 3:"unr", 4:"unr"}
         mat = mc.insert(cells)
+        pos = mc.robot.Position
+        mc._matrix[pos[0]][pos[1]] = 71
         mc._matrix = mat
         mc.update_matrix()
         mc.show()
