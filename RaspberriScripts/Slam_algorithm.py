@@ -233,7 +233,7 @@ if __name__ == "__main__":
 
             print(mc.robot.Position)
             print(mc.robot.Orientation)
-            print(slices)
+            print(tiles)
             print(np.array(mc._matrix))
 
 
