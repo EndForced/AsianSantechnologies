@@ -2,7 +2,8 @@
 import sys, os, platform, math
 
 import numpy as np
-from cv import update_frame_smart, fix_perspct
+# from cv import update_frame_smart, fix_perspct
+from CvProcessing import ZoneProcessor
 from CvProcessing.CellDetector import fix_perspective, analyze_frame,tile_to_code
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
