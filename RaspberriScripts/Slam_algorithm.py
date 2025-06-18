@@ -135,23 +135,12 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         matrix = self._matrix
         y,x  = self.robot.Position
         direction = self.robot.Orientation
-        """
-        Вставляет клетки в матрицу 15x15 со смещением вверх от текущей позиции
 
-        Параметры:
-        matrix - исходная матрица (список списков)
-        cells - словарь клеток {индекс: значение}
-        x, y - текущие координаты (int)
-        direction - направление вставки ('D', 'U', 'L', 'R')
-
-        Возвращает:
-        Модифицированную матрицу
-        """
         new_matrix = [row.copy() for row in matrix]
 
         # Сначала вычисляем базовые координаты с учетом смещения вверх
         if direction == 'U':
-            base_x, base_y = x - 1, y - 1  # Смещаем на 1 вверх и влево
+            base_x, base_y = x , y - 1  # Смещаем на 1 вверх и влево
         elif direction == 'D':
             base_x, base_y = x, y + 1  # Смещаем на 1 вниз
         elif direction == 'L':
