@@ -233,14 +233,14 @@ if __name__ == "__main__":
             #         # print(c)
             # #
 
-            mc.robot.do(_)
+
 
             print(mc.robot.Position)
             print(mc.robot.Orientation)
             print(tiles)
             print(np.array(mc._matrix))
             _ = input()
-
+            mc.robot.do(_)
         # mc.qualifiction()
         # time.sleep(1000)
         # while 1:
