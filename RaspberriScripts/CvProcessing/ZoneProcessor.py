@@ -30,7 +30,7 @@ cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1
               zones['first_right2c'], zones['first_left2_c'], zones['first_right2f'], zones['first_left2f']]
 
 
-hsw_red = [(5, 83, 180), (179, 255, 254)]
+hsw_red = [(0, 100, 80), (20, 255, 255)]
 mean_const = 160
 
 
