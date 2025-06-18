@@ -211,6 +211,10 @@ if __name__ == "__main__":
                 if str(item) != "unr":
                     tiles[key+1] = int(tile_to_code(slices[key]))
 
+                else:
+                    tiles[key + 1] = "unr"
+
+
             mc._matrix = mc.insert(tiles)
             map = mc.update_matrix()
 
