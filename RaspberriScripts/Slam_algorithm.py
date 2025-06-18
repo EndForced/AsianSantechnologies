@@ -185,10 +185,10 @@ if __name__ == "__main__":
             cv2.imwrite("warped.png", frame)
             # time.sleep(0.2)
             # mc.robot.set_frame(frame)
-            for i in slices:
-                if str(i) != "unr":
-                    print(tile_to_code(i))
-                    cv2.imwrite(f"{c}.png", i)
+            for key, item in slices.items():
+                if str(item) != "unr":
+                    print(tile_to_code(item))
+                    cv2.imwrite(f"{c}.png", item)
                     c+=1
                     print(c)
             #
