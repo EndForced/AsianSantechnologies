@@ -195,14 +195,14 @@ if __name__ == "__main__":
         mc.robot.Position = (8,8)
 
         time.sleep(3)
-        c = 0
+        # c = 0
         while 1:
             frame = mc.robot.get_uncompressed_frames(0)[1]
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
             frame= fix_perspective(frame)
-            cv2.imwrite("Warped.png", frame)
+            # cv2.imwrite("Warped.png", frame)
             frame, slices, borders = analyze_frame(frame, 1)
 
             for key, item in slices.items():
@@ -233,18 +233,18 @@ if __name__ == "__main__":
 
         # mc.qualifiction()
         # time.sleep(1000)
-        while 1:
-            # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
-            # frame, slices = update_frame_smart(frame)
-            # for i in range(len(slices)):
-            #     print(i)
-            #     cv2.imwrite(f"{i}.jpg", slices[i])
-            #
-            # print("upd!!")
-            # exit()
-            # # cv2.imwrite("testing.jpg", frame)
-            # mc.robot.set_frame(frame)
-            pass
+        # while 1:
+        #     # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
+        #     # frame, slices = update_frame_smart(frame)
+        #     # for i in range(len(slices)):
+        #     #     print(i)
+        #     #     cv2.imwrite(f"{i}.jpg", slices[i])
+        #     #
+        #     # print("upd!!")
+        #     # exit()
+        #     # # cv2.imwrite("testing.jpg", frame)
+        #     # mc.robot.set_frame(frame)
+        #     pass
     else:
         # print(type(res))
         #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
