@@ -255,18 +255,18 @@ if __name__ == "__main__":
         # while 1:
         #     pass
 
-        robot = mc.find_robot()
-        waves = mc.create_wave(robot)
-        mc.visualize_wave(waves)
+        # robot = mc.find_robot()
+        # waves = mc.create_wave(robot)
+        # mc.visualize_wave(waves)
         # res = mc.solve()
         # # print(res)
         # mc.draw_multiple_paths(res)
         # # print(mc.way_to_commands_single(res[2], "U"))
         # print(mc.way_to_commands(res, "D"))
         # mc.show()
-        unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
-                       "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
-                       "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
+        # unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
+        #                "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
+        #                "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
 
         # moves =mc.solve()
         # unload_type = mc.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
@@ -284,5 +284,11 @@ if __name__ == "__main__":
         # mc.draw_multiple_paths(moves)
         # m = mc.create_way((6,1),(6,5))
         # mc.draw_path(m)
+        # mc.show()
+        mc.robot.Orientation = "U"
+        mat = [[0]*15]*15
+        cells = {1:10, 2:20, 3:30, 4:40}
+        mat = mc.insert(cells)
+        mc._matrix = mat
+        mc.update_matrix()
         mc.show()
-

@@ -87,11 +87,45 @@ class RobotAPI:
 
     def do(self, args):
         self.ser.reset_input_buffer()
-        if args.find("Pid") != -1:
-            if self.Orientation == "U": self.Position = ( self.Position[0] - 1, self.Position[1] )
-            elif self.Orientation == "D": self.Position = (self.Position[0] + 1, self.Position[1])
-            elif self.Orientation == "R": self.Position = (self.Position[0], self.Position[1] + 1)
-            elif self.Orientation == "R": self.Position = (self.Position[0], self.Position[1] - 1)
+
+
+        if "Pid" in args:
+            # Движение вперед/назад с учетом ориентации
+            parts = args.split()  # Разбиваем строку по пробелам
+
+            # Ищем направление движения и количество шагов
+            direction = None
+            steps = 1  # По умолчанию 1 шаг
+
+            for i, part in enumerate(parts):
+                if part in ["Forward", "Backwards"]:
+                    direction = part
+                    # Пытаемся получить число шагов (следующий элемент после направления)
+                    if i + 1 < len(parts) and parts[i + 1].isdigit():
+                        steps = int(parts[i + 1])
+                    break
+
+            if direction:
+                for _ in range(steps):
+                    x, y = self.Position
+                    if direction == "Forward":
+                        if self.Orientation == "U":
+                            self.Position = (x - 1, y)
+                        elif self.Orientation == "D":
+                            self.Position = (x + 1, y)
+                        elif self.Orientation == "R":
+                            self.Position = (x, y + 1)
+                        elif self.Orientation == "L":
+                            self.Position = (x, y - 1)
+                    elif direction == "Backwards":
+                        if self.Orientation == "U":
+                            self.Position = (x + 1, y)
+                        elif self.Orientation == "D":
+                            self.Position = (x - 1, y)
+                        elif self.Orientation == "R":
+                            self.Position = (x, y - 1)
+                        elif self.Orientation == "L":
+                            self.Position = (x, y + 1)
 
 
 
