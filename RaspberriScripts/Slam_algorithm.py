@@ -155,9 +155,9 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             print(base_x, base_y, "bases")
             positions = [
                 (base_x, base_y, 1),  # Левый верхний (индекс 1)
-                (base_x + 1, base_y, 2),  # Правый верхний (индекс 2)
-                (base_x, base_y + 1, 3),  # Левый нижний (индекс 3)
-                (base_x + 1, base_y + 1, 4)  # Правый нижний (индекс 4)
+                (base_x - 1, base_y, 2),  # Правый верхний (индекс 2)
+                (base_x, base_y - 1, 3),  # Левый нижний (индекс 3)
+                (base_x - 1, base_y - 1, 4)  # Правый нижний (индекс 4)
             ]
         elif direction == 'D':
             positions = [
