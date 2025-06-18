@@ -2,13 +2,13 @@ zones = {
 }
 #sec/first - floors, right/left - u know, 1/2 - floors, c/f - close/far
 sec_right1c = [(341, 250), (657, 246), (795, 602), (317, 598), (337, 254)]#
-sec_left1c = [(36, 272), (316, 253), (290, 598), (3, 601), (8, 319), (37, 271)] #
+sec_left1c = [(36, 272), (316, 253), (290, 598), (3, 601), (8, 319)] #
 sec_fl_right1f = [(355, 98), (334, 247), (646, 251), (561, 98), (357, 97)] #
 sec_fl_left1f = [(158, 101), (59, 238), (328, 226), (347, 93), (158, 98)]#
 
-first_right1c = [(714, 599), (361, 597), (359, 301), (596, 306)]#
+first_right1c = [(356, 311), (328, 603), (701, 600), (601, 319), (356, 310)]#
 first_left1c = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)] #
-first_right1f = [(369, 143), (356, 241), (663, 245), (606, 144), (373, 138)]#
+first_right1f = [(357, 165), (344, 309), (582, 310), (524, 161), (357, 164)]#
 first_left1f = [(190, 153), (359, 144), (350, 271), (128, 278), (188, 154)] #
 
 first_right2c = [(353, 334), (333, 583), (621, 591), (557, 329), (350, 335)]#
@@ -17,16 +17,8 @@ first_left2_c = [(328, 602), (74, 597), (162, 362), (342, 364), (329, 601)]#
 first_left2f = [(216, 226), (169, 330), (345, 330), (352, 217), (216, 218)]#
 
 
-
-
-# dat_l_f = [(339, 330), (72, 326), (5, 590), (330, 600), (341, 331)]
-# dat_r_f = [(510, 238), (513, 266), (546, 261), (546, 233), (509, 238)]
-# dat_l_c = [(220, 514), (213, 565), (265, 570), (269, 516), (220, 513)]
-# dat_r_c = [(584, 487), (592, 577), (715, 573), (702, 479), (594, 487)]
-
-
 cam1floor1 = [first_right1c, first_left1c, first_right1f, first_left1f,    sec_right1c, sec_left1c, sec_fl_right1f, sec_fl_left1f]
-cam1floor2 = [first_right1c, first_left1c, sec_fl_right1f, first_left1f,    first_right2c, first_left2_c, first_right2f, first_left2f]
+cam1floor2 = [first_right1c, first_left1c, first_right1f, first_left1f,    first_right2c, first_left2_c, first_right2f, first_left2f]
 # dats1 = [dat_l_f, dat_r_f, dat_l_c, dat_r_c]
 
 hsw_red = [(5,83,180), (179,255,254)]
@@ -38,7 +30,7 @@ mean_const = 160
 
 import cv2
 import numpy as np
-from collections import defaultdict
+from itertools import combinations
 
 
 def update_frame_smart(frame, floor):
@@ -47,7 +39,7 @@ def update_frame_smart(frame, floor):
     borders = []
 
     if floor == 1:
-        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
+        slices = [cv2.resize(extart_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
         leads = []
         borders = check_for_borders(frame, 1)
 
@@ -104,7 +96,7 @@ def update_frame_smart(frame, floor):
                 list_of_slices.append(slices[i + 4])
 
     if floor == 2:
-        slices = [cv2.resize(extract_polygon_with_white_bg(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
+        slices = [cv2.resize(extart_warped(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
         # for i in slices:
         #     cv2.imshow("o", i)
         #     cv2.waitKey(0)
@@ -146,15 +138,6 @@ def update_frame_smart(frame, floor):
                 list_of_slices.append("unr")
                 continue
 
-            # Проверка зависимостей между индексами
-            # if i == 2 and leads[0] != "black":
-            #     list_of_slices.append("unr")
-            #     continue
-            #
-            # if i == 3 and leads[1] != "black":
-            #     list_of_slices.append("unr")
-            #     continue
-
             # Отрисовка в зависимости от цвета
             if lead == "black":
                 result_frame = draw_on_image(result_frame, cam1floor2[i])
@@ -190,7 +173,6 @@ def check_for_borders(frame,camnum):
 
     # print(found)
     return found
-
 
 def fix_perspct(frame):
 
@@ -237,7 +219,6 @@ def fix_perspct(frame):
     )
 
     return undistorted
-
 
 def draw_on_image(img, coordinates, shape_type='polygon', color=(0, 255, 0),
                   thickness=2, is_closed=True, fill=False, output_path=None):
@@ -301,43 +282,58 @@ def draw_on_image(img, coordinates, shape_type='polygon', color=(0, 255, 0),
 
     return img
 
-def extract_polygon_with_white_bg(image, points):
-    """
-    Вырезает область изображения, заданную полигоном, с белым фоном
-    (Гарантированно работает с 3-канальными изображениями)
+def extart_warped(image, points, output_size=500):
 
-    :param image: исходное изображение (BGR или GRAY)
-    :param points: список точек полигона в формате [(x1,y1), (x2,y2), ...]
-    :return: 3-канальное изображение с вырезанной областью и белым фоном
-    """
-    # Проверяем количество каналов и конвертируем при необходимости
-    if len(image.shape) == 2 or image.shape[2] == 1:
-        image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+    # Находим 2 ближайшие точки
+    min_dist = float('inf')
+    closest_pair = None
 
-    # Создаем маску (одноканальную)
-    mask = np.zeros(image.shape[:2], dtype=np.uint8)
-    pts = np.array(points, dtype=np.int32)
+    if len(points) != 5:
+        print(points, "ya livayu")
+        exit()
 
-    # Заполняем полигон на маске белым цветом
-    cv2.fillPoly(mask, [pts], 255)
+    # Перебираем все возможные пары точек
+    for (p1, p2) in combinations(points, 2):
+        dist = np.linalg.norm(np.array(p1) - np.array(p2))
+        if dist < min_dist:
+            min_dist = dist
+            closest_pair = (p1, p2)
 
-    # Создаем 3-канальный белый фон того же размера и типа, что и изображение
-    white_bg = np.full_like(image, 255)
+    if closest_pair is None:
+        raise ValueError("Не удалось найти ближайшую пару точек")
 
-    # Преобразуем маску в 3-канальную для операции where
-    mask_3ch = cv2.merge([mask, mask, mask])
+    # Заменяем их на среднюю точку
+    avg_point = (
+        (closest_pair[0][0] + closest_pair[1][0]) // 2,
+        (closest_pair[0][1] + closest_pair[1][1]) // 2
+    )
 
-    # Копируем только область внутри полигона на белый фон
-    result = np.where(mask_3ch.astype(bool), image, white_bg)
+    # Оставшиеся 3 точки + новая средняя
+    remaining_points = [p for p in points if p not in closest_pair]
+    final_points = remaining_points + [avg_point]
 
-    # Находим ограничивающий прямоугольник
-    x, y, w, h = cv2.boundingRect(pts)
+    # Сортируем точки по углу относительно их центра масс
+    center = np.mean(final_points, axis=0)
+    def sort_key(p):
+        return np.arctan2(p[1] - center[1], p[0] - center[0])
+    final_points_sorted = sorted(final_points, key=sort_key)
 
-    # Вырезаем область
-    cropped = result[y:y + h, x:x + w]
+    # Преобразуем в numpy array
+    src_points = np.array(final_points_sorted, dtype="float32")
 
-    return cropped
+    # Целевые точки (квадрат)
+    dst_points = np.array([
+        [0, 0],
+        [output_size, 0],
+        [output_size, output_size],
+        [0, output_size]
+    ], dtype="float32")
 
+    # Вычисляем матрицу перспективы и применяем её
+    M = cv2.getPerspectiveTransform(src_points, dst_points)
+    warped = cv2.warpPerspective(image, M, (output_size, output_size))
+
+    return warped
 
 def count_pixels(image, lower_hsv, upper_hsv):
 
@@ -355,10 +351,10 @@ def count_pixels(image, lower_hsv, upper_hsv):
     return pixel_count, mask
 
 def search_for_color(frame_, color, min_area=50):
-    hsv = {"R": [[150, 100, 80], [180, 255, 255]],
-           "R1": [[0, 0, 0], [20, 255, 255]],
-           "G": [[65, 90, 90], [95, 255, 255]],
-           "B": [[110, 90, 90], [140, 255, 255]]}
+    hsv = {"R": np.array([[150, 100, 80], [180, 255, 255]]),
+           "R1": np.array([[0, 0, 0], [20, 255, 255]]),
+           "G": np.array([[65, 90, 90], [95, 255, 255]]),
+           "B": np.array([[110, 90, 90], [140, 255, 255]])}
 
     if color == "Red":
         frame_height, frame_width = frame_.shape[:2]
@@ -444,10 +440,12 @@ def tile_to_code(frame200x200):
 
 
 if __name__ == "__main__":
-    fr, slices, borders = update_frame_smart(cv2.imread("warped.png"), 2)
-    # cv2.imshow("o", slices[0][0])
+    fr, slices, borders = update_frame_smart(cv2.imread("zones_output.jpg"), 1)
+    # # cv2.imshow("o", slices[0][0])
     cv2.imshow("p", fr)
-
+    # for i in range(len(slices)):
+    #     if str(slices[i]) != "unr":
+    #         cv2.imwrite(f"{i}.png",slices[i])
     # for i in range(len(slices)):
     #     if str(slices[i]) != "unr":
     #         slices[i] = cv2.resize(slices[i],(300,300))
@@ -455,7 +453,8 @@ if __name__ == "__main__":
     #         print(count)
     #         cv2.imshow(f"{i}", mask)
     #         cv2.waitKey(0)
-
+    # fr = cv2.imread("0.png")
+    # print(tile_to_code(fr))
     cv2.waitKey(0)
 
 

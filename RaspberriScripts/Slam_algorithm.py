@@ -3,7 +3,7 @@ import sys, os, platform, math
 
 import numpy as np
 from cv import update_frame_smart, fix_perspct
-
+from CvProcessing.CellDetector import fix_perspective, analyze_frame,tile_to_code
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
@@ -173,9 +173,9 @@ if __name__ == "__main__":
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
-            frame= fix_perspct(frame)
+            frame= fix_perspective(frame)
             cv2.imwrite("Warped.png", frame)
-            frame, slices, borders = update_frame_smart(frame, 1)
+            frame, slices, borders = analyze_frame(frame, 1)
 
             mc.robot.set_frame(frame)
             cv2.imwrite("warped.png", frame)
@@ -183,6 +183,7 @@ if __name__ == "__main__":
             # mc.robot.set_frame(frame)
             for i in slices:
                 if str(i) != "unr":
+                    print(tile_to_code(i))
                     cv2.imwrite(f"{c}.png", i)
                     c+=1
                     print(c)
