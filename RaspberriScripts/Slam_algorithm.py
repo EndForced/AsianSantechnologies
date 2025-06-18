@@ -210,6 +210,7 @@ if __name__ == "__main__":
             for key, item in slices.items():
                 if str(item) != "unr":
                     tiles[key+1] = int(tile_to_code(slices[key]))
+                    cv2.imwrite(f"{key}.png", item)
 
                 else:
                     tiles[key + 1] = "unr"
