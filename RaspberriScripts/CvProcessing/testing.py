@@ -49,12 +49,11 @@ import numpy as np
 # Создаем пустую матрицу 15x15
 matrix = np.zeros((15, 15), dtype=int).tolist()
 
-# Клетки для вставки
-cells = {1: 10, 2: 20, 3: 30, 4: 40}
 
-# Вставка с координатами (0,0) и направлением 'D'
-result = insert_cells_into_matrix(matrix, cells, 2, 2, 'R')
-
-# Выводим результат
-for row in result:
-    print(row)
+pos = (8,8)
+orientation = "U"
+mat = [[0]*15]*15
+cells = {1:20, 2:20, 3:30, 4:30}
+mat = insert_cells_into_matrix(mat, cells, pos[0], pos[1], "U")
+mat = np.array(mat)
+print(mat)

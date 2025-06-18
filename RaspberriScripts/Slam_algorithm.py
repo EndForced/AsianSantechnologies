@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
             for key, item in slices.items():
                 if str(item) != "unr":
-                    slices[key] = tile_to_code(slices[key])
+                    slices[key] = int(tile_to_code(slices[key]))
 
             mc._matrix = mc.insert(slices)
             map = mc.update_matrix()
@@ -231,6 +231,7 @@ if __name__ == "__main__":
             print(mc.robot.Position)
             print(mc.robot.Orientation)
             print(slices)
+            print(np.array(mc._matrix))
 
 
         # mc.qualifiction()
@@ -289,7 +290,7 @@ if __name__ == "__main__":
         # mc.show()
         mc.robot.Orientation = "U"
         mat = [[0]*15]*15
-        cells = {1:10, 2:20, 3:30, 4:40}
+        cells = {1:20, 2:20, 3:"unr", 4:"unr"}
         mat = mc.insert(cells)
         mc._matrix = mat
         mc.update_matrix()
