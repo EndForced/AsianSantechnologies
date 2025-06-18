@@ -131,7 +131,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves[0])
 
-    def insert_cells_into_matrix(self, cells):
+    def insert(self, cells):
         matrix = self._matrix
         y,x  = self.robot.Position
         direction = self.robot.Orientation
