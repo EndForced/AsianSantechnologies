@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 from itertools import combinations
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 #тут многа констант. Но если не работает, стоит менять меан конст и хсв красного
 
