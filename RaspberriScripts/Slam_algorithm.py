@@ -226,7 +226,7 @@ if __name__ == "__main__":
             #         # c+=1
             #         # print(c)
             # #
-            # _ = input()
+            _ = input()
 
             print(mc.robot.Position)
 
