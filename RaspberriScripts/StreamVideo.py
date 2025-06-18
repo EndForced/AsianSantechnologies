@@ -88,8 +88,8 @@ class RobotAPI:
     def do(self, args):
         self.ser.reset_input_buffer()
         if args.find("Pid") != -1:
-            if self.Orientation == "U": self.Position = ( self.Position[0] + 1, self.Position[1] )
-            elif self.Orientation == "D": self.Position = (self.Position[0] - 1, self.Position[1])
+            if self.Orientation == "U": self.Position = ( self.Position[0] - 1, self.Position[1] )
+            elif self.Orientation == "D": self.Position = (self.Position[0] + 1, self.Position[1])
             elif self.Orientation == "R": self.Position = (self.Position[0], self.Position[1] + 1)
             elif self.Orientation == "R": self.Position = (self.Position[0], self.Position[1] - 1)
 

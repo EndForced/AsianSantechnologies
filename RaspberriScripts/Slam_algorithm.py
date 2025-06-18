@@ -131,7 +131,13 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves[0])
 
-    def insert(matrix, cells, x, y, direction):
+    def insert(self,cells):
+
+        matrix = self._matrix
+        y,x = self.robot.Position
+        direction = self.robot.Orientation
+
+
         # Создаем копию матрицы
         new_matrix = [row.copy() for row in matrix]
 
@@ -176,7 +182,6 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         return new_matrix
 
-    import numpy as np
 
 if __name__ == "__main__":
     mat = [[10]*15]*15
@@ -200,9 +205,18 @@ if __name__ == "__main__":
             cv2.imwrite("Warped.png", frame)
             frame, slices, borders = analyze_frame(frame, 1)
 
+            for key, item in slices.items():
+                if str(item) != "unr":
+                    slices[key] = tile_to_code(slices[key])
+
+            mc._matrix = mc.insert(slices)
+            map = mc.visualize_matrix()
+
+
 
             mc.robot.set_frame(frame)
-            cv2.imwrite("warped.png", frame)
+            mc.send_map()
+            # cv2.imwrite("warped.png", frame)
             # time.sleep(0.2)
             # mc.robot.set_frame(frame)
             # for key, item in slices.items():
