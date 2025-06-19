@@ -103,7 +103,7 @@ class RobotAPI:
 
             if direction:
                 for _ in range(steps):
-                    x, y = self.Position
+                    y, x = self.Position
                     if direction == "Forward":
                         if self.Orientation == "U":
                             self.Position = (x - 1, y)
