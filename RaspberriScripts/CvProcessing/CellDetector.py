@@ -119,10 +119,10 @@ def check_for_borders(frame, cam_num):
     found = []
     if cam_num == 1:
         # front close
-        fr = frame[610:650, 390:740]
+        fr = frame[580:680, 360:740]
         width = fr.shape[1]
         _, __, w, h = search_for_color(fr, "Red")
-        if w > 0.8 * width:
+        if w > 0.75 * width:
             print(w, "fc")
             found.append("fc")
 
