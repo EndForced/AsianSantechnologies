@@ -392,7 +392,9 @@ def analyze_frame(frame, floor):
 
         leads = []
         for i in range(4):
-            leads.append("black" if np.mean(slices[i]) < mean_const else "white")
+            mini1 = slices[i][120:200,30:70]
+            mini2 = slices[i][120:200,130:170]
+            leads.append("black" if (np.mean(mini1)+np.mean(mini2))/2 < mean_const else "white")
 
 
         ignore_mask = process_borders(slices, borders, leads)
