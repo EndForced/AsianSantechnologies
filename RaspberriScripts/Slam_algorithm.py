@@ -1,11 +1,12 @@
-#тут типо жоски слем алгоритме
+# тут типо жоски слем алгоритме
 import sys, os, platform, math
 
 import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
-from CvProcessing.CellDetector import fix_perspective, analyze_frame,tile_to_code, replace_with_nearest_color
+from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code, replace_with_nearest_color
 
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
@@ -15,34 +16,37 @@ import base64
 if platform.system() == "Windows":
     class WebsiteHolder:
         pass
+
+
     serial = None
 
 if platform.system() == "Linux":
     from StreamVideo import WebsiteHolder
     import serial
+
     serial = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
 
-#ты ему клетки со фрейма, а он тебе все остальное
+
+# ты ему клетки со фрейма, а он тебе все остальное
 class MainComputer(VisualizePaths, WebsiteHolder):
     def __init__(self, matrix, serial_p):
 
         if not matrix:
-            matrix = [[0]*15]*15
+            matrix = [[0] * 15] * 15
 
-        VisualizePaths.__init__(self,matrix)
+        VisualizePaths.__init__(self, matrix)
 
         if self.OS == "Linux":
-            WebsiteHolder.__init__(self,serial_p)
+            WebsiteHolder.__init__(self, serial_p)
 
     def send_map(self):
-        #pozdno pozdno pozdno noch'u
+        # pozdno pozdno pozdno noch'u
         if self.resizedPicture is None:
             print("FAIL: No image to send")
             return
 
         if self.resizedPicture.dtype == 'uint16':
             self.resizedPicture = (self.resizedPicture // 257).astype('uint8')
-
 
         quality = max(0, min(100, self.robot.mapQuality))
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
@@ -82,7 +86,17 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
                 for j in tubes_cords:
                     # if math.dist(j, path[i][-1]) <= 1 and j not in used_tubes: print(123)
-                    if math.dist(j, path[i][-1]) <= 1 and j not in used_tubes and ((np.array(self._matrix)[path[i][-1]] in [20, 31,32,33,34] and np.array(self._matrix)[j] in [51,52]) or (np.array(self._matrix)[path[i][-1]] in [10, 31,32,33,34] and np.array(self._matrix)[j] in [41,42]) ):
+                    if math.dist(j, path[i][-1]) <= 1 and j not in used_tubes and ((np.array(self._matrix)[
+                                                                                        path[i][-1]] in [20, 31, 32, 33,
+                                                                                                         34] and
+                                                                                    np.array(self._matrix)[j] in [51,
+                                                                                                                  52]) or (
+                                                                                           np.array(self._matrix)[
+                                                                                               path[i][-1]] in [10, 31,
+                                                                                                                32, 33,
+                                                                                                                34] and
+                                                                                           np.array(self._matrix)[
+                                                                                               j] in [41, 42])):
                         cell_with_tube = j
                         used_tubes.append(j)
                         break
@@ -117,7 +131,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
                        "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
 
         moves = self.solve()
-        unload_type = self.detect_unload_type(moves[-1][-1]) #тип разгрузки, сторона с трубами
+        unload_type = self.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
         moves = self.way_to_commands(moves, "U")
 
         if unload_type[1] != moves[1]:
@@ -132,22 +146,22 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.drive_through_roadmap(moves[0])
 
     def insert(self, cells):
-        #josko insert
+        # josko insert
         matrix = self._matrix
-        y,x  = self.robot.Position
+        y, x = self.robot.Position
         direction = self.robot.Orientation
 
         new_matrix = [row.copy() for row in matrix]
 
         # Сначала вычисляем базовые координаты с учетом смещения вверх
         if direction == 'U':
-            base_x, base_y = x , y - 1  # Смещаем на 1 вверх и влево
+            base_x, base_y = x, y - 1  # Смещаем на 1 вверх и влево
         elif direction == 'D':
             base_x, base_y = x, y + 1  # Смещаем на 1 вниз
         elif direction == 'L':
             base_x, base_y = x - 1, y  # Смещаем на 1 влево
         elif direction == 'R':
-            base_x, base_y = x + 1, y - 1 # Смещаем на 1 вправо
+            base_x, base_y = x + 1, y - 1  # Смещаем на 1 вправо
         else:
             raise ValueError("Неправильное направление")
 
@@ -199,7 +213,7 @@ if __name__ == "__main__":
     if mc.OS == "Linux":
         mc.start_website()
         mc.robot.Orientation = "U"
-        mc.robot.Position = (8,8)
+        mc.robot.Position = (8, 8)
 
         time.sleep(3)
         tiles = {}
@@ -213,23 +227,20 @@ if __name__ == "__main__":
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
-            frame= fix_perspective(frame)
+            frame = fix_perspective(frame)
             cv2.imwrite("Warped.png", frame)
             frame, slices, borders = analyze_frame(frame, 1)
 
             for key, item in slices.items():
                 if str(item) != "unr":
-                    tiles[key+1] = int(tile_to_code(slices[key]))
+                    tiles[key + 1] = int(tile_to_code(slices[key]))
                     cv2.imwrite(f"{key}.png", item)
 
                 else:
                     tiles[key + 1] = "unr"
 
-
             mc._matrix = mc.insert(tiles)
             map = mc.update_matrix()
-
-
 
             mc.robot.set_frame(frame)
             mc.send_map()
@@ -240,17 +251,15 @@ if __name__ == "__main__":
                 if str(item) != "unr":
                     # print(tile_to_code(item))
                     cv2.imwrite(f"{c}.png", item)
-                    c+=1
+                    c += 1
                     print(c)
             #
-
-
 
             print(mc.robot.Position)
             print(mc.robot.Orientation)
             print(tiles)
             print(np.array(mc._matrix))
-            print("floor:",mc.floor)
+            print("floor:", mc.floor)
             _ = input()
             mc.robot.do(_)
         # mc.qualifiction()
@@ -269,9 +278,9 @@ if __name__ == "__main__":
         #     pass
     else:
         # print(type(res))
-        #frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
-        #mc.robot.set_frame(frames[0])...
-        #mc.send_map() no args!
+        # frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
+        # mc.robot.set_frame(frames[0])...
+        # mc.send_map() no args!
 
         # print(MainComputer.__mro__)
         # while 1:
@@ -309,8 +318,8 @@ if __name__ == "__main__":
         # mc.show()
         print(MainComputer.__mro__)
         mc.robot.Orientation = "U"
-        mat = [[0]*15]*15
-        cells = {1:20, 2:20, 3:"unr", 4:"unr"}
+        mat = [[0] * 15] * 15
+        cells = {1: 20, 2: 20, 3: "unr", 4: "unr"}
         mat = mc.insert(cells)
         pos = mc.robot.Position
         mc._matrix[pos[0]][pos[1]] = 71

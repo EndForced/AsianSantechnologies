@@ -122,6 +122,7 @@ def check_for_borders(frame, cam_num):
     if cam_num == 1:
         # front close
         fr = frame[580:680, 360:740]
+        fr = cv2.cvtColor(fr,cv2.COLOR_BGR2HSV)
         width = fr.shape[1]
         _, __, w, h = search_for_color(fr, "Red1", min_area=20)
         print(w, "fc")
@@ -131,6 +132,7 @@ def check_for_borders(frame, cam_num):
 
         # front far
         fr = frame[260:330, -450:-100]
+        fr = cv2.cvtColor(fr,cv2.COLOR_BGR2HSV)
         width = fr.shape[1]
         # cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
         _, __, w, h = search_for_color(fr, "Red1", min_area=20)
