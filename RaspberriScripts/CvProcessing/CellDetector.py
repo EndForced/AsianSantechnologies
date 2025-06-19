@@ -137,7 +137,7 @@ def check_for_borders(frame, cam_num):
 
         # side close
         # fr = frame[100:550, 300:400]
-        # red_count_side = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
+        # red_count_side = count_pixels(fr, hgsw_red[0], hsw_red[1])[0]
         # print(red_count_side, "sc")
         # if red_count_side > 5000:
         #     found.append("sc")
@@ -388,7 +388,7 @@ def analyze_frame(frame, floor):
     if floor == 1:
         slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
         borders, frame = check_for_borders(frame, 1)
-        cv2.rectangle(result_frame, (390, 610), (740, 650), (100, 0, 200), 3)
+        cv2.rectangle(result_frame, (360, 580), (740, 680), (100, 0, 200), 3)
 
         leads = []
         for i in range(4):
