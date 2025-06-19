@@ -115,21 +115,21 @@ def check_for_borders(frame, cam_num):
         fr = frame[-70:-30, :]
         red_count_close = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
         if red_count_close > 5000:
-            # print(red_count_close)
+            print(red_count_close, "fc")
             found.append("fc")
 
         # front far
         fr = frame[260:330, :]
         red_count_far = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
         if red_count_far > 1500:
-            # print(red_count_far)
+            print(red_count_far, "ff")
             found.append("ff")
 
         #side close
         if "fc" not in found:
             fr = frame[:, 300:400]
             red_count_side = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
-            # print(red_count_side)
+            print(red_count_side, "sc")
             if red_count_side > 1500:
                 found.append("sc")
     return found
