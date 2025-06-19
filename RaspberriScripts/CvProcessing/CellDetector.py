@@ -225,7 +225,9 @@ def tile_to_code(frame):
             return 33 if delta_x < 0 else 31
 
     # Определение высоты
-    elevation = 1 if np.mean(frame_blur) > 150 else 2
+    mini1 = frame_blur[120:200, 30:70]
+    mini2 = frame_blur[120:200, 130:170]
+    elevation = 1 if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else 2
 
     # Поиск красных труб
     x, y, h, w = search_for_color(hsv, "Red")
@@ -266,53 +268,6 @@ def process_borders(slices, borders, leads):
             ignore_mask[i] = True
 
     return ignore_mask
-
-
-from scipy import ndimage
-
-# Определяем известные цвета в формате BGR (как использует OpenCV)
-known_colors = {
-    "Red": [
-        np.array([172, 0, 0]),  # BGR для первого диапазона Red
-        np.array([255, 22, 22])  # BGR для второго диапазона Red
-    ],
-    "Gray": [
-        np.array([80, 100, 150]),  # BGR для первого диапазона Gray
-        np.array([255, 255, 180])  # BGR для второго диапазона Gray
-    ],
-    "Green": [
-        np.array([163, 161, 72]),  # BGR для первого диапазона Green
-        np.array([196, 255, 85])  # BGR для второго диапазона Green
-    ],
-    "Blue": [
-        np.array([90, 90, 110]),  # BGR для первого диапазона Blue
-        np.array([255, 255, 140])  # BGR для второго диапазона Blue
-    ],
-    "Black": [
-        np.array([68, 61, 75]),  # BGR для первого диапазона Black
-        np.array([38, 40, 142])  # BGR для второго диапазона Black
-    ],
-    "White": np.array([255, 255, 255])  # Добавляем белый цвет
-}
-
-# Создаем список всех эталонных цветов для поиска ближайшего
-reference_colors = []
-color_names = []
-
-from sklearn.neighbors import KDTree
-
-for name, colors in known_colors.items():
-    if name == "White":
-        reference_colors.append(colors)
-        color_names.append(name)
-    else:
-        for color in colors:
-            reference_colors.append(color)
-            color_names.append(name)
-
-# Преобразуем в массив numpy и строим KD-дерево для быстрого поиска
-ref_array = np.array(reference_colors)
-kdtree = KDTree(ref_array)
 
 
 def remove_small_areas(image, min_area=500):
