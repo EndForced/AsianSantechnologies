@@ -205,7 +205,7 @@ if __name__ == "__main__":
         tiles = {}
         mc._matrix[8][8] = 10 if int(mc.robot.do("MyFloor")[0]) == 1 else 20
         print("mat", mc._matrix)
-        # c = 0
+        c = 0
         while 1:
             mc.floor = int(mc.robot.do("MyFloor")[0])
             frame = mc.robot.get_uncompressed_frames(0)[1]
@@ -235,13 +235,13 @@ if __name__ == "__main__":
             # cv2.imwrite("warped.png", frame)
             # time.sleep(0.2)
             # mc.robot.set_frame(frame)
-            # for key, item in slices.items():
-            #     if str(item) != "unr":
-            #         print(tile_to_code(item))
-            #         cv2.imwrite(f"{c}.png", item)
-            #         # c+=1
-            #         # print(c)
-            # #
+            for key, item in slices.items():
+                if str(item) != "unr":
+                    # print(tile_to_code(item))
+                    cv2.imwrite(f"{c}.png", item)
+                    c+=1
+                    print(c)
+            #
 
 
 
