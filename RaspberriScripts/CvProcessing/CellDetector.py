@@ -37,7 +37,7 @@ mean_const = 160
 COLOR_RANGES = {
     "Red": [np.array([0, 90, 172]), np.array([22, 255, 255]),
             np.array([150, 100, 80]), np.array([180, 255, 255])],
-    "Red1": [np.array([0, 50, 50]), np.array([180, 255, 255]),
+    "Red1": [np.array([0, 50, 90]), np.array([180, 255, 255]),
              np.array([150, 90, 50]), np.array([180, 255, 255])],
     "Green": (np.array([72, 161, 163]), np.array([85, 255, 196])),
     "Blue": (np.array([110, 90, 90]), np.array([140, 255, 255]))
@@ -125,7 +125,7 @@ def check_for_borders(frame, cam_num):
         width = fr.shape[1]
         _, __, w, h = search_for_color(fr, "Red1", min_area=20)
         print(w, "fc")
-        if w > 0.4 * width:
+        if w > 0.5 * width:
             print(w, "fc")
             found.append("fc")
 
@@ -135,7 +135,7 @@ def check_for_borders(frame, cam_num):
         # cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
         _, __, w, h = search_for_color(fr, "Red1", min_area=20)
         print(w, "ff")
-        if w > 0.4 * width:
+        if w > 0.5 * width:
             print(w, "ff")
             found.append("ff")
 
