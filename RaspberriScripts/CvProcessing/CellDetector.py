@@ -31,11 +31,6 @@ cam1floor1 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1
 cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1f'], zones['first_left1f'],
               zones['first_right2c'], zones['first_left2_c'], zones['first_right2f'], zones['first_left2f']]
 
-
-hsw_red = [
-        np.array([0, 90,9]),  # BGR для первого диапазона Red
-        np.array([57, 250, 180])  # BGR для второго диапазона Red
-    ]
 mean_const = 160
 
 
@@ -124,7 +119,7 @@ def check_for_borders(frame, cam_num):
     if cam_num == 1:
         # front close
         fr = frame[-70:-30,-450:-100:]
-        red_count_close = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
+        red_count_close = count_pixels(fr, COLOR_RANGES["Red"][0], COLOR_RANGES["Red"][1])[0]
         # cv2.imshow("p", fr)
         # cv2.waitKey(0)
         print(red_count_close, "rclose")
@@ -134,7 +129,7 @@ def check_for_borders(frame, cam_num):
 
         # front far
         fr = frame[260:330,-450:-100]
-        red_count_far = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
+        red_count_far = count_pixels(fr, COLOR_RANGES["Red"][0], COLOR_RANGES["Red"][1])[0]
         if red_count_far > 1500:
             print(red_count_far, "ff")
             # cv2.imshow("p", fr)
