@@ -279,8 +279,8 @@ def analyze_frame(frame, floor):
 
     borders, frame = check_for_borders(frame, 1)
 
-    cv2.rectangle(result_frame, (-450, 260), (-100, 330), (100, 0, 200), 3)
-    cv2.rectangle(result_frame, (360, 580), (740, 680), (100, 0, 200), 3)
+    cv2.rectangle(result_frame, (780-450, 260), (680, 330), (100, 0, 200), 2)
+    cv2.rectangle(result_frame, (360, 580), (740, 680), (100, 0, 200), 2)
 
     leads = []
     for i in range(4):
@@ -294,12 +294,19 @@ def analyze_frame(frame, floor):
         if ignore_mask[i]:
             dict_of_slices[i] = "unr"
             continue
-
-        if leads[i] == "white":
-            result_frame = draw_on_image(result_frame, cam1floor1[i])
-            dict_of_slices[i] = slices[i]
-        else:
-            result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
-            dict_of_slices[i] = slices[i + 4]
+        if floor == 1:
+            if leads[i] == "white":
+                result_frame = draw_on_image(result_frame, cam1floor1[i])
+                dict_of_slices[i] = slices[i]
+            else:
+                result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
+                dict_of_slices[i] = slices[i + 4]
+        elif floor == 2:
+            if leads[i] == "white":
+                result_frame = draw_on_image(result_frame, cam1floor2[i])
+                dict_of_slices[i] = slices[i]
+            else:
+                result_frame = draw_on_image(result_frame, cam1floor2[i + 4], color=(0, 0, 255))
+                dict_of_slices[i] = slices[i + 4]
 
     return result_frame, dict_of_slices, borders
