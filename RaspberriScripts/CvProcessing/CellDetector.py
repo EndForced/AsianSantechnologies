@@ -244,10 +244,10 @@ def process_borders(slices, borders, leads):
             ignore_mask[i] = True
 
         # ignore black behind white
-        if i == 2 and leads[0] == "black" and tile_to_code(slices[0]) // 10 != 3:
+        if i == 2 and leads[0] == "black" and tile_to_code(slices[0]) == 31:
             ignore_mask[i] = True
 
-        if i == 3 and leads[1] == "black" and tile_to_code(slices[1]) // 10 != 3:
+        if i == 3 and leads[1] == "black" and tile_to_code(slices[1]) == 31:
             ignore_mask[i] = True
 
     return ignore_mask
