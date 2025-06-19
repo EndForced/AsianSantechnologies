@@ -204,6 +204,7 @@ if __name__ == "__main__":
         time.sleep(3)
         tiles = {}
         mc._matrix[8][8] = 71 if int(mc.robot.do("MyFloor")[0]) == 1 else 81
+        print("mat", mc._matrix)
         # c = 0
         while 1:
             mc.floor = int(mc.robot.do("MyFloor")[0])
