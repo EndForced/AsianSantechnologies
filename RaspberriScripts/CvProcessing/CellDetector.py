@@ -258,6 +258,64 @@ def process_borders(slices, borders, leads):
 
     return ignore_mask
 
+
+
+from sklearn.neighbors import KDTree
+
+# Определяем известные цвета в формате BGR (как использует OpenCV)
+known_colors = {
+    "Red": [
+        np.array([172, 0, 0]),  # BGR для первого диапазона Red
+        np.array([255, 22, 22])  # BGR для второго диапазона Red
+    ],
+    "Gray": [
+        np.array([80, 100, 150]),  # BGR для первого диапазона Gray
+        np.array([255, 255, 180])  # BGR для второго диапазона Gray
+    ],
+    "Green": [
+        np.array([163, 161, 72]),  # BGR для первого диапазона Green
+        np.array([196, 255, 85])  # BGR для второго диапазона Green
+    ],
+    "Blue": [
+        np.array([90, 90, 110]),  # BGR для первого диапазона Blue
+        np.array([255, 255, 140])  # BGR для второго диапазона Blue
+    ],
+    "Black": [
+        np.array([68, 61, 75]),  # BGR для первого диапазона Black
+        np.array([38, 40, 142])  # BGR для второго диапазона Black
+    ]
+}
+
+reference_colors = []
+color_names = []
+
+for name, colors in known_colors.items():
+    for color in colors:
+        reference_colors.append(color)
+        color_names.append(name)
+
+ref_array = np.array(reference_colors)
+kdtree = KDTree(ref_array)
+
+
+def replace_with_nearest_color(image):
+    # Получаем размеры изображения
+    height, width, _ = image.shape
+
+    # Преобразуем изображение в массив пикселей
+    pixels = image.reshape(-1, 3)
+
+    # Находим ближайшие известные цвета для всех пикселей
+    _, indices = kdtree.query(pixels, k=1)
+
+    # Заменяем цвета пикселей на ближайшие известные
+    replaced_pixels = ref_array[indices.flatten()]
+
+    # Восстанавливаем форму изображения
+    result_image = replaced_pixels.reshape(height, width, 3)
+
+    return result_image.astype(np.uint8)
+
 def analyze_frame(frame, floor):
     #я пытался делать модульный код (вроде работает)
     result_frame = frame.copy()

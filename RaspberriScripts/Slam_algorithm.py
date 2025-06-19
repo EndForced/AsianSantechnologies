@@ -5,7 +5,7 @@ import numpy as np
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
-from CvProcessing.CellDetector import fix_perspective, analyze_frame,tile_to_code
+from CvProcessing.CellDetector import fix_perspective, analyze_frame,tile_to_code, replace_with_nearest_color
 
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
@@ -209,6 +209,7 @@ if __name__ == "__main__":
         while 1:
             mc.floor = int(mc.robot.do("MyFloor")[0])
             frame = mc.robot.get_uncompressed_frames(0)[1]
+            frame = replace_with_nearest_color(frame)
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
