@@ -121,8 +121,9 @@ class RobotAPI:
                         elif self.Orientation == "R":
                             self.Position = (x, y + 1)
                         elif self.Orientation == "L":
+                            print(self.Position, "mycord")
                             self.Position = (x, y - 1)
-                            print(self.Position)
+
 
 
 
