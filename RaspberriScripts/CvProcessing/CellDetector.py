@@ -205,7 +205,7 @@ def tile_to_code(frame):
     hsv = cv2.cvtColor(frame_blur, cv2.COLOR_BGR2HSV)
 
     # Поиск зеленых труб
-    x, y, h, w = search_for_color(hsv, "Green")
+    x, y, w, h = search_for_color(hsv, "Green")
     if h * w:
         if w > h:
             return 61 if (y + h / 2) > 50 else 63
