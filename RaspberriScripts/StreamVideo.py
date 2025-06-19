@@ -119,9 +119,9 @@ class RobotAPI:
                         elif self.Orientation == "D":
                             self.Position = (x - 1, y)
                         elif self.Orientation == "R":
-                            self.Position = (x, y - 1)
-                        elif self.Orientation == "L":
                             self.Position = (x, y + 1)
+                        elif self.Orientation == "L":
+                            self.Position = (x, y - 1)
 
 
 
