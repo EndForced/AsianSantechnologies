@@ -32,7 +32,7 @@ cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1
               zones['first_right2c'], zones['first_left2_c'], zones['first_right2f'], zones['first_left2f']]
 
 
-hsw_red = [(5, 83, 180), (179, 255, 254)]
+hsw_red = [(0, 0, 172), (23, 255, 255)]
 mean_const = 160
 
 
@@ -114,19 +114,22 @@ def check_for_borders(frame, cam_num):
         # front close
         fr = frame[-70:-30, :]
         red_count_close = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
-        if red_count_close > 2000:
+        if red_count_close > 5000:
+            # print(red_count_close)
             found.append("fc")
 
         # front far
         fr = frame[260:330, :]
         red_count_far = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
         if red_count_far > 1500:
+            # print(red_count_far)
             found.append("ff")
 
         #side close
         if "fc" not in found:
             fr = frame[:, 300:400]
             red_count_side = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
+            # print(red_count_side)
             if red_count_side > 1500:
                 found.append("sc")
     return found

@@ -1,9 +1,4 @@
-# import cv2
-# a = cv2.imread("Warped.png")
-# a = a[:,300:400]
-# cv2.imshow("a",a)
-# cv2.waitKey(0)
-# cv2.imwrite("border.png", a)
+
 
 import cv2
 import numpy as np
@@ -26,11 +21,9 @@ cv2.createTrackbar('S_max', 'HSV Mask Tuner', initial_values['S_max'], 255, lamb
 cv2.createTrackbar('V_min', 'HSV Mask Tuner', initial_values['V_min'], 255, lambda x: None)
 cv2.createTrackbar('V_max', 'HSV Mask Tuner', initial_values['V_max'], 255, lambda x: None)
 
-# Захват видео с камеры (или загрузка видеофайла)
-cap = cv2.imread("border.png")  # 0 - первая камера, или укажите путь к видео
 
 while True:
-    frame = cv2.imread("border.png")
+    frame = cv2.imread("Warped.png")
 
 
     # Получаем текущие значения ползунков
