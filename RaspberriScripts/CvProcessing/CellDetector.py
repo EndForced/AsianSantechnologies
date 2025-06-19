@@ -32,7 +32,10 @@ cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1
               zones['first_right2c'], zones['first_left2_c'], zones['first_right2f'], zones['first_left2f']]
 
 
-hsw_red = [(0, 0, 172), (23, 255, 255)]
+hsw_red = [
+        np.array([0, 90,9]),  # BGR для первого диапазона Red
+        np.array([57, 250, 180])  # BGR для второго диапазона Red
+    ]
 mean_const = 160
 
 
@@ -260,8 +263,7 @@ def process_borders(slices, borders, leads):
     return ignore_mask
 
 
-
-from sklearn.neighbors import KDTree
+from scipy import ndimage
 
 # Определяем известные цвета в формате BGR (как использует OpenCV)
 known_colors = {
@@ -284,19 +286,66 @@ known_colors = {
     "Black": [
         np.array([68, 61, 75]),  # BGR для первого диапазона Black
         np.array([38, 40, 142])  # BGR для второго диапазона Black
-    ]
+    ],
+    "White": np.array([255, 255, 255])  # Добавляем белый цвет
 }
 
+# Создаем список всех эталонных цветов для поиска ближайшего
 reference_colors = []
 color_names = []
 
-for name, colors in known_colors.items():
-    for color in colors:
-        reference_colors.append(color)
-        color_names.append(name)
+from sklearn.neighbors import KDTree
 
+for name, colors in known_colors.items():
+    if name == "White":
+        reference_colors.append(colors)
+        color_names.append(name)
+    else:
+        for color in colors:
+            reference_colors.append(color)
+            color_names.append(name)
+
+# Преобразуем в массив numpy и строим KD-дерево для быстрого поиска
 ref_array = np.array(reference_colors)
 kdtree = KDTree(ref_array)
+
+
+def remove_small_areas(image, min_area=500):
+    """Удаляет мелкие цветные области, заменяя их на белый или черный"""
+    # Создаем маску для каждого цвета
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Маски для основных цветов (красный, зеленый, синий)
+    red_mask = cv2.inRange(hsv, np.array([0, 50, 50]), np.array([10, 255, 255])) | \
+               cv2.inRange(hsv, np.array([170, 50, 50]), np.array([180, 255, 255]))
+
+    green_mask = cv2.inRange(hsv, np.array([40, 50, 50]), np.array([80, 255, 255]))
+    blue_mask = cv2.inRange(hsv, np.array([100, 50, 50]), np.array([140, 255, 255]))
+
+    # Объединенная маска всех цветных областей
+    color_mask = red_mask | green_mask | blue_mask
+
+    # Находим связные компоненты
+    labeled, num_features = ndimage.label(color_mask)
+
+    # Для каждой компоненты проверяем размер
+    for i in range(1, num_features + 1):
+        component_mask = (labeled == i)
+        area = np.sum(component_mask)
+
+        if area < min_area:
+            # Определяем средний цвет области
+            mean_color = np.mean(image[component_mask], axis=0)
+
+            # Определяем, ближе к белому или черному
+            dist_white = np.linalg.norm(mean_color - known_colors["White"])
+            dist_black = np.linalg.norm(mean_color - known_colors["Black"][0])
+
+            # Заменяем на ближайший
+            replacement = known_colors["White"] if dist_white < dist_black else known_colors["Black"][0]
+            image[component_mask] = replacement
+
+    return image
 
 
 def replace_with_nearest_color(image):
@@ -316,6 +365,20 @@ def replace_with_nearest_color(image):
     result_image = replaced_pixels.reshape(height, width, 3)
 
     return result_image.astype(np.uint8)
+
+
+def process_image(image, min_area=500):
+    """Полный процесс обработки изображения"""
+    # Загружаем изображение
+
+    if image is not None:
+        # 1. Заменяем цвета на ближайшие известные
+        result = replace_with_nearest_color(image)
+
+        # 2. Удаляем мелкие цветные области (блики)
+        result = remove_small_areas(result, min_area)
+
+        return result
 
 def analyze_frame(frame, floor):
     #я пытался делать модульный код (вроде работает)
