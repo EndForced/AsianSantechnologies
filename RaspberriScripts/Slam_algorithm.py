@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 
-from cv_base import edge_to_matrix
+from cv import edge_to_matrix
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
