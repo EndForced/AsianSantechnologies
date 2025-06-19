@@ -228,7 +228,7 @@ def tile_to_code(frame):
     # Поиск красных труб
     x, y, w, h = search_for_color(hsv, "Red")
     if h * w:
-        return 31 + elevation * 10 if h / w > 1.2 else 32 + elevation * 10
+        return 32 + elevation * 10 if h / w > 1.2 else 31 + elevation * 10
 
     return elevation * 10
 
