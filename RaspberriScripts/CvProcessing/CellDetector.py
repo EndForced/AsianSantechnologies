@@ -154,8 +154,8 @@ def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
 
 
 COLOR_RANGES = {
-    "Red": [(np.array([0, 0, 172]), np.array([22, 255, 255])),
-        (np.array([150, 100, 80]), np.array([180, 255, 255]))],
+    "Red": [np.array([0, 0, 172]), np.array([22, 255, 255]),
+        np.array([150, 100, 80]), np.array([180, 255, 255])],
     "Green": (np.array([72, 161, 163]), np.array([85, 255, 196])),
     "Blue": (np.array([110, 90, 90]), np.array([140, 255, 255]))
 }
