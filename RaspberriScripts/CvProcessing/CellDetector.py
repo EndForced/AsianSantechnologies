@@ -227,7 +227,7 @@ def tile_to_code(frame):
     # Определение высоты
     mini1 = frame_blur[120:200, 30:70]
     mini2 = frame_blur[120:200, 130:170]
-    elevation = 1 if ((np.mean(mini1) + np.mean(mini2)) / 2) < 150 else 2
+    elevation = 1 if ((np.mean(mini1) + np.mean(mini2)) / 2) > 150 else 2
 
     # Поиск красных труб
     x, y, h, w = search_for_color(hsv, "Red")
@@ -268,63 +268,6 @@ def process_borders(slices, borders, leads):
             ignore_mask[i] = True
 
     return ignore_mask
-
-
-def remove_small_areas(image, min_area=500):
-    """Удаляет мелкие цветные области, заменяя их на белый или черный"""
-    # Создаем маску для каждого цвета
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-    # Маски для основных цветов (красный, зеленый, синий)
-    red_mask = cv2.inRange(hsv, np.array([0, 50, 50]), np.array([10, 255, 255])) | \
-               cv2.inRange(hsv, np.array([170, 50, 50]), np.array([180, 255, 255]))
-
-    green_mask = cv2.inRange(hsv, np.array([40, 50, 50]), np.array([80, 255, 255]))
-    blue_mask = cv2.inRange(hsv, np.array([100, 50, 50]), np.array([140, 255, 255]))
-
-    # Объединенная маска всех цветных областей
-    color_mask = red_mask | green_mask | blue_mask
-
-    # Находим связные компоненты
-    labeled, num_features = ndimage.label(color_mask)
-
-    # Для каждой компоненты проверяем размер
-    for i in range(1, num_features + 1):
-        component_mask = (labeled == i)
-        area = np.sum(component_mask)
-
-        if area < min_area:
-            # Определяем средний цвет области
-            mean_color = np.mean(image[component_mask], axis=0)
-
-            # Определяем, ближе к белому или черному
-            dist_white = np.linalg.norm(mean_color - known_colors["White"])
-            dist_black = np.linalg.norm(mean_color - known_colors["Black"][0])
-
-            # Заменяем на ближайший
-            replacement = known_colors["White"] if dist_white < dist_black else known_colors["Black"][0]
-            image[component_mask] = replacement
-
-    return image
-
-
-def replace_with_nearest_color(image):
-    # Получаем размеры изображения
-    height, width, _ = image.shape
-
-    # Преобразуем изображение в массив пикселей
-    pixels = image.reshape(-1, 3)
-
-    # Находим ближайшие известные цвета для всех пикселей
-    _, indices = kdtree.query(pixels, k=1)
-
-    # Заменяем цвета пикселей на ближайшие известные
-    replaced_pixels = ref_array[indices.flatten()]
-
-    # Восстанавливаем форму изображения
-    result_image = replaced_pixels.reshape(height, width, 3)
-
-    return result_image.astype(np.uint8)
 
 
 def process_image(image, min_area=500):
