@@ -213,9 +213,9 @@ def tile_to_code(frame):
             return 62 if (x + w / 2) > 100 else 64
 
     # Поиск синих объектов (рампа)
-    xb, yb, hb, wb = search_for_color(hsv, "Blue")
+    xb, yb, wb, hb = search_for_color(hsv, "Blue")
     if hb * wb:
-        xr, yr, hr, wr = search_for_color(hsv, "Red")
+        xr, yr, wr, hr = search_for_color(hsv, "Red")
         delta_x = xb - xr
         delta_y = yb - yr
 
@@ -230,7 +230,7 @@ def tile_to_code(frame):
     elevation = 1 if ((np.mean(mini1) + np.mean(mini2)) / 2) > 150 else 2
 
     # Поиск красных труб
-    x, y, h, w = search_for_color(hsv, "Red")
+    x, y, w, h = search_for_color(hsv, "Red")
     if h * w:
         return 31 + elevation * 10 if h / w > 1.2 else 32 + elevation * 10
 
