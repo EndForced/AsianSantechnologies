@@ -209,7 +209,7 @@ if __name__ == "__main__":
         while 1:
             mc.floor = int(mc.robot.do("MyFloor")[0])
             frame = mc.robot.get_uncompressed_frames(0)[1]
-            # frame = replace_with_nearest_color(frame)
+            frame = replace_with_nearest_color(frame)
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
