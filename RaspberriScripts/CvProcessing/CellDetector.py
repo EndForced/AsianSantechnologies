@@ -121,7 +121,6 @@ def check_for_borders(frame, cam_num):
         # front close
         fr = frame[610:650, 390:740]
         width = fr.shape[1]
-        cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
         _, __, w, h = search_for_color(fr, "Red")
         if w > 0.8 * width:
             print(w, "fc")
@@ -389,6 +388,7 @@ def analyze_frame(frame, floor):
     if floor == 1:
         slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
         borders, frame = check_for_borders(frame, 1)
+        cv2.rectangle(result_frame, (390, 610), (740, 650), (100, 0, 200), 3)
 
         leads = []
         for i in range(4):
