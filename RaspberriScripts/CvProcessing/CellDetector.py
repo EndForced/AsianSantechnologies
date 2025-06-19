@@ -37,6 +37,8 @@ mean_const = 160
 COLOR_RANGES = {
     "Red": [np.array([0, 90, 172]), np.array([22, 255, 255]),
             np.array([150, 100, 80]), np.array([180, 255, 255])],
+    "Red1": [np.array([0, 90, 90]), np.array([22, 255, 255]),
+             np.array([150, 100, 80]), np.array([180, 255, 255])],
     "Green": (np.array([72, 161, 163]), np.array([85, 255, 196])),
     "Blue": (np.array([110, 90, 90]), np.array([140, 255, 255]))
 }
@@ -168,7 +170,7 @@ def search_for_color(frame, color, min_area=50):
         raise ValueError(f"Unknown color: {color}")
 
     frame_height, frame_width = frame.shape[:2]
-    if color == "Red":
+    if color == "Red" or "Red1" == color:
         frame = frame[int(frame_height * 0.1):int(frame_height * 0.9),
                 int(frame_width * 0.1):int(frame_width * 0.9)]
         lower1, upper1, lower2, upper2 = COLOR_RANGES[color]
