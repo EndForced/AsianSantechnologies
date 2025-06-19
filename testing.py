@@ -23,7 +23,7 @@ cv2.createTrackbar('V_max', 'HSV Mask Tuner', initial_values['V_max'], 255, lamb
 
 
 while True:
-    frame = cv2.imread("Warped.png")
+    frame = cv2.imread("border.png")
 
 
     # Получаем текущие значения ползунков
