@@ -270,20 +270,6 @@ def process_borders(slices, borders, leads):
     return ignore_mask
 
 
-def process_image(image, min_area=500):
-    """Полный процесс обработки изображения"""
-    # Загружаем изображение
-
-    if image is not None:
-        # 1. Заменяем цвета на ближайшие известные
-        result = replace_with_nearest_color(image)
-
-        # 2. Удаляем мелкие цветные области (блики)
-        result = remove_small_areas(result, min_area)
-
-        return result
-
-
 def analyze_frame(frame, floor):
     # я пытался делать модульный код (вроде работает)
     result_frame = frame.copy()
