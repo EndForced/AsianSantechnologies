@@ -233,7 +233,7 @@ def tile_to_code(frame):
     return elevation * 10
 
 
-def process_borders(slices, borders, leads):
+def process_borders(slices, borders, leads, floor):
     ignore_mask = {i: False for i in range(4)}  # Инициализируем маску
 
     border_flags = {
@@ -252,16 +252,15 @@ def process_borders(slices, borders, leads):
         if (i == 2 or i == 3) and border_flags['ff']:
             ignore_mask[i] = True
 
-        # side close
-        if (i == 1 or i == 3) and border_flags['sc']:
-            ignore_mask[i] = True
+        if floor == 1:
+            # ignore  behind white
+            if i == 2 and tile_to_code(slices[0]) != 31:
+                ignore_mask[i] = True
 
-        # ignore black behind white
-        if i == 2 and leads[0] == "black" and tile_to_code(slices[0]) != 31:
-            ignore_mask[i] = True
+            if i == 3 and tile_to_code(slices[1]) != 31:
+                ignore_mask[i] = True
+        # elif floor == 2:
 
-        if i == 3 and leads[1] == "black" and tile_to_code(slices[1]) != 31:
-            ignore_mask[i] = True
 
     return ignore_mask
 
@@ -279,7 +278,7 @@ def analyze_frame(frame, floor):
 
     borders, frame = check_for_borders(frame, 1)
 
-    cv2.rectangle(result_frame, (780-450, 260), (680, 330), (100, 0, 200), 2)
+    cv2.rectangle(result_frame, (780 - 450, 260), (680, 330), (100, 0, 200), 2)
     cv2.rectangle(result_frame, (360, 580), (740, 680), (100, 0, 200), 2)
 
     leads = []
