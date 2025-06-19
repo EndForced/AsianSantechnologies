@@ -127,7 +127,7 @@ def check_for_borders(frame, cam_num):
         print(w, "fc")
         if w > 0.4 * width:
             print(w, "fc")
-            found.append("fc")
+            found.append("ff")
 
         # front far
         fr = frame[260:330, -450:-100]
@@ -137,7 +137,7 @@ def check_for_borders(frame, cam_num):
         print(w, "ff")
         if w > 0.4 * width:
             print(w, "ff")
-            found.append("ff")
+            found.append("fc")
 
         # side close
         # fr = frame[100:550, 300:400]
