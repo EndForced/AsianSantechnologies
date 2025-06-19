@@ -227,7 +227,7 @@ def tile_to_code(frame):
     # Определение высоты
     mini1 = frame_blur[120:200, 30:70]
     mini2 = frame_blur[120:200, 130:170]
-    elevation = 1 if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else 2
+    elevation = 1 if ((np.mean(mini1) + np.mean(mini2)) / 2) < 150 else 2
 
     # Поиск красных труб
     x, y, h, w = search_for_color(hsv, "Red")
