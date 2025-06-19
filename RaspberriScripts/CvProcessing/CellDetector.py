@@ -116,6 +116,7 @@ def check_for_borders(frame, cam_num):
         red_count_close = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
         # cv2.imshow("p", fr)
         # cv2.waitKey(0)
+        print(red_count_close, "rclose")
         if red_count_close > 3000:
             print(red_count_close, "fc")
             found.append("fc")
