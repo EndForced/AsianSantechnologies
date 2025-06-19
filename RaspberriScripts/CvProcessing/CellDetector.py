@@ -114,15 +114,19 @@ def check_for_borders(frame, cam_num):
         # front close
         fr = frame[-70:-30,-450:-100:]
         red_count_close = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
+        # cv2.imshow("p", fr)
+        # cv2.waitKey(0)
         if red_count_close > 10000:
             print(red_count_close, "fc")
             found.append("fc")
 
         # front far
-        fr = frame[260:330, :]
+        fr = frame[260:330,-450:-100]
         red_count_far = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
         if red_count_far > 1500:
             print(red_count_far, "ff")
+            # cv2.imshow("p", fr)
+            # cv2.waitKey(0)
             found.append("ff")
 
         #side close
