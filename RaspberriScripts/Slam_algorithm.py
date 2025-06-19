@@ -191,7 +191,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
 
 if __name__ == "__main__":
-    mat = [[0 for _ in range(9)] for _ in range(9)]
+    mat = [[0 for _ in range(17)] for _ in range(17)]
     mc = MainComputer(mat, serial)
     # res = mc.show()
     # print(mc.resizedPicture.dtype)
