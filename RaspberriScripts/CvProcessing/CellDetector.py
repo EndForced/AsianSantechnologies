@@ -1,8 +1,6 @@
-import cv2
-import numpy as np
-from itertools import combinations
-import sys
 import os
+import sys
+from itertools import combinations
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import cv2
@@ -122,21 +120,19 @@ def check_for_borders(frame, cam_num):
     if cam_num == 1:
         # front close
         fr = frame[580:680, 360:740]
-        fr = cv2.cvtColor(fr,cv2.COLOR_BGR2HSV)
+        fr = cv2.cvtColor(fr, cv2.COLOR_BGR2HSV)
         width = fr.shape[1]
         _, __, w, h = search_for_color(fr, "Red1", min_area=20)
-        print(w, "fc")
         if w > 0.5 * width:
             print(w, "fc")
             found.append("fc")
 
         # front far
         fr = frame[260:330, -450:-100]
-        fr = cv2.cvtColor(fr,cv2.COLOR_BGR2HSV)
+        fr = cv2.cvtColor(fr, cv2.COLOR_BGR2HSV)
         width = fr.shape[1]
         # cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
         _, __, w, h = search_for_color(fr, "Red1", min_area=20)
-        print(w, "ff")
         if w > 0.5 * width:
             print(w, "ff")
             found.append("ff")
@@ -278,27 +274,32 @@ def analyze_frame(frame, floor):
 
     if floor == 1:
         slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
-        borders, frame = check_for_borders(frame, 1)
-        cv2.rectangle(result_frame, (360, 580), (740, 680), (100, 0, 200), 3)
+    elif floor == 2:
+        slices = [cv2.resize(extract_warped(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
 
-        leads = []
-        for i in range(4):
-            mini1 = slices[i][120:200, 30:70]
-            mini2 = slices[i][120:200, 130:170]
-            leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
+    borders, frame = check_for_borders(frame, 1)
 
-        ignore_mask = process_borders(slices, borders, leads)
+    cv2.rectangle(result_frame, (-450, 260), (-100, 330), (100, 0, 200), 3)
+    cv2.rectangle(result_frame, (360, 580), (740, 680), (100, 0, 200), 3)
 
-        for i in range(4):
-            if ignore_mask[i]:
-                dict_of_slices[i] = "unr"
-                continue
+    leads = []
+    for i in range(4):
+        mini1 = slices[i][120:200, 30:70]
+        mini2 = slices[i][120:200, 130:170]
+        leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
 
-            if leads[i] == "white":
-                result_frame = draw_on_image(result_frame, cam1floor1[i])
-                dict_of_slices[i] = slices[i]
-            else:
-                result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
-                dict_of_slices[i] = slices[i + 4]
+    ignore_mask = process_borders(slices, borders, leads)
+
+    for i in range(4):
+        if ignore_mask[i]:
+            dict_of_slices[i] = "unr"
+            continue
+
+        if leads[i] == "white":
+            result_frame = draw_on_image(result_frame, cam1floor1[i])
+            dict_of_slices[i] = slices[i]
+        else:
+            result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
+            dict_of_slices[i] = slices[i + 4]
 
     return result_frame, dict_of_slices, borders
