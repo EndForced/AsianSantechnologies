@@ -125,7 +125,7 @@ def check_for_borders(frame, cam_num):
         width = fr.shape[1]
         _, __, w, h = search_for_color(fr, "Red", min_area=20)
         print(w, "fc")
-        if w > 0.6 * width:
+        if w > 0.4 * width:
             print(w, "fc")
             found.append("fc")
 
@@ -135,7 +135,7 @@ def check_for_borders(frame, cam_num):
         # cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
         _, __, w, h = search_for_color(fr, "Red", min_area=20)
         print(w, "ff")
-        if w > 0.6 * width:
+        if w > 0.4 * width:
             print(w, "ff")
             found.append("ff")
 
