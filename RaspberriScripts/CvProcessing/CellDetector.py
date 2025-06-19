@@ -27,8 +27,8 @@ zones = {
 
 cam1floor1 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1f'], zones['first_left1f'],
               zones['sec_right1c'], zones['sec_left1c'], zones['sec_fl_right1f'], zones['sec_fl_left1f']]
-cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1f'], zones['first_left1f'],
-              zones['first_right2c'], zones['first_left2_c'], zones['first_right2f'], zones['first_left2f']]
+cam1floor2 = [zones['first_right2c'], zones['first_left2c'], zones['first_right2f'], zones['first_left2f'],
+              zones['first_right1c'], zones['first_left1c'], zones['first_right1f'], zones['first_left1f']]
 
 mean_const = 160
 
