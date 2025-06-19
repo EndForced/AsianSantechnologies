@@ -36,8 +36,8 @@ hsw_red = [(5, 83, 180), (179, 255, 254)]
 mean_const = 160
 
 
-def fix_perspective(frame):
-
+def fix_perspective(img):
+    #больше констант??????????
     K = np.array(
         [
             [3.19241098e+02, 8.48447347e-02, 2.78952483e+02],
@@ -51,12 +51,6 @@ def fix_perspective(frame):
     [ 0.03454424]
 ])
 
-    # Загрузка изображения
-    img = frame
-    if img is None:
-        raise ValueError("Не удалось загрузить изображение! Проверьте путь.")
-
-    # 1. Добавляем 50-пиксельные поля вокруг изображения
     border_size = 100
     img_with_border = cv2.copyMakeBorder(
         img,
@@ -65,13 +59,11 @@ def fix_perspective(frame):
         value=(0, 0, 0)  # Черный цвет фона
     )
 
-    # 2. Обновляем параметры камеры для увеличенного изображения
     h, w = img_with_border.shape[:2]
     K_border = K.copy()
-    K_border[0, 2] += border_size  # Сдвигаем центр по x
-    K_border[1, 2] += border_size  # Сдвигаем центр по y
+    K_border[0, 2] += border_size
+    K_border[1, 2] += border_size
 
-    # 3. Устранение дисторсии
     undistorted = cv2.fisheye.undistortImage(
         img_with_border,
         K=K_border,
@@ -89,7 +81,6 @@ def extract_warped(image, points, output_size=500):
 
     points = np.array(points, dtype=np.float32)
 
-    # Находим 2 ближайшие точки
     min_dist = float('inf')
     closest_pair = None
 
@@ -154,7 +145,6 @@ def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     else:
         cv2.polylines(img, [pts], isClosed=True, color=color, thickness=thickness)
     return img
-
 
 
 COLOR_RANGES = {
@@ -261,7 +251,6 @@ def process_borders(slices, borders, leads):
             ignore_mask[i] = True
 
     return ignore_mask
-
 
 def analyze_frame(frame, floor):
     #я пытался делать модульный код (вроде работает)

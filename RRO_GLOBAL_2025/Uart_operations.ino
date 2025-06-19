@@ -1,4 +1,4 @@
-const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "Servo", "Button_skip", "Direction", "Elevation", "Tubes", "MyFloor" };
+const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "T", "Button_skip", "Direction", "Elevation", "Tubes", "MyFloor" };
 const int commandsCount = 14;
 String parameters[10];
 int paramCount = 0;
@@ -144,10 +144,10 @@ void handlePidCommand() {
 }
 
 void handleServoCommand() {
-  if (paramCount == 0) {
-    SendData("Error: No Servo specified");
-    return;
-  }
+  align(300, 0.7, 0.03, 0.6, 1000);
+
+  // Andrew's Job
+  SendData("allign ");
 }
 
 void handleMyFloorCommand(){

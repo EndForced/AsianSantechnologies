@@ -35,7 +35,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             WebsiteHolder.__init__(self,serial_p)
 
     def send_map(self):
-
+        #pozdno pozdno pozdno noch'u
         if self.resizedPicture is None:
             print("FAIL: No image to send")
             return
@@ -132,6 +132,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.drive_through_roadmap(moves[0])
 
     def insert(self, cells):
+        #josko insert
         matrix = self._matrix
         y,x  = self.robot.Position
         direction = self.robot.Orientation
@@ -181,7 +182,6 @@ class MainComputer(VisualizePaths, WebsiteHolder):
                 (base_x + 1, base_y + 1, 4)
             ]
 
-        # Вставляем клетки в матрицу
         for px, py, idx in positions:
             if 0 <= px < 15 and 0 <= py < 15:  # Проверяем границы
                 if idx in cells and cells[idx] != 'unr':
@@ -203,15 +203,16 @@ if __name__ == "__main__":
 
         time.sleep(3)
         tiles = {}
+        mc._matrix[8][8] = 71 if int(mc.robot.do("MyFloor")[0]) == 1 else 81
         # c = 0
         while 1:
-
+            mc.floor = int(mc.robot.do("MyFloor")[0])
             frame = mc.robot.get_uncompressed_frames(0)[1]
             # a = input()
             # cv2.imwrite(f"{c}.png", frame)
             # c+=1
             frame= fix_perspective(frame)
-            # cv2.imwrite("Warped.png", frame)
+            cv2.imwrite("Warped.png", frame)
             frame, slices, borders = analyze_frame(frame, 1)
 
             for key, item in slices.items():
@@ -247,6 +248,7 @@ if __name__ == "__main__":
             print(mc.robot.Orientation)
             print(tiles)
             print(np.array(mc._matrix))
+            print("floor:",mc.floor)
             _ = input()
             mc.robot.do(_)
         # mc.qualifiction()
@@ -303,6 +305,7 @@ if __name__ == "__main__":
         # m = mc.create_way((6,1),(6,5))
         # mc.draw_path(m)
         # mc.show()
+        print(MainComputer.__mro__)
         mc.robot.Orientation = "U"
         mat = [[0]*15]*15
         cells = {1:20, 2:20, 3:"unr", 4:"unr"}

@@ -13,6 +13,76 @@ void go_up(int way) {
 }
 
 
+#define PWM_MAX 1023 // Замените на фактическое максимальное значение PWM
+
+void align(int speed, float kp, float ki, float kd, int max_error) {
+  // Настройка параметров регулятора
+  float error_left = 0;
+  float error_right = 0;
+  float integral_left = 0;
+  float integral_right = 0;
+  float derivative_left = 0;
+  float derivative_right = 0;
+  float last_error_left = 0;
+  float last_error_right = 0;
+  float output_left = 0;
+  float output_right = 0;
+  all_diagonal();
+  delay(200);
+
+  while (abs(error_left) > 10 || abs(error_right) > 10) { // Условие выхода: ошибка достаточно мала
+
+    // Чтение значений датчиков
+    int d1 = sensor(1);
+    int d2 = sensor(2);
+    int d3 = sensor(3);
+    int d4 = sensor(4);
+
+    // Расчет ошибок для каждой стороны
+    error_left = d2 - d1; // Разница между левыми датчиками
+    error_right = d4 - d3; // Разница между правыми датчиками
+
+    // Ограничение ошибок
+    error_left = constrain(error_left, -max_error, max_error);
+    error_right = constrain(error_right, -max_error, max_error);
+
+    // ПИД-регуляторы для каждой стороны
+    // Левая сторона
+    integral_left += error_left;
+    integral_left = constrain(integral_left, -100, 100); // Антивинд ап
+    derivative_left = error_left - last_error_left;
+    output_left = kp * error_left + ki * integral_left + kd * derivative_left;
+    last_error_left = error_left;
+
+    // Правая сторона
+    integral_right += error_right;
+    integral_right = constrain(integral_right, -100, 100); // Антивинд ап
+    derivative_right = error_right - last_error_right;
+    output_right = kp * error_right + ki * integral_right + kd * derivative_right;
+    last_error_right = error_right;
+
+    // Применение регулировки к моторам
+    int left_speed = speed + output_left; // Увеличиваем скорость, если ошибка отрицательная
+    int right_speed = speed + output_right; // Увеличиваем скорость, если ошибка отрицательная
+
+    // Ограничение скорости
+    left_speed = constrain(left_speed, -PWM_MAX, PWM_MAX);
+    right_speed = constrain(right_speed, -PWM_MAX, PWM_MAX);
+
+    // Движение с коррекцией
+    drive(left_speed, left_speed, right_speed, right_speed);
+
+  }
+
+  // Задержка для стабилизации (можно настроить)
+  delay(50);
+
+  // Остановка после выравнивания
+  stop();
+}
+
+
+
 void grab_from_ramp(int way) {
   if (abs(way) == 1) {
     pidEnc(0.7, 0.03, 0.6, way * PWM_MAX, 400, 0);
@@ -23,34 +93,34 @@ void grab_from_ramp(int way) {
 }
 
 void grab_from_ramp_up() {
-  
+
   pidX(0.7, 0.03, 0.6, 900, 400, 1);
-//  arm(0);
-//  buttonWait(0);
-//  pidX(0.7, 0.03, 0.6, PWM_MAX*0.8, 400, 1);
+  //  arm(0);
+  //  buttonWait(0);
+  //  pidX(0.7, 0.03, 0.6, PWM_MAX*0.8, 400, 1);
   inverse = 1;
-//  buttonWait(0);
-  pidEnc(0.7, 0.03, 0.6,PWM_MAX, 1650, 1);
+  //  buttonWait(0);
+  pidEnc(0.7, 0.03, 0.6, PWM_MAX, 1650, 1);
   open_claws();
   delay(250);
   arm_deg(106);
   delay(200);
-//  buttonWait(0);
-  pidX(0.7, 0.03, 0.6, PWM_MAX*0.72, 50, 1);
+  //  buttonWait(0);
+  pidX(0.7, 0.03, 0.6, PWM_MAX * 0.72, 50, 1);
   arm(2);
   delay(100);
   close_claws();
   delay(250);
-  
+
   lay();
   delay(100);
-//  buttonWait(0);
+  //  buttonWait(0);
   go_down(-1);
   inverse = 0;
-  pidX(0.7, 0.03, 0.6, -PWM_MAX*0.75, 0, 0);
-  pidEnc(0.7, 0.03, 0.6,-PWM_MAX*0.70, 585, 1);
-   
-  
+  pidX(0.7, 0.03, 0.6, -PWM_MAX * 0.75, 0, 0);
+  pidEnc(0.7, 0.03, 0.6, -PWM_MAX * 0.70, 585, 1);
+
+
 
 }
 
@@ -61,7 +131,7 @@ void go_down(int way) {
     way /= 2;
     deg = 1400;
     beep(200, 200);
-    pidEnc(0.7, 0.03, 0.6, way * PWM_MAX*0.85, 400, 0);
+    pidEnc(0.7, 0.03, 0.6, way * PWM_MAX * 0.85, 400, 0);
   }
 
   pidEnc(0.7, 0.03, 0.6, way * 680, 1000, 0);
@@ -71,6 +141,7 @@ void go_down(int way) {
 
 
 void turn_to_line(int speed, int side_of_turn, int way_to_drive, int number) {
+
   all_diagonal();
   delay(200);
 
@@ -111,15 +182,13 @@ void turn_to_line(int speed, int side_of_turn, int way_to_drive, int number) {
         drive(side_of_turn * speed * 0.6, side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6, -side_of_turn * speed * 0.6);
     }
   }
-  int tormoz_speed = -side_of_turn * (1023);
-  drive(tormoz_speed, tormoz_speed, -tormoz_speed, -tormoz_speed);
-  delay(10);
-  all_diagonal();
-  delay((abs(speed) / 1023.0 * 30) - 10);
+
+
   stop();
   all_forward();
   delay(200);
 }
+
 
 
 

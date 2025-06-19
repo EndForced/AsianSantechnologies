@@ -88,19 +88,15 @@ class RobotAPI:
     def do(self, args):
         self.ser.reset_input_buffer()
 
-
         if "Pid" in args:
-            # Движение вперед/назад с учетом ориентации
-            parts = args.split()  # Разбиваем строку по пробелам
+            parts = args.split()
 
-            # Ищем направление движения и количество шагов
             direction = None
             steps = 1  # По умолчанию 1 шаг
 
             for i, part in enumerate(parts):
                 if part in ["Forward", "Backwards"]:
                     direction = part
-                    # Пытаемся получить число шагов (следующий элемент после направления)
                     if i + 1 < len(parts) and parts[i + 1].isdigit():
                         steps = int(parts[i + 1])
                     break
@@ -130,50 +126,37 @@ class RobotAPI:
 
 
         elif args.find("Turn") != -1:
-
-            if "2" not in args:  # Обычный поворот (не двойной)
-
+            if "2" not in args:
                 if "Left" in args:
 
                     if self.Orientation == "L":
                         self.Orientation = "D"
-
                     elif self.Orientation == "D":
                         self.Orientation = "R"
-
                     elif self.Orientation == "R":
                         self.Orientation = "U"
-
                     elif self.Orientation == "U":
                         self.Orientation = "L"
 
 
                 elif "Right" in args:
-
                     if self.Orientation == "L":
                         self.Orientation = "U"
-
                     elif self.Orientation == "U":
                         self.Orientation = "R"
-
                     elif self.Orientation == "R":
                         self.Orientation = "D"
-
                     elif self.Orientation == "D":
                         self.Orientation = "L"
 
 
             else:
-
                 if self.Orientation == "L":
                     self.Orientation = "R"
-
                 elif self.Orientation == "R":
                     self.Orientation = "L"
-
                 elif self.Orientation == "U":
                     self.Orientation = "D"
-
                 elif self.Orientation == "D":
                     self.Orientation = "U"
 
@@ -185,6 +168,7 @@ class RobotAPI:
             res = ""
             if args == "Reset":
                 return
+
             self.send(args)
             print(f"doing {args} ... ")
 
