@@ -3,11 +3,12 @@ import numpy as np
 from itertools import combinations
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import cv2
 import numpy as np
 
-#тут многа констант. Но если не работает, стоит менять меан конст и хсв красного
+# тут многа констант. Но если не работает, стоит менять меан конст и хсв красного
 
 zones = {
     'sec_right1c': [(341, 250), (657, 246), (795, 602), (317, 598), (337, 254)],
@@ -33,17 +34,16 @@ cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1
 
 mean_const = 160
 
-
 COLOR_RANGES = {
     "Red": [np.array([0, 90, 172]), np.array([22, 255, 255]),
-        np.array([150, 100, 80]), np.array([180, 255, 255])],
+            np.array([150, 100, 80]), np.array([180, 255, 255])],
     "Green": (np.array([72, 161, 163]), np.array([85, 255, 196])),
     "Blue": (np.array([110, 90, 90]), np.array([140, 255, 255]))
 }
 
 
 def fix_perspective(img):
-    #больше констант??????????
+    # больше констант??????????
     K = np.array(
         [
             [3.19241098e+02, 8.48447347e-02, 2.78952483e+02],
@@ -51,11 +51,11 @@ def fix_perspective(img):
             [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
         ])
     D = np.array([
-    [ 0.05878302],
-    [-0.02615866],
-    [-0.04267542],
-    [ 0.03454424]
-])
+        [0.05878302],
+        [-0.02615866],
+        [-0.04267542],
+        [0.03454424]
+    ])
 
     border_size = 100
     img_with_border = cv2.copyMakeBorder(
@@ -80,8 +80,9 @@ def fix_perspective(img):
 
     return undistorted
 
+
 def extract_warped(image, points, output_size=500):
-    #если бы я только знал что тут происходит...
+    # если бы я только знал что тут происходит...
     if len(points) != 5:
         raise ValueError("Tochki chekni prekolist")
 
@@ -95,7 +96,6 @@ def extract_warped(image, points, output_size=500):
         if dist < min_dist:
             min_dist = dist
             closest_pair = (p1, p2)
-
 
     avg_point = (closest_pair[0] + closest_pair[1]) / 2
     remaining_points = [p for p in points if
@@ -114,35 +114,36 @@ def extract_warped(image, points, output_size=500):
     M = cv2.getPerspectiveTransform(final_points_sorted, dst_points)
     return cv2.warpPerspective(image, M, (output_size, output_size))
 
+
 def check_for_borders(frame, cam_num):
     found = []
     if cam_num == 1:
         # front close
-        fr = frame[-70:-30,-450:-100:]
-        red_count_close = count_pixels(fr, COLOR_RANGES["Red"][0], COLOR_RANGES["Red"][1])[0]
-        # cv2.imshow("p", fr)
-        # cv2.waitKey(0)
-        print(red_count_close, "rclose")
-        if red_count_close > 3000:
-            print(red_count_close, "fc")
+        fr = frame[610:650, 390:740]
+        width = fr.shape[1]
+        # cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
+        _, __, w, h = search_for_color(fr, "Red")
+        if w > 0.8 * width:
+            print(w, "fc")
             found.append("fc")
 
         # front far
-        fr = frame[260:330,-450:-100]
-        red_count_far = count_pixels(fr, COLOR_RANGES["Red"][0], COLOR_RANGES["Red"][1])[0]
-        if red_count_far > 1500:
-            print(red_count_far, "ff")
-            # cv2.imshow("p", fr)
-            # cv2.waitKey(0)
+        fr = frame[260:330, -450:-100]
+        width = fr.shape[1]
+        # cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
+        _, __, w, h = search_for_color(fr, "Red")
+        if w > 0.8 * width:
+            print(w, "ff")
             found.append("ff")
 
-        #side close
+        # side close
         # fr = frame[100:550, 300:400]
         # red_count_side = count_pixels(fr, hsw_red[0], hsw_red[1])[0]
         # print(red_count_side, "sc")
         # if red_count_side > 5000:
         #     found.append("sc")
-    return found
+    return found, frame
+
 
 def count_pixels(image, lower_hsv, upper_hsv):
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -151,6 +152,7 @@ def count_pixels(image, lower_hsv, upper_hsv):
     mask = cv2.inRange(hsv_image, lower, upper)
     return cv2.countNonZero(mask), mask
 
+
 def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     pts = np.array(coordinates, dtype=np.int32)
     if fill:
@@ -158,6 +160,7 @@ def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     else:
         cv2.polylines(img, [pts], isClosed=True, color=color, thickness=thickness)
     return img
+
 
 def search_for_color(frame, color, min_area=50):
     if color not in COLOR_RANGES:
@@ -186,6 +189,7 @@ def search_for_color(frame, color, min_area=50):
                 x, y, w, h = x1, y1, w1, h1
 
     return x, y, w, h
+
 
 def tile_to_code(frame):
     if frame.shape[:2] != (200, 200):
@@ -224,6 +228,7 @@ def tile_to_code(frame):
 
     return elevation * 10
 
+
 def process_borders(slices, borders, leads):
     ignore_mask = {i: False for i in range(4)}  # Инициализируем маску
 
@@ -234,7 +239,7 @@ def process_borders(slices, borders, leads):
         'sf': 'sf' in borders
     }
 
-    #front close = skip
+    # front close = skip
     if border_flags['fc']:
         return {i: True for i in range(4)}
 
@@ -374,25 +379,24 @@ def process_image(image, min_area=500):
 
         return result
 
+
 def analyze_frame(frame, floor):
-    #я пытался делать модульный код (вроде работает)
+    # я пытался делать модульный код (вроде работает)
     result_frame = frame.copy()
     dict_of_slices = {}
     borders = []
 
     if floor == 1:
         slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
-        borders = check_for_borders(frame, 1)
+        borders, frame = check_for_borders(frame, 1)
 
         leads = []
         for i in range(4):
-            mini1 = slices[i][120:200,30:70]
-            mini2 = slices[i][120:200,130:170]
-            leads.append("black" if (np.mean(mini1)+np.mean(mini2))/2 < mean_const else "white")
-
+            mini1 = slices[i][120:200, 30:70]
+            mini2 = slices[i][120:200, 130:170]
+            leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
 
         ignore_mask = process_borders(slices, borders, leads)
-
 
         for i in range(4):
             if ignore_mask[i]:
