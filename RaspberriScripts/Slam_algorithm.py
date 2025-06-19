@@ -245,9 +245,9 @@ if __name__ == "__main__":
                     tiles[key + 1] = "unr"
 
             mc._matrix = mc.insert(tiles)
-
-            if len(borders) > 0:
-                edge_to_matrix(mc._matrix, borders[0], mc.robot.Position, mc.robot.Orientation)
+            #
+            # if len(borders) > 0:
+            #     edge_to_matrix(mc._matrix, borders[0], mc.robot.Position, mc.robot.Orientation)
 
             map = mc.update_matrix()
 
