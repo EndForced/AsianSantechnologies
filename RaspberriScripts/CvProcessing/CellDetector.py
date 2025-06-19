@@ -38,7 +38,7 @@ COLOR_RANGES = {
     "Red": [np.array([0, 90, 172]), np.array([22, 255, 255]),
             np.array([150, 100, 80]), np.array([180, 255, 255])],
     "Red1": [np.array([0, 50, 50]), np.array([180, 255, 255]),
-             np.array([150, 50, 50]), np.array([180, 255, 255])],
+             np.array([150, 90, 50]), np.array([180, 255, 255])],
     "Green": (np.array([72, 161, 163]), np.array([85, 255, 196])),
     "Blue": (np.array([110, 90, 90]), np.array([140, 255, 255]))
 }
