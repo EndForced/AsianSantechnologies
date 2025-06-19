@@ -208,7 +208,7 @@ def tile_to_code(frame):
     x, y, h, w = search_for_color(hsv, "Green")
     if h * w:
         if w > h:
-            return 61 if (y + h / 2) > 100 else 63
+            return 61 if (y + h / 2) > 50 else 63
         else:
             return 62 if (x + w / 2) > 100 else 64
 
