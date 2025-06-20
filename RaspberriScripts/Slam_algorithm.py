@@ -287,7 +287,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         print(np.array(self._matrix))
         _ = input()
         self.Waves =  self.create_wave(self.robot.Position)
-        print(self.Waves)
+        print(self.cellsConnections)
 
         interest_mat = self.interest_calculation(unrevealed)
         interest_sorted = self.sort_matrix_coordinates(interest_mat)
