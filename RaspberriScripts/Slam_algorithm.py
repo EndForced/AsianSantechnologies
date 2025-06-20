@@ -6,8 +6,8 @@ import numpy as np
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
-from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code, replace_with_nearest_color
-
+from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code
+from SlamLogic.SlamLogic import prepare_to_insert
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
 import cv2
@@ -147,6 +147,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def insert(self, cells):
         # josko insert
+        cells = prepare_to_insert(cells, self.robot.Orientation)
         matrix = self._matrix
         y, x = self.robot.Position
         direction = self.robot.Orientation
