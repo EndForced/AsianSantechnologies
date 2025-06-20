@@ -303,7 +303,7 @@ if __name__ == "__main__":
         #     #     cv2.imwrite(f"{i}.jpg", slices[i])
         #     #
         #     # print("upd!!")
-        #     # exit()
+        #     # exit()git
         #     # # cv2.imwrite("testing.jpg", frame)
         #     # mc.robot.set_frame(frame)
         #     pass
