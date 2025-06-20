@@ -245,21 +245,20 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.send_map()
 
     def sort_matrix_coordinates(self, matrix):
-        def sort_matrix_coordinates(matrix):
-            # Создаем список кортежей (значение, y, x)
-            coordinates = []
-            for y in range(len(matrix)):
-                for x in range(len(matrix[y])):
-                    value = matrix[y][x]
-                    if value != 0:  # Игнорируем нули
-                        coordinates.append((value, y, x))  # Порядок: значение, y, x
+        # Создаем список кортежей (значение, y, x)
+        coordinates = []
+        for y in range(len(matrix)):
+            for x in range(len(matrix[y])):
+                value = matrix[y][x]
+                if value != 0:  # Игнорируем нули
+                    coordinates.append((value, y, x))  # Порядок: значение, y, x
 
-            # Сортируем сначала по значению, затем по y (чем меньше y, тем важнее), затем по x
-            coordinates.sort()
+        # Сортируем сначала по значению, затем по y (чем меньше y, тем важнее), затем по x
+        coordinates.sort()
 
-            # Форматируем вывод: значение[y, x]
-            sorted_coordinates = [f"{value}[{y}, {x}]" for value, y, x in coordinates]
-            return sorted_coordinates
+        # Форматируем вывод: значение[y, x]
+        sorted_coordinates = [f"{value}[{y}, {x}]" for value, y, x in coordinates if self.is_in_waves((y,x))]
+        return sorted_coordinates
 
     def interest_calculation(self, matrix):
         mat = np.array(matrix)
