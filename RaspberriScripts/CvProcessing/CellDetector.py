@@ -252,9 +252,11 @@ def process_borders(slices, borders, leads, floor):
             # ignore  behind white
             if i == 2 and leads[i] == "black"and tile_to_code(slices[0]) != 31:
                 ignore_mask[i] = True
+                print("heh")
 
             if i == 3 and leads[i] == "black"  and tile_to_code(slices[1]) != 31:
                 ignore_mask[i] = True
+                print("huh")
         # elif floor == 2:
 
 
