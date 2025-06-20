@@ -308,7 +308,7 @@ class WaveCreator:
         elif diff == 3:
             return "L1"
 
-    def way_to_commands_single(self, path, my_dir):
+    def way_to_commands_single(self, path, my_dir, optimize = 1):
         mat = np.array(self._matrix)
         res = []
         floor = 1 if mat[path[0]] == 10 else 2
@@ -359,7 +359,7 @@ class WaveCreator:
             if res_prev != "" and res_prev:
                 res.append(res_prev)
 
-        res_optimized = self.optimize_commands(res)
+        ires_optimized = self.optimize_commands(res) if optimize else res
         # print(res_optimized)
 
         res_relative = []

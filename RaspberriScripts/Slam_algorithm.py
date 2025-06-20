@@ -220,7 +220,6 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.do(f"Elevation {self.floor}")
         self.robot.do("Direction -1")
 
-
     def capture_to_map(self):
         self.floor = int(mc.robot.do("MyFloor")[0])
         frame = self.robot.get_uncompressed_frames(0)[1]
@@ -244,6 +243,31 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.set_frame(frame)
         self.send_map()
 
+    def drive_and_capture(self, cell):
+        commands = self.create_way(self.robot.Position, cell)
+        commands = self.way_to_commands_single(commands, self.robot.Orientation, 0 )
+        # command_prev = []
+
+        commands_dict = {"L": "Turn Left", "R": "Turn Right", "X": "Pid Forward", "x": "Pid Backwards", "F1": "Up",
+                         "F0": "Down", "G0": "Grab", "P1": "Put"}
+
+        for i in range(len(commands)):
+            if len(commands[i]) == 2:
+                if commands[i][0] not in ["F", "P", "G"]:
+                    command = commands[i][0]
+                    num = commands[i][1] if commands[i][1] else ""
+                    commands[i] = f"{commands_dict[command]} {num}"
+
+                elif commands[i][0] in ["F", "P", "G"]:
+                    command = commands[i]
+                    commands[i] = f"{commands_dict[command]}"
+
+        print(commands)
+
+        for i in commands:
+            self.capture_to_map()
+            self.robot.do(i)
+
     def sort_matrix_coordinates(self, matrix):
         # Создаем список кортежей (значение, y, x)
         coordinates = []
@@ -253,11 +277,11 @@ class MainComputer(VisualizePaths, WebsiteHolder):
                 if value != 0:  # Игнорируем нули
                     coordinates.append((value, y, x))  # Порядок: значение, y, x
 
-        # Сортируем сначала по значению, затем по y (чем меньше y, тем важнее), затем по x
-        coordinates.sort()
+        # Сортируем по убыванию значения, затем по y (возрастание), затем по x (возрастание)
+        coordinates.sort(key=lambda item: (-item[0], item[1], item[2]))
 
-        # Форматируем вывод: значение[y, x]
-        sorted_coordinates = [f"{value}[{y}, {x}]" for value, y, x in coordinates if self.is_in_waves((y,x))]
+        # Возвращаем список кортежей (y, x) только для координат из waves
+        sorted_coordinates = [(y, x) for value, y, x in coordinates if self.is_in_waves((y, x))]
         return sorted_coordinates
 
     def interest_calculation(self, matrix):
@@ -281,20 +305,12 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         return result
 
-    def move_to_border(self):
+    def interesting_coords(self):
         unrevealed = np.array([[0 if cell == 0 or cell == 99 else 1 for cell in row] for row in self._matrix])
-        # print(np.array(self._matrix))
-
-
-        self.create_wave(self.robot.Position)
+        self.Waves = self.create_wave(self.robot.Position)
         interest_mat = self.interest_calculation(unrevealed)
         interest_sorted = self.sort_matrix_coordinates(interest_mat)
-
-        print("interest", interest_sorted, "w:", self.Waves)
-        print(self.is_in_waves((8,8)))
-        # print(interest_mat)
-        _ = input()
-
+        return interest_sorted
 
 
 
@@ -306,17 +322,26 @@ if __name__ == "__main__":
 
         mc.start_website()
         tiles = {}
-        while 1:
-            mc.capture_to_map()
-            mc.move_to_border()
+        mc.capture_to_map()
 
-            print(mc.robot.Position)
-            print(mc.robot.Orientation)
-            print(tiles)
-            print(np.array(mc._matrix))
-            print("floor:", mc.floor)
-            _ = input()
-            mc.robot.do(_)
+        while 1:
+            cords = mc.interesting_coords()
+            for i in cords:
+                if mc.is_in_waves(i):
+                    mc.drive_and_capture(i)
+                    print(mc.robot.Position)
+                    print(mc.robot.Orientation)
+                    print(tiles)
+                    print(np.array(mc._matrix))
+                    print("floor:", mc.floor)
+                    _ = input()
+
+
+
+
+
+            # _ = input()
+            # mc.robot.do(_)
         # mc.qualifiction()
         # time.sleep(1000)
         # while 1:
