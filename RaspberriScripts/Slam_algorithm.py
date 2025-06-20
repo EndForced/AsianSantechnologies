@@ -333,7 +333,7 @@ if __name__ == "__main__":
         while 1:
             cords = mc.interesting_coords()
             for i in cords:
-                if mc.is_in_waves(i):
+                if mc.is_in_waves(i) and np.array(mc._matrix)[i] not in [31,32,33,34]:
                     mc.drive_and_capture(i)
                     for _ in range(4):
                         mc.robot.do("Turn Right")
