@@ -244,6 +244,22 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.set_frame(frame)
         self.send_map()
 
+    def sort_matrix_coordinates(self, matrix):
+        # Создаем список кортежей (значение, (строка, столбец))
+        coordinates = []
+        for i in range(len(matrix)):
+            for j in range(len(matrix[i])):
+                value = matrix[i][j]
+                if value != 0:  # Игнорируем нули, так как они не содержат информации
+                    coordinates.append((value, (i, j)))
+
+        # Сортируем сначала по значению, затем по координатам
+        coordinates.sort()
+
+        # Форматируем вывод
+        sorted_coordinates = [f"{value}{[x, y]}" for value, (x, y) in coordinates]
+        return sorted_coordinates
+
     def interest_calculation(self, matrix):
         mat = np.array(matrix)
         revealed = np.array([[0 if cell == 0 else 1 for cell in row] for row in matrix])
@@ -270,6 +286,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         print(unrevealed)
 
         interest_mat = self.interest_calculation(unrevealed)
+        interest_sorted = self.sort_matrix_coordinates(interest_mat)
+        print(interest_sorted)
         print(interest_mat)
 
 
