@@ -292,19 +292,20 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         mat = np.array(matrix)
         revealed = np.array([[0 if cell == 0 else 1 for cell in row] for row in matrix])
         rows, cols = mat.shape[:2]
-        k_rows, k_cols = self.coefficient_mat.shape[:2]
-        offset_r, offset_c = k_rows // 2, k_cols // 2  # Центр маски
 
-        result = np.array([[0] * cols] * rows)
+        # Область 2x2 слева от текущей клетки
+        k_rows, k_cols = 2, 2
+        result = np.zeros((rows, cols))
 
         for r in range(rows):
             for c in range(cols):
                 total = 0
+                # Проверяем только клетки слева (c-1 и c-2) в пределах матрицы
                 for kr in range(k_rows):
                     for kc in range(k_cols):
-                        nr, nc = r + kr - offset_r, c + kc - offset_c
+                        nr, nc = r, c - (kc + 1)  # Смещаемся только влево
                         if 0 <= nr < rows and 0 <= nc < cols:  # Проверка границ
-                            total += revealed[nr][nc] * self.coefficient_mat[kr][kc]
+                            total += revealed[nr][nc] * 1  # Все коэффициенты = 1
                 result[r][c] = total
 
         return result
