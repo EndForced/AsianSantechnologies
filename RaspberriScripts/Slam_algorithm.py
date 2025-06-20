@@ -245,20 +245,21 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.send_map()
 
     def sort_matrix_coordinates(self, matrix):
-        # Создаем список кортежей (значение, (строка, столбец))
-        coordinates = []
-        for i in range(len(matrix)):
-            for j in range(len(matrix[i])):
-                value = matrix[i][j]
-                if value != 0:  # Игнорируем нули, так как они не содержат информации
-                    coordinates.append((value, (i, j)))
+        def sort_matrix_coordinates(matrix):
+            # Создаем список кортежей (значение, y, x)
+            coordinates = []
+            for y in range(len(matrix)):
+                for x in range(len(matrix[y])):
+                    value = matrix[y][x]
+                    if value != 0:  # Игнорируем нули
+                        coordinates.append((value, y, x))  # Порядок: значение, y, x
 
-        # Сортируем сначала по значению, затем по координатам
-        coordinates.sort()
+            # Сортируем сначала по значению, затем по y (чем меньше y, тем важнее), затем по x
+            coordinates.sort()
 
-        # Форматируем вывод
-        sorted_coordinates = [f"{value}{[x, y]}" for value, (x, y) in coordinates]
-        return sorted_coordinates
+            # Форматируем вывод: значение[y, x]
+            sorted_coordinates = [f"{value}[{y}, {x}]" for value, y, x in coordinates if self.is_in_waves((y,x))]
+            return sorted_coordinates
 
     def interest_calculation(self, matrix):
         mat = np.array(matrix)
@@ -283,10 +284,12 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def move_to_border(self):
         unrevealed = np.array([[0 if cell == 0 or cell == 99 else 1 for cell in row] for row in self._matrix])
+        self.create_wave(self.robot.Position)
         print(unrevealed)
 
         interest_mat = self.interest_calculation(unrevealed)
         interest_sorted = self.sort_matrix_coordinates(interest_mat)
+
         print(interest_sorted)
         print(interest_mat)
 
