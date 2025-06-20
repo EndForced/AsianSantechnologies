@@ -153,7 +153,6 @@ def count_pixels(image, lower_hsv, upper_hsv):
     mask = cv2.inRange(hsv_image, lower, upper)
     return cv2.countNonZero(mask), mask
 
-
 def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     pts = np.array(coordinates, dtype=np.int32)
     if fill:
@@ -161,7 +160,6 @@ def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     else:
         cv2.polylines(img, [pts], isClosed=True, color=color, thickness=thickness)
     return img
-
 
 def search_for_color(frame, color, min_area=50):
     if color not in COLOR_RANGES:
@@ -191,7 +189,6 @@ def search_for_color(frame, color, min_area=50):
                 x, y, w, h = x1, y1, w1, h1
 
     return x, y, w, h
-
 
 def tile_to_code(frame):
     if frame.shape[:2] != (200, 200):
@@ -232,7 +229,6 @@ def tile_to_code(frame):
 
     return elevation * 10
 
-
 def process_borders(slices, borders, leads, floor):
     ignore_mask = {i: False for i in range(4)}  # Инициализируем маску
 
@@ -254,16 +250,15 @@ def process_borders(slices, borders, leads, floor):
 
         if floor == 1:
             # ignore  behind white
-            if i == 2 and tile_to_code(slices[0]) != 31:
+            if i == 2 and border_flags["ff"] and tile_to_code(slices[0]) != 31:
                 ignore_mask[i] = True
 
-            if i == 3 and tile_to_code(slices[1]) != 31:
+            if i == 3 and border_flags["ff"] and tile_to_code(slices[1]) != 31:
                 ignore_mask[i] = True
         # elif floor == 2:
 
 
     return ignore_mask
-
 
 def analyze_frame(frame, floor):
     # я пытался делать модульный код (вроде работает)
