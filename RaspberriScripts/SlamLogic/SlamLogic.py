@@ -100,6 +100,8 @@ def edge_to_matrix(mat17x17, edge_type, cords_yx, orientation):
     # второй край через поле от него
     line_in_matrix(99,direction_of_line_normale,cord,mat17x17)
 
+    return mat17x17
+
 
 
 
