@@ -193,8 +193,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             positions = [
                 (base_x, base_y, 2),
                 (base_x, base_y + 1, 1),
-                (base_x + 1, base_y, 3),
-                (base_x + 1, base_y + 1, 4)
+                (base_x + 1, base_y, 4),
+                (base_x + 1, base_y + 1, 3)
             ]
 
         for px, py, idx in positions:
