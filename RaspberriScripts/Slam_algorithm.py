@@ -286,16 +286,14 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         unrevealed = np.array([[0 if cell == 0 or cell == 99 else 1 for cell in row] for row in self._matrix])
         # print(np.array(self._matrix))
 
-        print(self.robot.Orientation)
-        print(self.create_wave(self.robot.Position))
-        _ = input()
+
 
         interest_mat = self.interest_calculation(unrevealed)
         interest_sorted = self.sort_matrix_coordinates(interest_mat)
 
-        print(interest_sorted)
-        print(interest_mat)
-
+        print("interest", interest_sorted)
+        # print(interest_mat)
+        _ = input()
 
 
 
