@@ -246,6 +246,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
     def drive_and_capture(self, cell):
         commands = self.create_way(self.robot.Position, cell)
         commands = self.way_to_commands_single(commands, self.robot.Orientation, 0 )[0]
+        print(commands)
         # command_prev = []
 
         print(commands)
@@ -334,12 +335,12 @@ if __name__ == "__main__":
             for i in cords:
                 if mc.is_in_waves(i):
                     mc.drive_and_capture(i)
-                    print(mc.robot.Position)
-                    print(mc.robot.Orientation)
-                    print(tiles)
-                    print(np.array(mc._matrix))
-                    print("floor:", mc.floor)
-                    _ = input()
+                    # print(mc.robot.Position)
+                    # print(mc.robot.Orientation)
+                    # print(tiles)
+                    # print(np.array(mc._matrix))
+                    # print("floor:", mc.floor)
+                    # _ = input()
 
 
 
