@@ -200,7 +200,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         for px, py, idx in positions:
             if 0 <= px < 15 and 0 <= py < 15:  # Проверяем границы
                 if idx in cells and cells[idx] != 'unr':
-                    new_matrix[py][px] = cells[idx]
+                    if self._matrix [py][px] != 99:
+                        new_matrix[py][px] = cells[idx]
 
         return new_matrix
 
