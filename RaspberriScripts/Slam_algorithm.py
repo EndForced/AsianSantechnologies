@@ -258,7 +258,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             coordinates.sort()
 
             # Форматируем вывод: значение[y, x]
-            sorted_coordinates = [f"{value}[{y}, {x}]" for value, y, x in coordinates if self.is_in_waves((y,x))]
+            sorted_coordinates = [f"{value}[{y}, {x}]" for value, y, x in coordinates]
             return sorted_coordinates
 
     def interest_calculation(self, matrix):
