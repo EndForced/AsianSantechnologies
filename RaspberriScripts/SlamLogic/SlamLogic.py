@@ -101,49 +101,46 @@ def edge_to_matrix(mat17x17, edge_type, cords_yx, orientation):
 
     return fill_enclosed_areas(mat17x17)
 
+
 def fill_enclosed_areas(matrix):
-    # Создаем копию матрицы, чтобы не изменять оригинал
     matrix = np.array(matrix, dtype=int)
     rows, cols = matrix.shape
-
-    # Создаем матрицу для отметки посещенных ячеек
     visited = np.zeros((rows, cols), dtype=bool)
-
-    # Определяем направления для поиска в соседние ячейки
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-    # Обходим все ячейки матрицы
     for i in range(rows):
         for j in range(cols):
-            # Если ячейка не посещена и содержит 0
+            # Если ячейка не посещена и содержит 0 (и не на границе)
             if not visited[i][j] and matrix[i][j] == 0:
-                # Используем BFS для поиска всех связанных 0
-                queue = deque()
-                queue.append((i, j))
+                queue = deque([(i, j)])
                 visited[i][j] = True
                 region = [(i, j)]
-                enclosed = True
+                is_enclosed = True
 
                 while queue:
                     x, y = queue.popleft()
 
-                    # Если текущая ячейка на границе, то область не ограничена
-                    if x == 0 or x == rows - 1 or y == 0 or y == cols - 1:
-                        enclosed = False
-
+                    # Проверяем соседей
                     for dx, dy in directions:
                         nx, ny = x + dx, y + dy
-                        if 0 <= nx < rows and 0 <= ny < cols:
-                            if not visited[nx][ny] and matrix[nx][ny] == 0:
-                                visited[nx][ny] = True
-                                queue.append((nx, ny))
-                                region.append((nx, ny))
-                            elif matrix[nx][ny] != 99 and matrix[nx][ny] != 0:
-                                # Если соседняя ячейка не 99 и не 0, то область не ограничена 99
-                                enclosed = False
 
-                # Если область ограничена 99 и не содержит других чисел, заполняем ее 99
-                if enclosed:
+                        # Если сосед выходит за границы — область не замкнута
+                        if nx < 0 or nx >= rows or ny < 0 or ny >= cols:
+                            is_enclosed = False
+                            continue
+
+                        # Если сосед — не 0 и не 99, область не подходит
+                        if matrix[nx][ny] != 0 and matrix[nx][ny] != 99:
+                            is_enclosed = False
+
+                        # Если сосед — 0 и не посещен, добавляем в очередь
+                        if not visited[nx][ny] and matrix[nx][ny] == 0:
+                            visited[nx][ny] = True
+                            queue.append((nx, ny))
+                            region.append((nx, ny))
+
+                # Если область замкнута, заполняем её 99
+                if is_enclosed:
                     for x, y in region:
                         matrix[x][y] = 99
 
