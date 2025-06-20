@@ -39,11 +39,11 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         if self.OS == "Linux":
             WebsiteHolder.__init__(self, serial_p)
 
-        self.coefficient_mat = np.array([[0, 1, 1, 1, 0],
-                            [1, 1, 1, 1, 1],
-                            [1, 1, 0, 1, 1],
-                            [1, 1, 1, 1, 1],
-                            [0, 1, 1, 1, 0]])
+        self.coefficient_mat = np.array([[0, 1, 1, 0, 0],
+                                         [0, 1, 1, 1, 1],
+                                         [1, 1, 0, 1, 1],
+                                         [1, 1, 1, 1, 0],
+                                         [0, 0, 1, 1, 0]])
 
     def send_map(self):
         # pozdno pozdno pozdno noch'u
