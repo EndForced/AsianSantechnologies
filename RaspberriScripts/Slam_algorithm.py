@@ -292,29 +292,21 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def interest_calculation(self, matrix):
         mat = np.array(matrix)
+        revealed = np.array([[0 if cell == 0 else 1 for cell in row] for row in matrix])
         rows, cols = mat.shape[:2]
-        result = np.zeros((rows, cols))
+        k_rows, k_cols = self.coefficient_mat.shape[:2]
+        offset_r, offset_c = k_rows // 2, k_cols // 2  # Центр маски
 
-        # Определяем маску видимости (2 вперед, 2 слева вперед)
-        # Предполагаем, что агент смотрит вверх (направление -r)
+        result = np.array([[0] * cols] * rows)
+
         for r in range(rows):
             for c in range(cols):
-                if mat[r][c] != 0:  # Если клетка уже открыта, пропускаем
-                    continue
-
                 total = 0
-                # Проверяем две клетки вперед (вверх)
-                for dr in [1, 2]:
-                    nr, nc = r - dr, c
-                    if 0 <= nr < rows and 0 <= nc < cols and mat[nr][nc] != 0:
-                        total += 1
-
-                # Проверяем две клетки слева вперед (вверх-влево)
-                for dr, dc in [(1, -1), (2, -2)]:
-                    nr, nc = r - dr, c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols and mat[nr][nc] != 0:
-                        total += 1
-
+                for kr in range(k_rows):
+                    for kc in range(k_cols):
+                        nr, nc = r + kr - offset_r, c + kc - offset_c
+                        if 0 <= nr < rows and 0 <= nc < cols:  # Проверка границ
+                            total += revealed[nr][nc] * self.coefficient_mat[kr][kc]
                 result[r][c] = total
 
         return result
@@ -342,7 +334,6 @@ if __name__ == "__main__":
             cords = mc.interesting_coords()
             for i in cords:
                 if mc.is_in_waves(i):
-                    print(i)
                     mc.drive_and_capture(i)
                     for _ in range(4):
                         mc.robot.do("Turn Right")
