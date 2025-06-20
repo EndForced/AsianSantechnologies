@@ -162,7 +162,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         elif direction == 'L':
             base_x, base_y = x - 1, y  # Смещаем на 1 влево
         elif direction == 'R':
-            base_x, base_y = x + 1, y - 1  # Смещаем на 1 вправо
+            base_x, base_y = x + 1, y   # Смещаем на 1 вправо
         else:
             raise ValueError("Неправильное направление")
 
