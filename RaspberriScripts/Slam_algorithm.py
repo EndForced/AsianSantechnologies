@@ -168,7 +168,6 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         # Распределение клеток по направлениям
         if direction == 'U':
-            print(base_x, base_y, "bases")
             positions = [
                 (base_x, base_y, 1),  # Левый верхний (индекс 1)
                 (base_x - 1, base_y, 2),  # Правый верхний (индекс 2)
@@ -176,6 +175,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
                 (base_x - 1, base_y - 1, 4)  # Правый нижний (индекс 4)
             ]
         elif direction == 'D':
+            print(base_x, base_y, "bases")
             positions = [
                 (base_x, base_y, 1),
                 (base_x + 1, base_y, 2),
