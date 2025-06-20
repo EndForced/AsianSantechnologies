@@ -290,7 +290,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         sorted_coordinates = [(y, x) for value, y, x in coordinates if self.is_in_waves((y, x))]
         return sorted_coordinates
 
-    def interest_calculation(matrix):
+    def interest_calculation(self, matrix):
         mat = np.array(matrix)
         rows, cols = mat.shape[:2]
         result = np.zeros((rows, cols))
