@@ -232,7 +232,7 @@ if __name__ == "__main__":
             cv2.imwrite("Warped.png", frame)
             frame, slices, borders = analyze_frame(frame, mc.floor)
             if borders:
-                mc._matrix = edge_to_matrix(mc._matrix, borders[0], mc.robot.Position, mc.robot.Orientation)
+                mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
 
 
 
