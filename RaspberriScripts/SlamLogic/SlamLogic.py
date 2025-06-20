@@ -9,3 +9,5 @@ def prepare_to_insert(cells, direction):
         for i in range(len(cells)):
             if cells[i] in replacements.keys():
                 cells[i] = replacements[i]
+
+        return cells
