@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
 from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code
-from SlamLogic.SlamLogic import prepare_to_insert
+from SlamLogic.SlamLogic import prepare_to_insert, edge_to_matrix
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
 import cv2
@@ -231,6 +231,10 @@ if __name__ == "__main__":
             frame = fix_perspective(frame)
             cv2.imwrite("Warped.png", frame)
             frame, slices, borders = analyze_frame(frame, mc.floor)
+            if borders:
+                mc._matrix = edge_to_matrix(mc._matrix, borders[0], mc.robot.Position, mc.robot.Orientation)
+
+
 
             for key, item in slices.items():
                 if str(item) != "unr":
@@ -248,12 +252,12 @@ if __name__ == "__main__":
             # cv2.imwrite("warped.png", frame)
             # time.sleep(0.2)
             # mc.robot.set_frame(frame)
-            for key, item in slices.items():
-                if str(item) != "unr":
-                    # print(tile_to_code(item))
-                    cv2.imwrite(f"{c}.png", item)
-                    c += 1
-                    print(c)
+            # for key, item in slices.items():
+            #     if str(item) != "unr":
+            #         # print(tile_to_code(item))
+            #         cv2.imwrite(f"{c}.png", item)
+            #         c += 1
+            #         print(c)
             #
 
             print(mc.robot.Position)
