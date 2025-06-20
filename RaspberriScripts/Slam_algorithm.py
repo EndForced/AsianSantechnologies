@@ -1,17 +1,12 @@
 # тут типо жоски слем алгоритме
-import math
-import os
-import platform
-import sys
+import sys, os, platform, math
 
 import numpy as np
-
-from cv import edge_to_matrix
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
-from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code
+from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code, replace_with_nearest_color
 
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
@@ -234,7 +229,7 @@ if __name__ == "__main__":
             # c+=1
             frame = fix_perspective(frame)
             cv2.imwrite("Warped.png", frame)
-            frame, slices, borders = analyze_frame(frame, mc.floor)
+            frame, slices, borders = analyze_frame(frame, 1)
 
             for key, item in slices.items():
                 if str(item) != "unr":
@@ -245,10 +240,6 @@ if __name__ == "__main__":
                     tiles[key + 1] = "unr"
 
             mc._matrix = mc.insert(tiles)
-            #
-            # if len(borders) > 0:
-            #     edge_to_matrix(mc._matrix, borders[0], mc.robot.Position, mc.robot.Orientation)
-
             map = mc.update_matrix()
 
             mc.robot.set_frame(frame)
