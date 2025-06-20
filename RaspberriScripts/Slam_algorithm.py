@@ -245,8 +245,11 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def drive_and_capture(self, cell):
         commands = self.create_way(self.robot.Position, cell)
-        commands = self.way_to_commands_single(commands, self.robot.Orientation, 0 )
+        commands = self.way_to_commands_single(commands, self.robot.Orientation, 0 )[0]
         # command_prev = []
+
+        print(commands)
+        _ = input()
 
         commands_dict = {"L": "Turn Left", "R": "Turn Right", "X": "Pid Forward", "x": "Pid Backwards", "F1": "Up",
                          "F0": "Down", "G0": "Grab", "P1": "Put"}
