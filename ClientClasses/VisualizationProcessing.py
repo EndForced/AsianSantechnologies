@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from wayProcessingOperations import BasicWaveOperations as WaveProcessing
 from wayProcessingOperations.BasicWaveOperations import PattersSolver
 import platform
-possible_codes = [0, 10, 20, 31,32,33,34, 41,42, 51,52, 61,62,63,64, 71,72,73,74, 81,82,83,84, 91,92,93,94]
+possible_codes = [0, 10, 20, 31,32,33,34, 41,42, 51,52, 61,62,63,64, 71,72,73,74, 81,82,83,84, 91,92,93,94, 99]
 
 
 class VisualizeMatrix:
