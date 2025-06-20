@@ -230,7 +230,7 @@ if __name__ == "__main__":
             # c+=1
             frame = fix_perspective(frame)
             cv2.imwrite("Warped.png", frame)
-            frame, slices, borders = analyze_frame(frame, 1)
+            frame, slices, borders = analyze_frame(frame, mc.floor)
 
             for key, item in slices.items():
                 if str(item) != "unr":

@@ -270,6 +270,7 @@ def analyze_frame(frame, floor):
     result_frame = frame.copy()
     dict_of_slices = {}
     borders = []
+    slices = []
 
     if floor == 1:
         slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
@@ -286,6 +287,7 @@ def analyze_frame(frame, floor):
         mini1 = slices[i][120:200, 30:70]
         mini2 = slices[i][120:200, 130:170]
         leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
+    print(leads)
 
     ignore_mask = process_borders(slices, borders, leads, floor)
 
