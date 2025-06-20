@@ -14,7 +14,9 @@ except serial.SerialException as e:
     print(f"Failed to initialize serial port: {e}")
     serial_conn = None
 
-
+mat = [[8]]
+mc = MainComputer(mat, serial_conn)
+mc.robot.do("Beep")
 def string2list(matrix_string):
     try:
         result = ast.literal_eval(matrix_string)
@@ -29,7 +31,7 @@ def string2list(matrix_string):
 def process_matrix_in_background(mat, serial_conn):
     try:
         print("Background processing started")
-        mc = MainComputer(mat, serial_conn)
+        mc._matrix = mat
 
         # mc.robot.do("OK")
         mc.robot.do("Beep")
