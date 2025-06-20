@@ -252,14 +252,14 @@ def process_borders(slices, borders, leads, floor):
             # ignore  behind white
             if i == 2 and leads[0] == "black"and tile_to_code(slices[0]) != 31:
                 ignore_mask[i] = True
-                print("heh")
+                # print("heh")
 
             if i == 3 and leads[1] == "black"  and tile_to_code(slices[1]) != 31:
                 ignore_mask[i] = True
-                print("huh")
+                # print("huh")
         # elif floor == 2:
 
-
+    print("ignore", ignore_mask)
     return ignore_mask
 
 def analyze_frame(frame, floor):
@@ -285,6 +285,7 @@ def analyze_frame(frame, floor):
         mini2 = slices[i][120:200, 130:170]
         leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
     print(leads)
+
 
     ignore_mask = process_borders(slices, borders, leads, floor)
 
