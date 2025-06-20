@@ -15,7 +15,7 @@ def prepare_to_insert(cells, direction):
 
     elif direction == "L":
         replacements = {41:42, 51:52, 42:41, 52:51, 32:31, 34:33, 31:32, 33:34}#idktbh 61:63, 62:64, 63:61, 64:62
-        for i in cells.keys():
+        for i in cells.values():
             if cells[i] in replacements.keys():
                 cells[i] = replacements[i]
         print("cells finish")
@@ -23,7 +23,7 @@ def prepare_to_insert(cells, direction):
 
     elif direction == "R": #not sure
         replacements = {41:42, 51:52, 42:41, 52:51, 32:31, 34:33, 31:32, 33:34}#idktbh 61:63, 62:64, 63:61, 64:62
-        for i in cells.keys():
+        for i in cells.values():
             if cells[i] in replacements.keys():
                 cells[i] = replacements[i]
         print("cells finish")
