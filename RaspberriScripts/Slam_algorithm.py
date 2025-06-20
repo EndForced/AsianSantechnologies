@@ -225,13 +225,10 @@ if __name__ == "__main__":
         while 1:
             mc.floor = int(mc.robot.do("MyFloor")[0])
             frame = mc.robot.get_uncompressed_frames(0)[1]
-            # frame = replace_with_nearest_color(frame)
-            # a = input()
-            # cv2.imwrite(f"{c}.png", frame)
-            # c+=1
             frame = fix_perspective(frame)
             cv2.imwrite("Warped.png", frame)
             frame, slices, borders = analyze_frame(frame, mc.floor)
+
             if borders:
                 mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
 
