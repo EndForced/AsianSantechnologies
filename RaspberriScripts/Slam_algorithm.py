@@ -269,6 +269,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         for i in commands:
             self.capture_to_map()
+            i = i.replace("Forward", "Backwards")
             self.robot.do(i)
 
     def sort_matrix_coordinates(self, matrix):
