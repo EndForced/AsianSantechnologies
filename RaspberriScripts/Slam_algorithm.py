@@ -267,6 +267,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def move_to_border(self):
         unrevealed = np.array([[1 if cell == 0 or cell == 99 else 0 for cell in row] for row in self._matrix])
+        print(unrevealed)
+
         interest_mat = self.interest_calculation(unrevealed)
         print(interest_mat)
 
