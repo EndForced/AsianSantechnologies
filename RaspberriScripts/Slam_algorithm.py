@@ -244,9 +244,12 @@ if __name__ == "__main__":
     mat = [[0 for _ in range(17)] for _ in range(17)]
     mc = MainComputer(mat, serial)
     if mc.OS == "Linux":
+        mc.slam_parameters_init()
+
         mc.start_website()
         tiles = {}
         while 1:
+            mc.capture_to_map()
             print(mc.robot.Position)
             print(mc.robot.Orientation)
             print(tiles)
