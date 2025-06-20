@@ -10,7 +10,7 @@ import copy
 
 # from ClientClasses.VisualizationProcessing import VisualizeMatrix
 
-possible_codes = [0, 10, 20, 31,32,33,34, 41,42, 51,52, 61,62,63,64, 71,72,73,74, 81,82,83,84, 91,92,93,94]
+possible_codes = [0, 10, 20, 31,32,33,34, 41,42, 51,52, 61,62,63,64, 71,72,73,74, 81,82,83,84, 91,92,93,94,99]
 
 class WaveCreator:
     def __init__(self,matrix_in:list[list[int]]):
@@ -52,6 +52,7 @@ class WaveCreator:
                                  52: {"up": [None], "left": [None], "down": [None], "right": [None]},
 
                                  0: {"up": [None], "left": [None], "down": [None], "right": [None]},
+                                 99: {"up": [None], "left": [None], "down": [None], "right": [None]},
 
                                  94: {"up": [31, 10, 41], "left": [34, 10, 42], "down": [33, 10, 41],"right": [32, 10, 42]},
                                  }

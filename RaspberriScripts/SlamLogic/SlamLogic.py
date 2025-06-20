@@ -16,7 +16,7 @@ def prepare_to_insert(cells, direction):
         return cells
 
     elif direction == "L":
-        replacements = {41:42, 51:52, 42:41, 52:51, 32:31, 34:33, 31:32, 33:34}#idktbh 61:63, 62:64, 63:61, 64:62
+        replacements = {41:42, 51:52, 42:41, 52:51, 32:31, 34:33, 31:34, 33:32}#idktbh 61:63, 62:64, 63:61, 64:62
         for i in cells.keys():
             if cells[i] in replacements.keys():
                 cells[i] = replacements[cells[i]]

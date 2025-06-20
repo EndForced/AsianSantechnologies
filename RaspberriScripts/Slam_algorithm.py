@@ -39,6 +39,12 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         if self.OS == "Linux":
             WebsiteHolder.__init__(self, serial_p)
 
+        self.coefficient_mat = np.array([[0,     0.8,    1,  0.8,    0],
+                                        [0.8,   1.41,   2,  1.41,   0.8],
+                                        [1,     2,      0,  2,      1],
+                                        [0.8,   1.41,   2,  1.41,   0.8],
+                                        [0,     0.8,    1,  0.8,    0]])
+
     def send_map(self):
         # pozdno pozdno pozdno noch'u
         if self.resizedPicture is None:
@@ -238,6 +244,34 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.set_frame(frame)
         self.send_map()
 
+    def interest_calculation(self, matrix):
+        mat = np.array(matrix)
+        revealed = np.array([[0 if cell == 0 else 1 for cell in row] for row in matrix])
+        rows, cols = mat.shape[:2]
+        k_rows, k_cols = self.coefficient_mat.shape[:2]
+        offset_r, offset_c = k_rows // 2, k_cols // 2  # Центр маски
+
+        result = np.array([[0] * cols] * rows)
+
+        for r in range(rows):
+            for c in range(cols):
+                total = 0
+                for kr in range(k_rows):
+                    for kc in range(k_cols):
+                        nr, nc = r + kr - offset_r, c + kc - offset_c
+                        if 0 <= nr < rows and 0 <= nc < cols:  # Проверка границ
+                            total += revealed[nr][nc] * self.coefficient_mat[kr][kc]
+                result[r][c] = total
+
+        return result
+
+    def move_to_border(self):
+        unrevealed = np.array([[1 if cell == 0 or cell == 99 else 0 for cell in row] for row in self._matrix])
+        interest_mat = self.interest_calculation(unrevealed)
+        print(interest_mat)
+
+
+
 
 
 if __name__ == "__main__":
@@ -250,6 +284,8 @@ if __name__ == "__main__":
         tiles = {}
         while 1:
             mc.capture_to_map()
+            mc.move_to_border()
+
             print(mc.robot.Position)
             print(mc.robot.Orientation)
             print(tiles)
