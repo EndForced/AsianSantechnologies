@@ -205,59 +205,48 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         return new_matrix
 
+    def slam_parameters_init(self):
+        self.robot.Orientation = "U"
+        self.robot.Position = (8, 8)
+
+        self._matrix[8][8] = 10 if int(mc.robot.do("MyFloor")[0]) == 1 else 20
+        self.floor = int(mc.robot.do("MyFloor")[0])
+        self.robot.do(f"Elevation {self.floor}")
+        self.robot.do("Direction -1")
+
+
+    def capture_to_map(self):
+        self.floor = int(mc.robot.do("MyFloor")[0])
+        frame = self.robot.get_uncompressed_frames(0)[1]
+        frame = fix_perspective(frame)
+        # cv2.imwrite("Warped.png", frame)
+        frame, slices, borders = analyze_frame(frame, self.floor)
+
+        if borders:
+            mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], self.robot.Position, self.robot.Orientation))
+
+        for key, item in slices.items():
+            if str(item) != "unr":
+                tiles[key + 1] = int(tile_to_code(slices[key]))
+                cv2.imwrite(f"{key}.png", item)
+
+            else:
+                tiles[key + 1] = "unr"
+
+        self._matrix = self.insert(tiles)
+        self.update_matrix()
+        self.robot.set_frame(frame)
+        self.send_map()
+
+
 
 if __name__ == "__main__":
     mat = [[0 for _ in range(17)] for _ in range(17)]
     mc = MainComputer(mat, serial)
-    # res = mc.show()
-    # print(mc.resizedPicture.dtype)
-
     if mc.OS == "Linux":
         mc.start_website()
-        mc.robot.Orientation = "U"
-        mc.robot.Position = (8, 8)
-
-        time.sleep(3)
         tiles = {}
-        mc._matrix[8][8] = 71 if int(mc.robot.do("MyFloor")[0]) == 1 else 81
-        print("mat", mc._matrix)
-        c = 0
         while 1:
-            mc.floor = int(mc.robot.do("MyFloor")[0])
-            frame = mc.robot.get_uncompressed_frames(0)[1]
-            frame = fix_perspective(frame)
-            cv2.imwrite("Warped.png", frame)
-            frame, slices, borders = analyze_frame(frame, mc.floor)
-
-            if borders:
-                mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
-
-
-
-            for key, item in slices.items():
-                if str(item) != "unr":
-                    tiles[key + 1] = int(tile_to_code(slices[key]))
-                    cv2.imwrite(f"{key}.png", item)
-
-                else:
-                    tiles[key + 1] = "unr"
-
-            mc._matrix = mc.insert(tiles)
-            map = mc.update_matrix()
-
-            mc.robot.set_frame(frame)
-            mc.send_map()
-            # cv2.imwrite("warped.png", frame)
-            # time.sleep(0.2)
-            # mc.robot.set_frame(frame)
-            # for key, item in slices.items():
-            #     if str(item) != "unr":
-            #         # print(tile_to_code(item))
-            #         cv2.imwrite(f"{c}.png", item)
-            #         c += 1
-            #         print(c)
-            #
-
             print(mc.robot.Position)
             print(mc.robot.Orientation)
             print(tiles)
@@ -280,45 +269,6 @@ if __name__ == "__main__":
         #     # mc.robot.set_frame(frame)
         #     pass
     else:
-        # print(type(res))
-        # frames = mc.robot.get_uncompressed_frames(save_in_folder = 0)
-        # mc.robot.set_frame(frames[0])...
-        # mc.send_map() no args!
-
-        # print(MainComputer.__mro__)
-        # while 1:
-        #     pass
-
-        # robot = mc.find_robot()
-        # waves = mc.create_wave(robot)
-        # mc.visualize_wave(waves)
-        # res = mc.solve()
-        # # print(res)
-        # mc.draw_multiple_paths(res)
-        # # print(mc.way_to_commands_single(res[2], "U"))
-        # print(mc.way_to_commands(res, "D"))
-        # mc.show()
-        # unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
-        #                "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
-        #                "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
-
-        # moves =mc.solve()
-        # unload_type = mc.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
-        # print("un", unload_type)
-        # moves1 = mc.way_to_commands(moves, "D") #return - путь, направление робота в конце
-
-        # print("dirs", unload_type[1], moves[1])
-        # if unload_type[1] != moves1[1]:
-        #     moves1[0].append(mc.get_rotation_direction(moves1[1], unload_type[1]))
-        #
-        # type_u = unload_type[0]
-        # moves1[0].extend(unload_dict[type_u])
-        # print(moves1)
-        #
-        # mc.draw_multiple_paths(moves)
-        # m = mc.create_way((6,1),(6,5))
-        # mc.draw_path(m)
-        # mc.show()
         print(MainComputer.__mro__)
         mc.robot.Orientation = "U"
         mat = [[0] * 15] * 15
