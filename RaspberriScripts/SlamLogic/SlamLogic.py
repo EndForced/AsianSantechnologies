@@ -7,7 +7,7 @@ def prepare_to_insert(cells, direction):
         return cells
     elif direction == "D":
         replacements = {31:33, 32:34, 33:31, 34:32, 61:63, 62:64, 63:61, 64:62}
-        for i in cells.keys():
+        for i in cells.values():
             if cells[i] in replacements.keys():
                 cells[i] = replacements[i]
         print("cells finish")
