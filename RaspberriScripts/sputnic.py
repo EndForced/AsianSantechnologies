@@ -31,7 +31,7 @@ def process_matrix_in_background(mat, serial_conn):
         print("Background processing started")
         mc = MainComputer(mat, serial_conn)
 
-        mc.robot.do("OK")
+        # mc.robot.do("OK")
         mc.robot.do("Beep")
         floor = int(mc.robot.do("MyFloor")[0])
         cord = mc.find_robot()
