@@ -342,6 +342,7 @@ if __name__ == "__main__":
             cords = mc.interesting_coords()
             for i in cords:
                 if mc.is_in_waves(i):
+                    print(i)
                     mc.drive_and_capture(i)
                     for _ in range(4):
                         mc.robot.do("Turn Right")
