@@ -284,7 +284,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def move_to_border(self):
         unrevealed = np.array([[0 if cell == 0 or cell == 99 else 1 for cell in row] for row in self._matrix])
-        self.create_wave(self.robot.Position)
+        self.Waves =  self.create_wave(self.robot.Position)
         print(unrevealed)
 
         interest_mat = self.interest_calculation(unrevealed)
