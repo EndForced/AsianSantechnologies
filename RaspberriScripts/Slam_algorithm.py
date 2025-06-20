@@ -292,6 +292,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         interest_sorted = self.sort_matrix_coordinates(interest_mat)
 
         print("interest", interest_sorted, "w:", self.Waves)
+        print(self.is_in_waves((8,8)))
         # print(interest_mat)
         _ = input()
 
