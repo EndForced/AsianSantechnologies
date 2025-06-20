@@ -191,8 +191,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             ]
         elif direction == 'R':
             positions = [
-                (base_x, base_y, 1),
-                (base_x, base_y + 1, 2),
+                (base_x, base_y, 2),
+                (base_x, base_y + 1, 1),
                 (base_x + 1, base_y, 3),
                 (base_x + 1, base_y + 1, 4)
             ]
