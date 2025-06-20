@@ -300,8 +300,9 @@ def analyze_frame(frame, floor):
             else:
                 result_frame = draw_on_image(result_frame, cam1floor1[i + 4], color=(0, 0, 255))
                 dict_of_slices[i] = slices[i + 4]
+
         elif floor == 2:
-            if leads[i] == "white":
+            if leads[i] == "black":
                 result_frame = draw_on_image(result_frame, cam1floor2[i])
                 dict_of_slices[i] = slices[i]
             else:
