@@ -359,7 +359,7 @@ class WaveCreator:
             if res_prev != "" and res_prev:
                 res.append(res_prev)
 
-        ires_optimized = self.optimize_commands(res) if optimize else res
+        res_optimized = self.optimize_commands(res) if optimize else res
         # print(res_optimized)
 
         res_relative = []
