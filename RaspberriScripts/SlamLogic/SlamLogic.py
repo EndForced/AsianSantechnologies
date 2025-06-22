@@ -64,7 +64,7 @@ def edge_to_matrix(mat17x17, edge_type, cords_yx, orientation):
         print(f"unknown edge type - {edge_type}")
         return
 
-    if cords_yx[0] > mat17x17.shape[0] or cords_yx[0] < 0 :
+    if cords_yx[0] > mat17x17.shape[0] or cords_yx[0] < 0:
         print(f"cord y is outside of map bound")
         return
     if cords_yx[1] > mat17x17.shape[1] or cords_yx[1] < 0:
@@ -80,28 +80,34 @@ def edge_to_matrix(mat17x17, edge_type, cords_yx, orientation):
     if edge_type[1] == "f":
         delta = 2
 
-    if orientation == "U" or orientation=="L":
-        delta*=-1
+    if orientation == "U" or orientation == "L":
+        delta *= -1
 
     if edge_type[0] == 'f':
         direction_of_line_normale = same_dir(orientation)
     else:
         direction_of_line_normale = opposite_dir(orientation)
 
-
-    cord = cords_yx[0] if direction_of_line_normale=='y' else cords_yx[1]
+    cord = cords_yx[0] if direction_of_line_normale == 'y' else cords_yx[1]
     cord = cord + delta
     # край ближний к нам
-    line_in_matrix(99,direction_of_line_normale,cord,mat17x17)
+
 
     if cord > 8:
+        for i in range(cord,17+1):
+            line_in_matrix(99, direction_of_line_normale, i, mat17x17)
         cord = cord - 9
+        for i in range(0,cord+1):
+            line_in_matrix(99, direction_of_line_normale, i, mat17x17)
     else:
+        for i in range(0, cord + 1):
+            line_in_matrix(99, direction_of_line_normale, i, mat17x17)
         cord = cord + 9
-    # второй край через поле от него
-    line_in_matrix(99,direction_of_line_normale,cord,mat17x17)
+        for i in range(cord, 17 + 1):
+            line_in_matrix(99, direction_of_line_normale, i, mat17x17)
 
     return mat17x17
+
 
 def cell_interest(cell, direction, mat, used_cells):
     #адаптировать под вторую камеру будет не сложно
@@ -223,7 +229,7 @@ def coolest_route(mc):
                     roadmap = roadmap[::-1]
 
                 cords_to_pos = route_to_dirs(cords_roadmap, roadmap, mc.robot.Orientation)
-                print(cords_roadmap, cords_to_pos)
+                # print(cords_roadmap, cords_to_pos)
                 route_interest = 0
 
                 for cord, dirs in cords_to_pos.items():

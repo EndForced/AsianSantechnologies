@@ -3,8 +3,8 @@ import sys, os, platform, math
 
 import numpy as np
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
 from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code
 from SlamLogic.SlamLogic import prepare_to_insert, edge_to_matrix, coolest_route, optimal_cell_scanning
@@ -89,7 +89,7 @@ if platform.system() == "Windows":
 
 
                     elif "Right" in args:
-                        print("hui")
+                        # print("hui")
                         if self.Orientation == "L":
                             self.Orientation = "U"
                         elif self.Orientation == "U":
@@ -111,10 +111,32 @@ if platform.system() == "Windows":
                         self.Orientation = "U"
 
 
+            x, y = self.Position
+            if "Up" in args:
+                if self.Orientation == "U":
+                    self.Position = (x - 1, y)
+                elif self.Orientation == "D":
+                    self.Position = (x + 1, y)
+                elif self.Orientation == "R":
+                    self.Position = (x, y + 1)
+                elif self.Orientation == "L":
+                    self.Position = (x, y - 1)
+            elif "Down" in args:
+                if self.Orientation == "U":
+                    self.Position = (x - 1, y)
+                elif self.Orientation == "D":
+                    self.Position = (x + 1, y)
+                elif self.Orientation == "R":
+                    self.Position = (x, y + 1)
+                elif self.Orientation == "L":
+                    # print(self.Position, "mycord")
+                    self.Position = (x, y - 1)
 
-            print(f"doing {args} ... ")
 
-            print(f"done {args}, res:  ... ")
+
+            # print(f"doing {args} ... ")
+            #
+            # print(f"done {args}, res:  ... ")
 
             # time.sleep(0.1)
 
@@ -268,7 +290,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         elif direction == 'D':
             base_x, base_y = x-1, y + 1  # Смещаем на 1 вниз
         elif direction == 'L':
-            base_x, base_y = x , y   # Смещаем на 1 влево и вниз
+            base_x, base_y = x-1 , y -1   # Смещаем на 1 влево и вниз
         elif direction == 'R':
             base_x, base_y = x + 2, y + 1   # Смещаем на 1 вправо
         else:
@@ -297,12 +319,12 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             ]
         elif direction == 'L':
             positions = [
-                (base_x-1, base_y - 1, 1),
-                (base_x-1, base_y , 2),
-                (base_x-1, base_y + 1 , 3),
-                (base_x -2 , base_y-1, 4),
-                (base_x - 2, base_y , 5),
-                (base_x - 2, base_y + 1, 6)
+                (base_x, base_y, 1),
+                (base_x, base_y+1 , 2),
+                (base_x, base_y + 2 , 3),
+                (base_x - 1 , base_y, 4),
+                (base_x - 1, base_y+1 , 5),
+                (base_x - 1, base_y + 2, 6)
             ]
         elif direction == 'R':
             positions = [
@@ -433,7 +455,8 @@ if __name__ == "__main__":
         #     # mc.robot.set_frame(frame)
         #     pass
     else:
-        se = ScanEmulator(fm)
+        m = 0
+        se = ScanEmulator(fm.copy())
         mc.robot.Orientation = "U"
         mc._matrix[mc.robot.Position[0]][mc.robot.Position[1]] = 10
         # mc._matrix = fm
@@ -442,15 +465,17 @@ if __name__ == "__main__":
 
         for i in range(4):
             cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
+            print(cells)
             if borders: mc._matrix = edge_to_matrix(mc._matrix, borders[0], mc.robot.Position, mc.robot.Orientation)
             mc._matrix = mc.insert(cells)
             mc.update_matrix()
             mc.robot.do("Turn Right")
             mc.show()
-            print(mc.robot.Orientation)
+            m+=1
+            # print(mc.robot.Orientation)
 
 
-        while 1:
+        while not mc.solve(mc.robot.Position):
             cell_to_go, used_cells = coolest_route(mc)
             # print(cell_to_go)
 
@@ -464,22 +489,31 @@ if __name__ == "__main__":
                 mc.robot.do(i)
                 print(mc.robot.Position, mc.robot.Orientation)
                 cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
-                print(borders)
+                print(cells)
                 if borders: mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
                 mc._matrix = mc.insert(cells)
 
                 mc.update_matrix()
                 mc.visualize_wave(used_cells)
                 mc.put_frame(mc.robot.Position, (0,0, 65000))
-                mc.draw_path(way)
+                m += 1
                 mc.show()
 
 
 
-            print(way, "way")
+
+            # print(way, "way")
             mc.update_matrix()
             mc.visualize_wave(used_cells)
-            mc.draw_path(way)
+            # mc.draw_path(way)
+            print("moves:", m)
+            # mc.show()
 
-
+        way = mc.solve(mc.robot.Position )
+        w = mc.create_wave(mc.robot.Position)
+        mc.visualize_wave(w)
+        mc.draw_multiple_paths( way)
         mc.show()
+
+
+

@@ -409,9 +409,9 @@ class PattersSolver(WaveCreator):
         #возвращает словарь вида {(yt, xt): []}
         tubes = []
 
-        for i in range(len(self.matrix)):
-            for j in range(len(self.matrix[i])):
-                if str(self.matrix[i][j])[0] in ["4", "5"]:
+        for i in range(len(self._matrix)):
+            for j in range(len(self._matrix[i])):
+                if str(self._matrix[i][j])[0] in ["4", "5"]:
                     tubes.append((i,j))
 
         return tubes
@@ -469,15 +469,13 @@ class PattersSolver(WaveCreator):
         return tubes_out
 
     def get_unload_type(self):
-        mat = []
+        mat  = np.array(self._matrix)
 
-        for i in self._matrix:
-            mat += i
 
-        if mat.count(61): return "up"
-        elif mat.count(62): return "right"
-        elif mat.count(63): return "down"
-        elif mat.count(64):return "left"
+        if 61 in mat: return "up"
+        elif 62 in mat: return "right"
+        elif 63 in mat: return "down"
+        elif 64 in mat:return "left"
 
         print("no holders")
 
@@ -585,13 +583,26 @@ class PattersSolver(WaveCreator):
             combins[weight] = way
         return  combins[min(combins.keys())]
 
-    def solve(self):
-        start = self.find_robot()
+    def solve(self, start = None):
+        if not start: start = self.find_robot()
+        self.matrix = self._matrix
         self.robot_cord = start
-        self._matrix[start[0]][start[1]] = 10 if self._matrix[start[0]][start[1]] in [71,72,73,74] else 20
+        self._matrix[start[0]][start[1]] = 10 if self._matrix[start[0]][start[1]] in [71,72,73,74, 10] else 20
         self.tubes = self.find_tubes()
+
+        # print("coordst :",self.tubes)
+        if len(self.tubes) < 3:
+            return
+
         self.holders = self.find_holders()
+        if len(self.tubes) < 3:
+            return
+
+
         self.pick_up = self.pick_tubes_cords()
+        for i in self.pick_up.keys():
+            if not self.pick_up[i]:
+                return
 
 
         combs = self.generate_combinations(start)
