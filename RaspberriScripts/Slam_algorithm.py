@@ -7,18 +7,119 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
 from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code
-from SlamLogic.SlamLogic import prepare_to_insert, edge_to_matrix
+from SlamLogic.SlamLogic import prepare_to_insert, edge_to_matrix, coolest_route, optimal_cell_scanning
+from SlamLogic.scan_emulator import ScanEmulator, fm, dummy_def
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
 import cv2
 import base64
 
 if platform.system() == "Windows":
+    class RobotAPI:
+        # по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
+
+        def __init__(self, position, orientation, serial, socketio=None):
+            self.telemetryQuality = 15
+            self.mapQuality = 40
+
+            self.socket = socketio
+
+            if max(position) > 15:
+                raise ValueError("Robot is out of borders!", position)
+            self.Position = position
+
+            if orientation not in ["U", "D", "R", "L"]:
+                raise ValueError("Unknown orientation!", orientation)
+            self.Orientation = orientation
+
+            self.IsDoingAction = 0
+            self.frames = {}
+
+        def do(self, args):
+            if "Pid" in args:
+                parts = args.split()
+
+                direction = None
+                steps = 1  # По умолчанию 1 шаг
+
+                for i, part in enumerate(parts):
+                    if part in ["Forward", "Backwards"]:
+                        direction = part
+                        if i + 1 < len(parts) and parts[i + 1].isdigit():
+                            steps = int(parts[i + 1])
+                        break
+
+                if direction:
+                    for _ in range(steps):
+                        x, y = self.Position
+                        if direction == "Forward":
+                            if self.Orientation == "U":
+                                self.Position = (x - 1, y)
+                            elif self.Orientation == "D":
+                                self.Position = (x + 1, y)
+                            elif self.Orientation == "R":
+                                self.Position = (x, y + 1)
+                            elif self.Orientation == "L":
+                                self.Position = (x, y - 1)
+                        elif direction == "Backwards":
+                            if self.Orientation == "U":
+                                self.Position = (x - 1, y)
+                            elif self.Orientation == "D":
+                                self.Position = (x + 1, y)
+                            elif self.Orientation == "R":
+                                self.Position = (x, y + 1)
+                            elif self.Orientation == "L":
+                                # print(self.Position, "mycord")
+                                self.Position = (x, y - 1)
+
+
+
+
+            elif "Turn" in args:
+                if "2" not in args:
+                    if "Left" in args:
+                        if self.Orientation == "L":
+                            self.Orientation = "D"
+                        elif self.Orientation == "D":
+                            self.Orientation = "R"
+                        elif self.Orientation == "R":
+                            self.Orientation = "U"
+                        elif self.Orientation == "U":
+                            self.Orientation = "L"
+
+
+                    elif "Right" in args:
+                        print("hui")
+                        if self.Orientation == "L":
+                            self.Orientation = "U"
+                        elif self.Orientation == "U":
+                            self.Orientation = "R"
+                        elif self.Orientation == "R":
+                            self.Orientation = "D"
+                        elif self.Orientation == "D":
+                            self.Orientation = "L"
+
+
+                else:
+                    if self.Orientation == "L":
+                        self.Orientation = "R"
+                    elif self.Orientation == "R":
+                        self.Orientation = "L"
+                    elif self.Orientation == "U":
+                        self.Orientation = "D"
+                    elif self.Orientation == "D":
+                        self.Orientation = "U"
+
+
+
+            print(f"doing {args} ... ")
+
+            print(f"done {args}, res:  ... ")
+
+            # time.sleep(0.1)
+
     class WebsiteHolder:
-        pass
-
-
-    serial = None
+        robot = RobotAPI((8,8), "U", None)
 
 if platform.system() == "Linux":
     from StreamVideo import WebsiteHolder
@@ -153,62 +254,73 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def insert(self, cells):
         # josko insert
-        cells = prepare_to_insert(cells, self.robot.Orientation)
+        # cells = prepare_to_insert(cells, self.robot.Orientation)
         matrix = self._matrix
         y, x = self.robot.Position
         direction = self.robot.Orientation
+        positions = []
 
         new_matrix = [row.copy() for row in matrix]
 
         # Сначала вычисляем базовые координаты с учетом смещения вверх
         if direction == 'U':
-            base_x, base_y = x, y - 1  # Смещаем на 1 вверх и влево
+            base_x, base_y = x+1, y - 1  # Смещаем на 1 вверх и влево
         elif direction == 'D':
-            base_x, base_y = x, y + 1  # Смещаем на 1 вниз
+            base_x, base_y = x-1, y + 1  # Смещаем на 1 вниз
         elif direction == 'L':
-            base_x, base_y = x - 1, y  # Смещаем на 1 влево
+            base_x, base_y = x , y   # Смещаем на 1 влево и вниз
         elif direction == 'R':
-            base_x, base_y = x + 1, y - 1   # Смещаем на 1 вправо
+            base_x, base_y = x + 2, y + 1   # Смещаем на 1 вправо
         else:
             raise ValueError("Неправильное направление")
 
         # Распределение клеток по направлениям
         if direction == 'U':
+            # print(base_x, base_y, "bases")
             positions = [
-                (base_x, base_y, 1),  # Левый верхний (индекс 1)
-                (base_x - 1, base_y, 2),  # Правый верхний (индекс 2)
-                (base_x, base_y - 1, 3),  # Левый нижний (индекс 3)
-                (base_x - 1, base_y - 1, 4)  # Правый нижний (индекс 4)
+                (base_x, base_y, 1),
+                (base_x - 1, base_y, 2),
+                (base_x - 2, base_y, 3),
+                (base_x, base_y - 1, 4),
+                (base_x - 1, base_y - 1, 5),
+                (base_x - 2, base_y - 1, 6)
             ]
         elif direction == 'D':
             print(base_x, base_y, "bases")
             positions = [
                 (base_x, base_y, 1),
                 (base_x + 1, base_y, 2),
-                (base_x, base_y + 1, 3),
-                (base_x + 1, base_y + 1, 4)
+                (base_x + 2, base_y, 3),
+                (base_x, base_y + 1, 4),
+                (base_x + 1, base_y + 1, 5),
+                (base_x + 2, base_y + 1, 6)
             ]
         elif direction == 'L':
             positions = [
-                (base_x, base_y, 1),
-                (base_x, base_y + 1, 2),
-                (base_x - 1, base_y, 3),
-                (base_x - 1, base_y + 1, 4)
+                (base_x-1, base_y - 1, 1),
+                (base_x-1, base_y , 2),
+                (base_x-1, base_y + 1 , 3),
+                (base_x -2 , base_y-1, 4),
+                (base_x - 2, base_y , 5),
+                (base_x - 2, base_y + 1, 6)
             ]
         elif direction == 'R':
             positions = [
-                (base_x, base_y, 2),
-                (base_x, base_y + 1, 1),
-                (base_x + 1, base_y, 4),
-                (base_x + 1, base_y + 1, 3)
+                (base_x, base_y, 4),
+                (base_x, base_y - 1, 5),
+                (base_x, base_y - 2, 6),
+                (base_x - 1, base_y, 1),
+                (base_x - 1, base_y - 1, 2),
+                (base_x - 1, base_y - 2, 3)
             ]
 
         for px, py, idx in positions:
             if 0 <= px < 15 and 0 <= py < 15:  # Проверяем границы
-                if idx in cells and cells[idx] != 'unr':
+                if cells[idx-1] != 'unr':
                     if self._matrix [py][px] != 99:
-                        new_matrix[py][px] = cells[idx]
+                        new_matrix[py][px] = cells[idx-1]
 
+        self._matrix = new_matrix
         return new_matrix
 
     def slam_parameters_init(self):
@@ -274,55 +386,15 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             self.robot.do(i)
 
 
-    def sort_matrix_coordinates(self, matrix):
-        # Создаем список кортежей (значение, y, x)
-        coordinates = []
-        for y in range(len(matrix)):
-            for x in range(len(matrix[y])):
-                value = matrix[y][x]
-                if value != 0:  # Игнорируем нули
-                    coordinates.append((value, y, x))  # Порядок: значение, y, x
-
-        # Сортируем по убыванию значения, затем по y (возрастание), затем по x (возрастание)
-        coordinates.sort(key=lambda item: (-item[0], item[1], item[2]))
-
-        # Возвращаем список кортежей (y, x) только для координат из waves
-        sorted_coordinates = [(y, x) for value, y, x in coordinates if self.is_in_waves((y, x))]
-        return sorted_coordinates
-
-    def interest_calculation(self, matrix):
-        mat = np.array(matrix)
-        revealed = np.array([[0 if cell == 0 else 1 for cell in row] for row in matrix])
-        rows, cols = mat.shape[:2]
-        k_rows, k_cols = self.coefficient_mat.shape[:2]
-        offset_r, offset_c = k_rows // 2, k_cols // 2  # Центр маски
-
-        result = np.array([[0] * cols] * rows)
-
-        for r in range(rows):
-            for c in range(cols):
-                total = 0
-                for kr in range(k_rows):
-                    for kc in range(k_cols):
-                        nr, nc = r + kr - offset_r, c + kc - offset_c
-                        if 0 <= nr < rows and 0 <= nc < cols:  # Проверка границ
-                            total += revealed[nr][nc] * self.coefficient_mat[kr][kc]
-                result[r][c] = total
-
-        return result
-
-    def interesting_coords(self):
-        unrevealed = np.array([[0 if cell == 0 or cell == 99 else 1 for cell in row] for row in self._matrix])
-        self.Waves = self.create_wave(self.robot.Position)
-        interest_mat = self.interest_calculation(unrevealed)
-        interest_sorted = self.sort_matrix_coordinates(interest_mat)
-        return interest_sorted
 
 
 
 if __name__ == "__main__":
     mat = [[0 for _ in range(17)] for _ in range(17)]
-    mc = MainComputer(mat, serial)
+    mc = MainComputer(mat, 1)
+    mc.robot.Orientation = "U"
+    mc.robot.Position = (8,8)
+
     if mc.OS == "Linux":
         mc.slam_parameters_init()
 
@@ -331,13 +403,8 @@ if __name__ == "__main__":
         mc.capture_to_map()
 
         while 1:
-            cords = mc.interesting_coords()
-            for i in cords:
-                if mc.is_in_waves(i) and np.array(mc._matrix)[i] not in [31,32,33,34]:
-                    mc.drive_and_capture(i)
-                    for _ in range(4):
-                        mc.robot.do("Turn Right")
-                        mc.capture_to_map()
+            coolest_route(mc)
+
                     # print(mc.robot.Position)
                     # print(mc.robot.Orientation)
                     # print(tiles)
@@ -366,13 +433,53 @@ if __name__ == "__main__":
         #     # mc.robot.set_frame(frame)
         #     pass
     else:
-        print(MainComputer.__mro__)
+        se = ScanEmulator(fm)
         mc.robot.Orientation = "U"
-        mat = [[0] * 15] * 15
-        cells = {1: 20, 2: 20, 3: "unr", 4: "unr"}
-        mat = mc.insert(cells)
-        pos = mc.robot.Position
-        mc._matrix[pos[0]][pos[1]] = 71
-        mc._matrix = mat
-        mc.update_matrix()
+        mc._matrix[mc.robot.Position[0]][mc.robot.Position[1]] = 10
+        # mc._matrix = fm
+        # mc.update_matrix()
+        # mc.show()
+
+        for i in range(4):
+            cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
+            if borders: mc._matrix = edge_to_matrix(mc._matrix, borders[0], mc.robot.Position, mc.robot.Orientation)
+            mc._matrix = mc.insert(cells)
+            mc.update_matrix()
+            mc.robot.do("Turn Right")
+            mc.show()
+            print(mc.robot.Orientation)
+
+
+        while 1:
+            cell_to_go, used_cells = coolest_route(mc)
+            # print(cell_to_go)
+
+            # optimal_cell_scanning(mc,cell_to_go, mc.robot.Orientation, used_cells)
+            way = mc.create_way(mc.robot.Position, cell_to_go)
+            way_c = mc.way_to_commands_single(way, mc.robot.Orientation, 0)[0]
+            way_c = dummy_def(way_c)
+            # print(way_c)
+
+            for i in way_c:
+                mc.robot.do(i)
+                print(mc.robot.Position, mc.robot.Orientation)
+                cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
+                print(borders)
+                if borders: mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
+                mc._matrix = mc.insert(cells)
+
+                mc.update_matrix()
+                mc.visualize_wave(used_cells)
+                mc.put_frame(mc.robot.Position, (0,0, 65000))
+                mc.draw_path(way)
+                mc.show()
+
+
+
+            print(way, "way")
+            mc.update_matrix()
+            mc.visualize_wave(used_cells)
+            mc.draw_path(way)
+
+
         mc.show()

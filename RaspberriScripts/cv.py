@@ -125,7 +125,7 @@ def update_frame_smart(frame, floor):
             if np.mean(slices[i]) < mean_const:
                 lead = "black"
             else:
-                lead = "white"
+                lead = "white2"
             leads.append(lead)
 
             # Пропускаем индексы 2 и 3 если есть дальний бордер

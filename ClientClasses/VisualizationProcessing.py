@@ -83,6 +83,8 @@ class VisualizeMatrix:
         return self.picture
 
     def update_matrix(self):
+        self._matrixMaxHeight, self._matrixMaxWeight = WaveProcessing.WaveCreator.matrix_max_dimensions(self._matrix)
+
         self.picture = self.image_by_matrix_size()
 
         self._codesInMatrix = self.find_included_codes()
