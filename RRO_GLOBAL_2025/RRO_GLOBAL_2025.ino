@@ -5,6 +5,7 @@ volatile int countr = 0;
 int inverse = 0;
 
 int dir = 1;
+const int align_flag = 0;
 
 float e_old = 0;
 int err_i = 0;
@@ -40,25 +41,20 @@ void setup() {
   close_claws();
 
   buttonWait(0);
-  cam(1, 10);
+  cam(1, 7);
   open_claws();
   delay(100);
 }
 
 void loop() {
-  //  for (int i = 0; i < 3; i++) {
-  //    buttonWait(0);
-  //    grab();
-  //  }
-  //  for (int i = 0; i < 3; i++) {
-  //    buttonWait(0);
-  //    put();
-  //  }
-
   uartProcessing();
-//buttonWait(0);
-////
-//grab_from_ramp_up();
+  // for (int i = 0; i < 4; i++) {
+  //   pidXN(1000, 2);
+  //   turn_to_line(950, 1, 1, 1);
+  // }
+  // otrovnyat(150000);
+  // stop();
+  // buttonWait(0);
 }
 
 
@@ -66,14 +62,13 @@ uint32_t tim = 0;
 void buttonWait(int flag) {
   while (1) {
     //  Serial.println(button());
-    if (button() == 0){
-//      while (Serial1.readStringUntil('\n') != "OK"){ #for fun
-//      SendData("Activated");
-//      }
-//      SendData("OK Accepted!");
+    if (button() == 0) {
+      // while (Serial1.readStringUntil('\n') != "OK") {  // for fun
+      //   SendData("Activated");
+      // }
+      // SendData("OK Accepted!");
       break;
-    }
-    else if (millis() - tim > 200) {
+    } else if (millis() - tim > 200) {
       tim = millis();
       switch (flag) {
         case (1):

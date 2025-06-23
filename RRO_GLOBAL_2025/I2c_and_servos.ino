@@ -9,21 +9,16 @@ Adafruit_NeoPixel pixels(NUMPIXELS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 /*------------------------------A---B---CL1-ARM-CL2-CAM-C---D-*/
 const int base_positions[8] = { 93, 87, 90, 10, 90, 150, 86, 88 };
 
-#define ASF 140
-#define BSF 40
-#define CSF 135
-#define DSF 45
-
 void servos_init() {
   Wire.begin();  // Join I2C bus as master
   Wire.setClock(400000);
 
   send_rgb(0, 0, 0);
+
   delay(20);
-  arm(6, 10);
-  delay(150);
   close_claws();
-  cam(0);
+  arm(6, 7);
+  cam(0,7);
 
   // open_claws();
   all_forward();
@@ -31,7 +26,7 @@ void servos_init() {
 }
 
 const byte arm_num = 3;
-const byte arm_positions[] = { 102, 98, 93, 60, 40, 22, 5};  // from stand to last tube
+const byte arm_positions[] = { 102, 98, 93, 60, 38, 20, 2 };  // from stand to last tube
 const byte max_pos = sizeof(arm_positions) / sizeof(byte) - 1;
 
 byte last_arm_pos = 10;
@@ -134,8 +129,8 @@ void put() {
 }
 
 const byte claw_nums[] = { 2, 4 };
-const byte claw_open[] = { 124, 55 };
-const byte claw_closed[] = { 58, 129 };
+const byte claw_open[] = { 119, 66 };
+const byte claw_closed[] = { 53, 134 };
 
 void open_claws() {
   Wire.beginTransmission(I2C_ADDRESS);  // Slave address
@@ -175,6 +170,7 @@ void close_claws() {
   }
   Wire.endTransmission();
 }
+
 const byte cam_pos[] = { 153, 52 };
 const byte cam_num = 5;
 byte last_cam = 0;
@@ -192,6 +188,12 @@ void cam(byte num_pos) {
 }
 
 
+#define ASF 140
+#define BSF 40
+#define CSF 135
+#define DSF 45
+
+const byte sideways[4] = { 62, 112, 60, 115 };
 const byte diagonal[4] = { 91, 86, 86, 90 };
 const byte forward[4] = { ASF, BSF, CSF, DSF };
 const byte abcd[4] = { 0, 1, 6, 7 };
@@ -206,6 +208,12 @@ void all_diagonal() {
   Wire.beginTransmission(I2C_ADDRESS);  // Slave address
   for (int i = 0; i < 4; i++)
     send_servo(abcd[i], diagonal[i]);
+  Wire.endTransmission();
+}
+void all_side() {
+  Wire.beginTransmission(I2C_ADDRESS);  // Slave address
+  for (int i = 0; i < 4; i++)
+    send_servo(abcd[i], sideways[i]);
   Wire.endTransmission();
 }
 
