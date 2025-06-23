@@ -417,16 +417,16 @@ if __name__ == "__main__":
         mc.slam_parameters_init()
 
         mc.start_website()
-
+        c = 1
         while 1:
             frame = mc.robot.get_uncompressed_frames(1)[0]
-            frame = fix_perspective(frame)
+            # frame = fix_perspective(frame)
             # frame, borders, cells = analyze_frame(frame, 1)
-            cv2.imwrite("test_frame.png", frame)
-            mc.robot.set_frame(frame)
+            cv2.imwrite(f"{c}.png", frame)
+            # mc.robot.set_frame(frame)
 
             _ = input()
-            mc.robot.do(_)
+            # mc.robot.do(_)
 
 
         # tiles = {}
