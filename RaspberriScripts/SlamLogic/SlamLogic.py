@@ -10,7 +10,7 @@ def prepare_to_insert(cells, direction):
         return cells
 
     elif direction == "D":
-        replacements = {31:33, 32:34, 33:31, 34:32, 61:63, 62:64, 63:61, 64:62}
+        replacements = {31: 33, 32: 34, 33: 31, 34: 32, 61: 63, 62: 64, 63: 61, 64: 62}
         for i in range(len((cells))):
             if cells[i] in replacements.keys():
                 cells[i] = replacements[cells[i]]
@@ -18,25 +18,29 @@ def prepare_to_insert(cells, direction):
         return cells
 
     elif direction == "L":
-        replacements = {41:42, 51:52, 42:41, 52:51, 32:31, 34:33, 31:34, 33:32}#idktbh 61:63, 62:64, 63:61, 64:62
+        replacements = {41: 42, 51: 52, 42: 41, 52: 51, 32: 31, 34: 33, 31: 34,
+                        33: 32, 61: 64, 62: 61, 63: 62, 64: 63}  # idktbh 61:63, 62:64, 63:61, 64:62
         for i in range(len((cells))):
             if cells[i] in replacements.keys():
                 cells[i] = replacements[cells[i]]
         print("cells finish")
         return cells
 
-    elif direction == "R": #not sure
-        replacements = {41:42, 51:52, 42:41, 52:51, 32:31, 34:33, 31:34, 33:32}#idktbh 61:63, 62:64, 63:61, 64:62
+    elif direction == "R":  # not sure
+        replacements = {41: 42, 51: 52, 42: 41, 52: 51, 32: 31, 34: 33, 31: 34,
+                        33: 32, 61: 62, 62: 63, 63: 64, 64: 61}  # idktbh 61:63, 62:64, 63:61, 64:62
         for i in range(len((cells))):
             if cells[i] in replacements.keys():
                 cells[i] = replacements[cells[i]]
         print("cells finish")
         return cells
+
 
 def line_in_matrix(line_of, cord_type, cord, mat17x17):
     length = mat17x17.shape[0] if cord_type == 'x' else mat17x17.shape[1]
     if length != 17 or sum(mat17x17.shape[:2]) != 17 * 2:
-        print(f"you are using some strange matrix?\nnormal one should be 17x17 not {mat17x17.shape[0]}x{mat17x17.shape[1]}")
+        print(
+            f"you are using some strange matrix?\nnormal one should be 17x17 not {mat17x17.shape[0]}x{mat17x17.shape[1]}")
     if cord < 0 or cord >= sum(mat17x17.shape[:2]) - length:
         print(f"cord {cord} is outside of map bound")
         return
@@ -49,6 +53,7 @@ def line_in_matrix(line_of, cord_type, cord, mat17x17):
         else:
             print(f"unknown cord type - {cord_type}")
             return
+
 
 def edge_to_matrix(mat17x17, edge_type, cords_yx, orientation):
     def same_dir(dir):
@@ -92,12 +97,11 @@ def edge_to_matrix(mat17x17, edge_type, cords_yx, orientation):
     cord = cord + delta
     # край ближний к нам
 
-
     if cord > 8:
-        for i in range(cord,17+1):
+        for i in range(cord, 17 + 1):
             line_in_matrix(99, direction_of_line_normale, i, mat17x17)
         cord = cord - 9
-        for i in range(0,cord+1):
+        for i in range(0, cord + 1):
             line_in_matrix(99, direction_of_line_normale, i, mat17x17)
     else:
         for i in range(0, cord + 1):
@@ -110,7 +114,7 @@ def edge_to_matrix(mat17x17, edge_type, cords_yx, orientation):
 
 
 def cell_interest(cell, direction, mat, used_cells):
-    #адаптировать под вторую камеру будет не сложно
+    # адаптировать под вторую камеру будет не сложно
     used_cells = used_cells.copy()
     y, x = cell
     mat = np.array(mat)
@@ -118,13 +122,13 @@ def cell_interest(cell, direction, mat, used_cells):
     banned_indexes = []
 
     cords_of_interest = {
-        "U": [(y-1, x), (y-1, x-1), (y-2, x), (y-2, x-1)],
-        "D": [(y+1,x), (y+1, x+1), (y+2, x), (y+2, x+1)],
-        "R": [(y, x+1), (y-1, x+1), (y, x+2), (y-1, x+2)],
-        "L": [(y, x-1), (y+1, x-1), (y, x-2), (y+1, x-2) ]
+        "U": [(y - 1, x + 1), (y - 1, x), (y - 1, x - 1), (y - 2, x + 1), (y - 2, x), (y - 2, x - 1)],
+        "D": [(y + 1, x - 1), (y + 1, x), (y + 1, x + 1), (y + 2, x - 1), (y + 2, x), (y + 2, x + 1)],
+        "R": [(y + 1, x + 1), (y, x + 1), (y - 1, x + 1), (y + 1, x + 2), (y, x + 2), (y - 1, x + 2)],
+        "L": [(y - 1, x - 1), (y, x - 1), (y + 1, x - 1), (y - 1, x - 2), (y, x - 2), (y + 1, x - 2)]
     }
 
-    if direction not in ["U","D","R","L"]:
+    if direction not in ["U", "D", "R", "L"]:
         print("Strange direction while interest calculation!!!1", direction)
         return
 
@@ -132,25 +136,32 @@ def cell_interest(cell, direction, mat, used_cells):
     for cord in cords_of_interest[direction]:
         yc, xc = cord
 
-        if -1 < yc + 1 <= ymax and -1 < xc + 1 <= xmax: #in matrix range
+        if -1 < yc <= ymax - 1 and -1 < xc <= xmax - 1:  # in matrix range
 
-
-            if cords_of_interest[direction].index(cord) == 0: #cant read behind 2 floor
-                if mat[cord] in [20, 51, 52, 32,33,34]:
-                    banned_indexes.append(2)
-
-            if cords_of_interest[direction].index(cord) == 1:
-                if mat[cord] in [20, 51, 52, 32,33,34]:
+            if cords_of_interest[direction].index(cord) == 0:  # cant read behind 2 floor
+                if mat[cord] in [20, 51, 52, 32, 33, 34]:
                     banned_indexes.append(3)
 
-            flag = 0 if cord in used_cells or cords_of_interest[direction].index(cord) in banned_indexes  else 1
+            if cords_of_interest[direction].index(cord) == 1:
+                if mat[cord] in [20, 51, 52, 32, 33, 34]:
+                    banned_indexes.append(4)
+
+            if cords_of_interest[direction].index(cord) == 2:
+                if mat[cord] in [20, 51, 52, 32, 33, 34]:
+                    banned_indexes.append(5)
+
+            flag = 0 if mat[cord] != 0 or cord in used_cells or cords_of_interest[direction].index(
+                cord) in banned_indexes else 1
+
             if min(cord) > -1 and flag:
                 used_cells.append(cord)
 
-            if mat[cord] == 0 and cords_of_interest[direction].index(cord) not in banned_indexes and flag and min(cord) > -1:
+            if mat[cord] == 0 and cords_of_interest[direction].index(cord) not in banned_indexes and flag and min(
+                    cord) > -1:
                 interest += 1
 
     return interest, used_cells
+
 
 def dirs_summ(dir1, dir2):
     if dir1 == "U":
@@ -177,8 +188,9 @@ def dirs_summ(dir1, dir2):
         if dir2 == "L":
             return "D"
 
-def route_to_dirs(route,commands, dir_start):
-    #heart of the slam
+
+def route_to_dirs(route, commands, dir_start):
+    # heart of the slam
     dir_d = {}
     dir_d[route[0]] = [dir_start]
     dir_prev = dir_start
@@ -192,7 +204,8 @@ def route_to_dirs(route,commands, dir_start):
             if route[c] in dir_d.keys():
                 dir_d[route[c]].append(curr_dir)
 
-            else:dir_d[route[c]] = [curr_dir]
+            else:
+                dir_d[route[c]] = [curr_dir]
 
             dir_prev = copy.copy(curr_dir)
 
@@ -202,8 +215,8 @@ def route_to_dirs(route,commands, dir_start):
             if route[c] not in dir_d.keys():
                 dir_d[route[c]] = [curr_dir]
 
-
     return dir_d
+
 
 def coolest_route(mc):
     cells_interests = {}
@@ -215,15 +228,13 @@ def coolest_route(mc):
         for j in i:
             cords_roadmap = mc.create_way(cord_r, j)
 
-            if len(cords_roadmap) > 1 and np.array(mc._matrix)[j] not in [31,32,33,34]:
+            if len(cords_roadmap) > 1 and np.array(mc._matrix)[j] not in [31, 32, 33, 34]:
                 used_cells = []
 
                 roadmap, end_dir = mc.way_to_commands_single(cords_roadmap, mc.robot.Orientation, 0)
                 if roadmap[0] == "R2":
                     roadmap.pop(0)
                     roadmap = roadmap[::-1]
-                    #Надо бы вынести функцию проверки маршрута и кормить ее разными вариациями поворотов.
-                    #Строим маршрут, едем и сканим, это же гениально!)
                     roadmap.append("R1")
                     roadmap.append("R1")
                     roadmap = roadmap[::-1]
@@ -231,32 +242,39 @@ def coolest_route(mc):
                 cords_to_pos = route_to_dirs(cords_roadmap, roadmap, mc.robot.Orientation)
                 # print(cords_roadmap, cords_to_pos)
                 route_interest = 0
-
+                counter = 0
                 for cord, dirs in cords_to_pos.items():
                     for dir in dirs:
                         cell_int, used_cells = cell_interest(cord, dir, mc._matrix, used_cells)
                         route_interest += cell_int
+                        route_interest -= 0.01 * counter ** 0.5
+                        counter += 1
 
-                cells_interests[route_interest] =  cords_roadmap[-1]
+                cells_interests[route_interest] = cords_roadmap[-1]
                 used_cells_d[route_interest] = used_cells
 
-    print(f"Now going to {cells_interests[max(cells_interests.keys())]} with route interest {max(cells_interests.keys())}")
+    print(
+        f"Now going to {cells_interests[max(cells_interests.keys())]} with route interest {max(cells_interests.keys())}")
     return cells_interests[max(cells_interests.keys())], [used_cells_d[max(cells_interests.keys())]]
+
 
 def choose_by_border(cell, mc, dir):
     pass
 
+
 def choose_by_interest(interest, cell, mc, dir):
     pass
 
+
 def find_optimal_orientation(cell, mc, dir):
     pass
+
 
 def optimal_cell_scanning(mc, cell, dir, used_cells):
     dirs = ["U", "R", "D", "L"]
     # print(used_cells)
     interest_dirs = []
-    for i  in dirs:
+    for i in dirs:
         interest = cell_interest(cell, i, mc._matrix, used_cells[0])[0]
         if interest:
             # print(interest, i)
@@ -266,32 +284,23 @@ def optimal_cell_scanning(mc, cell, dir, used_cells):
         return choose_by_border(cell, mc, dir)
 
     elif interest_dirs.count(max(interest_dirs)) == 1:
-        return choose_by_interest(cell , mc, dir)
+        return choose_by_interest(cell, mc, dir)
 
-    else: return find_optimal_orientation(cell, mc, dir)
-
-
-
+    else:
+        return find_optimal_orientation(cell, mc, dir)
 
     # print(interest_dirs)
 
 
-mat  = [[0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 20],
-        [10, 10, 10, 32, 20],
-        [0, 0, 10, 10, 10],
-        [0, 0, 0, 0, 0],
-              ]
-
-# print(cell_interest((2,2), "U", mat))
-
-
-
-
-
-
-
-
+mat = [[0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0],
+       [0, 0, 10, 0, 0],
+       [0, 20, 20, 20, 0],
+       [0, 0, 0, 0, 0],
+       ]
+used_cells = []
+print(cell_interest((2, 2), "D", mat, used_cells))
+print(used_cells)
 
 # mat = np.full((17,17),10)
 # cords = (8,8)
@@ -311,4 +320,3 @@ mat  = [[0, 0, 0, 0, 0],
 # # mat = np.full((8,4),10)
 # # line_in_matrix(99,'y',8,mat)
 # # print(mat)
-

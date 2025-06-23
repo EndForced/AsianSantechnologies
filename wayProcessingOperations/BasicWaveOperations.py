@@ -576,7 +576,7 @@ class PattersSolver(WaveCreator):
 
                 if way_single == "No way":
                     print("Unsolvable")
-                    return "No solution"
+                    return
 
                 weight += self.weight_calculator(way_single)
                 way.append(way_single)
@@ -592,16 +592,19 @@ class PattersSolver(WaveCreator):
 
         # print("coordst :",self.tubes)
         if len(self.tubes) < 3:
+            print("cant solve tubes", self.tubes)
             return
 
         self.holders = self.find_holders()
         if len(self.tubes) < 3:
+            print("can't solve holders", self.holders)
             return
 
 
         self.pick_up = self.pick_tubes_cords()
         for i in self.pick_up.keys():
             if not self.pick_up[i]:
+                print("pick up err", self.pick_up)
                 return
 
 

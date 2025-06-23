@@ -30,71 +30,76 @@ class ScanEmulator:
         y,x = cord
         ycorr, xcorr= self.cord_correction
         realcord = (y - ycorr,x - xcorr)
+        # print("realcord", realcord)
         if min(realcord) <= -1  or max(realcord) >= len(self.matr) :
             print("can't handle this coords, ", cord, realcord)
             return
 
-        y,x = realcord
+        y, x = realcord
 
-        if dir not in ["U","R","D","L"]: print("Strange dir while fake revealing ",dir )
+        if dir not in ["U", "R", "D", "L"]: print("Strange dir while fake revealing ", dir)
 
         revealcords = {
-            "U": [(y-1, x+1), (y-1 , x), (y-1, x-1), (y-2, x+1), (y-2, x), (y-2, x-1)],
-            "D": [(y+1, x-1), (y+1 , x), (y+1, x+1), (y+2, x-1), (y+2, x), (y+2, x+1)],
-            "R": [(y+1, x+1), (y, x+1), (y-1, x+1), (y+1, x+2), (y, x+2), (y-1, x+2)],
-            "L": [(y-1, x-1), (y, x-1), (y+1, x-1), (y-1,x-2), (y, x-2), (y+1, x-1)]
+            "U": [(y - 1, x + 1), (y - 1, x), (y - 1, x - 1), (y - 2, x + 1), (y - 2, x), (y - 2, x - 1)],
+            "D": [(y + 1, x - 1), (y + 1, x), (y + 1, x + 1), (y + 2, x - 1), (y + 2, x), (y + 2, x + 1)],
+            "R": [(y + 1, x + 1), (y, x + 1), (y - 1, x + 1), (y + 1, x + 2), (y, x + 2), (y - 1, x + 2)],
+            "L": [(y-1, x-1), (y, x-1), (y+1, x-1), (y-1,x-2), (y, x-2), (y+1, x-2)]
         }
         sec_fl = []
 
         res = []
         for i in range(len(revealcords[dir])):
             if max(revealcords[dir][i]) <= len(self.matr)-1 and min(revealcords[dir][i]) > -1:
-
                 cord = revealcords[dir][i]
                 res.append(int(self.matr[cord]))
-
 
             else:
                 res.append("unr")
                 if not borders:
 
                     if dir == "U":
-                        if realcord[0] == 0:
+                        if realcord[0] == 0 :
                             borders.append("fc")
-                        elif realcord[0] == 1 and self.matr[realcord[0]][realcord[1]] != 20:
+                        elif realcord[0] == 1 and self.matr[realcord[0]][realcord[1]] != 20 and self.matr[realcord[0]-1][realcord[1]]!=20:
                             borders.append("ff")
 
                     if dir == "D":
                         if realcord[0] == 7:
                             borders.append("fc")
-                        elif realcord[0] == 6 and self.matr[realcord[0]][realcord[1]] != 20:
+                        elif realcord[0] == 6 and self.matr[realcord[0]][realcord[1]] != 20 and self.matr[realcord[0]+1][realcord[1]]!=20:
                             borders.append("ff")
 
                     if dir == "R":
-                        print(realcord)
-                        if realcord[1] == 7:
+                        # print(realcord)
+                        if realcord[1] ==  7:
                             borders.append("fc")
-                        elif realcord[1] == 6 and self.matr[realcord[0]][realcord[1]] != 20:
+                        elif realcord[1] == 6 and self.matr[realcord[0]][realcord[1]] != 20 and self.matr[realcord[0]][realcord[1]+1]!=20:
                             borders.append("ff")
 
                     if dir == "L":
-                        print(realcord)
+                        # print(realcord, self.matr)
                         if realcord[1] == 0:
                             borders.append("fc")
-                        elif realcord[0] == 1 and self.matr[realcord[0]][realcord[1]] != 20:
+                        elif realcord[1] == 1 and self.matr[realcord[0]][realcord[1]] != 20 and self.matr[realcord[0]][realcord[1]-1]!=20:
                             borders.append("ff")
                 else:
                     if self.matr[realcord]!= 20: borders.append("ff")
 
-            lst = [20, 52, 52, 31, 32, 33, 34]
-            lst.remove(goodramp)
-            if res[i] in lst :
-                sec_fl.append(i)
+            # print(res, "resss")
+
+            # print("rl", realcord, self.matr[realcord])
+            if self.matr[realcord]!= 20:
+                lst = [20, 52, 52, 31, 32, 33, 34]
+                lst.remove(goodramp)
+                if res[i] in lst :
+                    # print(123)
+                    sec_fl.append(i)
 
         if 0 in sec_fl: res[3] = "unr"
         if 1 in sec_fl: res[4] = "unr"
         if 2 in sec_fl: res[5] = "unr"
 
+        # print(sec_fl)
         return list(res), borders
 
 def dummy_def(commands):
@@ -113,7 +118,20 @@ def dummy_def(commands):
 
     return commands
 
-fm = [[10, 10, 20, 10, 20, 1041, 34, 10], [10, 20, 10, 32, 20, 20, 34, 10], [71, 20, 20, 20, 20, 34, 20, 10], [10, 32, 20, 20, 20, 34, 20, 20], [10, 10, 10, 20, 10, 10, 33, 10], [10, 42, 10, 10, 10, 10, 42, 10], [10, 10, 10, 10, 32, 34, 10, 10], [63, 63, 63, 10, 20, 20, 20, 34]]
+
+fm =[ [10,10,10,10,10,10,10,10,10,10],
+[10,10,10,10,10,10,10,10,10,10],
+[10,10,10,10,10,10,10,10,10,10],
+[10,10,10,10,10,10,10,10,10,10],
+[10,10,10,10,10,71,10,10,10,10],
+[10,10,10,10,10,10,10,10,10,10],
+[10,10,10,10,10,10,10,10,10,10],
+[10,10,10,10,10,10,10,10,10,10],
+[10,10,10,10,10,10,10,10,10,10],]
+
+fm = [[10, 10, 10, 52, 20, 20, 34, 10], [10, 32, 20, 20, 20, 34, 10, 71], [20, 10, 20, 20, 34, 31, 10, 62], [20, 20, 20, 34, 20, 20, 10, 62], [20, 10, 10, 20, 10, 20, 10, 62], [33, 32, 34, 10, 10, 33, 10, 41], [10, 10, 10, 10, 10, 10, 10, 10], [10, 20, 41, 10, 20, 20, 10, 10]]
 se = ScanEmulator(fm)
+
+
 rev = se.reveal((8,8),"U")
 print(rev)
