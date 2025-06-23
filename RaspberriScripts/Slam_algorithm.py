@@ -421,7 +421,7 @@ if __name__ == "__main__":
         while 1:
             frame = mc.robot.get_uncompressed_frames(1)[1]
             frame = fix_perspective(frame)
-            frame = analyze_frame(frame, 1)
+            frame, borders, cells = analyze_frame(frame, 1)
             mc.robot.set_frame(frame)
 
             _ = input()
