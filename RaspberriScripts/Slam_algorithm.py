@@ -425,8 +425,7 @@ if __name__ == "__main__":
             cv2.imwrite(f"{c}.png", frame)
             mc.robot.set_frame(frame)
 
-            _ = input()
-            mc.robot.do(_)
+            print("written")
 
 
         # tiles = {}
