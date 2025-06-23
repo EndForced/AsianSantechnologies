@@ -42,7 +42,7 @@ COLOR_RANGES = {
 }
 
 
-def fix_perspective(img):
+def fix_perspective(img, camnum):
     # больше констант??????????
     K = np.array(
         [
@@ -50,12 +50,19 @@ def fix_perspective(img):
             [0.00000000e+00, 3.17958710e+02, 1.98634298e+02],
             [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
         ])
-    D = np.array([
-        [0.05878302],
-        [-0.02615866],
-        [-0.04267542],
-        [0.03454424]
-    ])
+
+
+    if camnum == 1:
+        D = np.array([
+            [0.05878302],
+            [-0.02615866],
+            [-0.04267542],
+            [0.03454424]
+        ])
+
+    elif camnum == 0:
+        D = np.array([[-0.14],    [0.301],  [-0.0318], [-0.05]  ])
+
 
     border_size = 100
     img_with_border = cv2.copyMakeBorder(
