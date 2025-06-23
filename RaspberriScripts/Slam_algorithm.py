@@ -13,7 +13,7 @@ from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatri
 import time
 import cv2
 import base64
-
+serial = 1
 if platform.system() == "Windows":
     class RobotAPI:
         # по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
@@ -409,7 +409,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
 if __name__ == "__main__":
     mat = [[0 for _ in range(17)] for _ in range(17)]
-    mc = MainComputer(mat, 1)
+    mc = MainComputer(mat, serial)
     mc.robot.Orientation = "U"
     mc.robot.Position = (8,8)
 
