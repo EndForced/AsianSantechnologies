@@ -419,9 +419,9 @@ if __name__ == "__main__":
         mc.start_website()
 
         while 1:
-            frame = mc.robot.get_uncompressed_frames(1)[1]
+            frame = mc.robot.get_uncompressed_frames(1)[0]
             frame = fix_perspective(frame)
-            frame, borders, cells = analyze_frame(frame, 1)
+            # frame, borders, cells = analyze_frame(frame, 1)
             cv2.imwrite("test_frame.png", frame)
             mc.robot.set_frame(frame)
 
