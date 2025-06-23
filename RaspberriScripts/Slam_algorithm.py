@@ -422,7 +422,7 @@ if __name__ == "__main__":
             frame = mc.robot.get_uncompressed_frames(1)[0]
             frame = fix_perspective(frame, 0)
             # frame, borders, cells = analyze_frame(frame, 1)
-            # cv2.imwrite(f"{c}.png", frame)
+            cv2.imwrite(f"test0.png", frame)
             mc.robot.set_frame(frame)
 
             print("written")
