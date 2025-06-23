@@ -407,10 +407,6 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             i = i.replace("Forward", "Backwards")
             self.robot.do(i)
 
-
-
-
-
 if __name__ == "__main__":
     mat = [[0 for _ in range(17)] for _ in range(17)]
     mc = MainComputer(mat, 1)
@@ -434,9 +430,6 @@ if __name__ == "__main__":
 
         # tiles = {}
         # mc.capture_to_map()
-
-        while 1:
-            coolest_route(mc)
 
                     # print(mc.robot.Position)
                     # print(mc.robot.Orientation)
