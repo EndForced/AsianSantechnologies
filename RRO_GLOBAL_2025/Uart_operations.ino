@@ -1,4 +1,4 @@
-const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "T", "Button_skip", "Direction", "Elevation", "Tubes", "MyFloor" };
+const String commands[] = { "Reset", "Beep", "Turn", "Pid", "Up", "Down", "Grab", "Put", "T", "Button_skip", "Direction", "Elevation", "Tubes", "MyFloor", "Route", "RRR" };
 const int commandsCount = 14;
 String parameters[10];
 int paramCount = 0;
@@ -44,10 +44,13 @@ void uartProcessing() {
       case 10: handleDirCommand(); break;        // "Dir_swap"
       case 11: handleElevationCommand(); break;  // "Elevation_swap"
       case 12: handleTubesCommand(); break;      // "Tubes"
-      case 13: handleMyFloorCommand(); break;      // "Tubes"
 
+      case 13: handleMyFloorCommand(); break;    // "MyFloor"
 
-      default:  // we fucking dont know whut is it
+      case 14: handleRoute();  //Route
+      case 15: handleRoute();  // RRR
+
+      default:                 // we fucking dont know whut is it
         SendData("Unknown command: " + command);
         break;
     }
@@ -116,7 +119,7 @@ void handleTurnCommand() {
 
   String direction = parameters[0];
   int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
-  int speed = (paramCount > 2) ? parameters[2].toInt() : 1000;
+  int speed = (paramCount > 2) ? parameters[2].toInt() : 850;
   int way = (direction == "Left") ? -1 : 1;
 
   turn_to_line(speed, way, dir, steps);
@@ -133,7 +136,7 @@ void handlePidCommand() {
 
   String direction = parameters[0];
   int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
-  int speed = (paramCount > 2) ? parameters[2].toInt() : 900;
+  int speed = (paramCount > 2) ? parameters[2].toInt() : 950;
 
   int way = (direction == "Forward") ? 1 : -1;
 
@@ -144,30 +147,25 @@ void handlePidCommand() {
 }
 
 void handleServoCommand() {
-  align(300, 0.7, 0.03, 0.6, 1000);
-
   // Andrew's Job
   SendData("allign ");
 }
 
-void handleMyFloorCommand(){
+void handleMyFloorCommand() {
   int datvals = 0;
-  for (int i = 1; i < 5; i ++ ) {
+  for (int i = 1; i < 5; i++) {
     datvals += sensor_x(i);
   }
-  if (datvals / 4 < 30) {
+  if (datvals / 4 < 500) {
     SendData("2");
-  }
-  else{
+  } else {
     SendData("1");
   }
-
 }
 
 // String identifier = parameters[0];
 // if (isdigit(identifier[0])){}
 // int steps = (paramCount > 1) ? parameters[1].toInt() : 1;
-
 // int way = (direction == "Forward") ? 1 : -1;
 
 // pidXN(speed * way, steps);
@@ -234,6 +232,14 @@ void handleTubesCommand() {
 
   SendData("Tubes swiched to " + collected_tubes);
 }
+
+
+void handleRoute(){
+
+}
+
+
+
 
 
 

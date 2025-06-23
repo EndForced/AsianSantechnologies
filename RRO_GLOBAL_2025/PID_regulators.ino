@@ -3,9 +3,9 @@ void pidXN(float sped, int n) {
     for (int i = 1; i < n; i++) {
       pidX(0.5, 0.01, 0.4, sped, 150, 0);
     }
-  int overdrive = 585;
+  int overdrive = 575;
   pidX(0.5, 0.02, 0.5, sped, 0, 0);
-  pidEnc(0.5, 0.02, 0.5, sped * 0.6, overdrive, 1);
+  pidEnc(0.5, 0.02, 0.5, sped * 0.8, overdrive, 1);
 }
 
 void pidX(float kp, float ki, float kd, float sped, int overdrive, int stopp) {
@@ -138,6 +138,6 @@ void stop_after_pid(float sped) {
   drive(tormoz_speed, tormoz_speed, tormoz_speed, tormoz_speed);
   delay(10);
   all_forward();
-  delay((abs(sped) / 1023.0 * 30) - 10);
+  delay((abs(sped) / 1023.0 * 25) - 10);
   stop();
 }

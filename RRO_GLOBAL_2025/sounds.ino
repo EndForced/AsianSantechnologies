@@ -7,7 +7,6 @@ void buzzer_init() {
   pinMode(BZ1_PIN, OUTPUT);
   pinMode(BTN_PIN, INPUT_PULLUP);
 }
-
 bool button() {
   if (Serial1.available()) {
     String input = Serial1.readStringUntil('\n');
