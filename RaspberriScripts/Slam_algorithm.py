@@ -3,8 +3,8 @@ import sys, os, platform, math
 
 import numpy as np
 
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
 from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code
 from SlamLogic.SlamLogic import prepare_to_insert, edge_to_matrix, coolest_route, optimal_cell_scanning

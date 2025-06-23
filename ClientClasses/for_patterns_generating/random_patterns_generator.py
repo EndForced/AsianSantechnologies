@@ -77,6 +77,8 @@ def rotate_patterns(dir,pat):
         else:
             print("unknown direction while pat rotating!11!!1 dir: ", dir)
 
+
+
 def pattern_placer(mat,patts):
     #that one was kinda hard (because im really dummy ass)
     global num
