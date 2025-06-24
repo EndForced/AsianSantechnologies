@@ -12,26 +12,17 @@ import numpy as np
 import time
 import cv2
 
-import time
-import socket
-import pickle
-import cv2
-import numpy as np
-import base64
-from gpiozero import OutputDevice, InputDevice
-
-
 class RobotAPI:
-    def __init__(self, position, orientation,socketio=None, tx_pin=23, rx_pin=24, baudrate=115200, ):
+    #по большей части тут работа с юартом, запоминание позиции, получение и отправка данных с камер
+
+
+
+    def __init__(self, position, orientation, serial, socketio = None):
         self.telemetryQuality = 15
         self.mapQuality = 40
 
-        # Инициализация Software UART
-        self.tx = OutputDevice(tx_pin, initial_value=True)
-        self.rx = InputDevice(rx_pin)
-        self.BAUDRATE = baudrate
-        self.BIT_TIME = 1.0 / baudrate
-
+        self.ser = serial
+        self.ser.flush()
         self.socket = socketio
 
         if max(position) > 15:
@@ -46,57 +37,11 @@ class RobotAPI:
         self.IsDoingAction = 0
         self.frames = {}
 
-        # Соединение с сервером для работы с камерой
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.conn.connect(('localhost', 65432))
         self.conn.sendall(b"UNCOMPRESSED_API")
 
-    # --- Software UART методы ---
-    def _send_byte(self, byte):
-        """Отправка одного байта через Software UART."""
-        self.tx.off()  # Старт-бит (0)
-        time.sleep(self.BIT_TIME)
-
-        for i in range(8):
-            self.tx.value = (byte >> i) & 1  # LSB first
-            time.sleep(self.BIT_TIME)
-
-        self.tx.on()  # Стоп-бит (1)
-        time.sleep(self.BIT_TIME)
-
-    def _receive_byte(self):
-        """Приём одного байта через Software UART."""
-        while self.rx.is_active:  # Ждём старт-бит (0)
-            pass
-
-        time.sleep(self.BIT_TIME * 1.5)  # Центрируем чтение
-
-        byte = 0
-        for i in range(8):
-            if self.rx.is_active:
-                byte |= (1 << i)
-            time.sleep(self.BIT_TIME)
-
-        time.sleep(self.BIT_TIME)  # Ждём стоп-бит
-        return byte
-
-    def send(self, data):
-        """Отправка строки через Software UART."""
-        for char in data + "\n":
-            self._send_byte(ord(char))
-
-    def read(self):
-        """Чтение строки из Software UART."""
-        line = []
-        while True:
-            byte = self._receive_byte()
-            if byte == 0x0A:  # '\n' - конец строки
-                break
-            line.append(chr(byte))
-
-        received = ''.join(line).strip()
-        if received:
-            return received.split("*")
+        # time.sleep(0.1)
 
     @staticmethod
     def recvall(conn, n):
