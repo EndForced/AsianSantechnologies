@@ -252,7 +252,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         self.robot.do("OK")
         time.sleep(0.1)
-        self.robot.do("Beep")
+        # self.robot.do("Beep")
 
         unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
                        "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
@@ -416,10 +416,10 @@ if __name__ == "__main__":
            [10, 10, 10, 10, 10, 10, 41, 10],
            [10, 32, 20, 20, 34, 10, 10, 33],
            [10, 10, 20, 52, 20, 34, 10, 31],
-           [33, 10, 20, 10, 10, 10, 10, 10],
-           [20, 10, 31, 52, 20, 20, 10, 33],
+           [33, 10, 20, 42, 10, 10, 10, 10],
+           [20, 10, 31, 10, 20, 20, 10, 33],
            [20, 10, 71, 10, 10, 10, 20, 20],
-           [20, 34, 10, 61, 61, 61, 20, 20]]
+           [20, 34, 10, 63, 63, 63, 20, 20]]
 
     mc = MainComputer(mat, serial)
 
@@ -432,7 +432,7 @@ if __name__ == "__main__":
         # mc.start_website()
 
     else:
-        # moves = mc.solve()
-        # mc.draw_multiple_paths(moves)
+        moves = mc.solve()
+        mc.draw_multiple_paths(moves)
         mc.visualize_matrix()
         mc.show()
