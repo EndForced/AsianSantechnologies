@@ -38,7 +38,7 @@ def process_matrix_in_background(mat, serial_conn):
         mc._matrix[cord[0]][cord[1]] = 71 if floor == 1 else 81
 
         print("Current matrix:", mc._matrix)
-        mc.qualifiction()
+        mc.qualification()
         print("Background processing completed")
     except Exception as e:
         print(f"Error in background processing: {e}")
