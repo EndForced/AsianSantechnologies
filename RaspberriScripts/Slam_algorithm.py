@@ -430,8 +430,8 @@ if __name__ == "__main__":
 
 
         mc.start_website()
-        while 1:
-            pass
+        # while 1:
+        #     pass
         # mc.start_website()
         # c = 1
         # while 1:
@@ -443,7 +443,7 @@ if __name__ == "__main__":
         #
         #     print("written")
 
-        # mc.qualification()
+        mc.qualification()
 
         # tiles = {}
         # mc.capture_to_map()
