@@ -242,7 +242,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         return res, rob_dir
 
-    def qualifiction(self):
+    def qualification(self):
         print("Starting qualification...")
 
         res = str(self.robot.read())
@@ -439,7 +439,7 @@ if __name__ == "__main__":
         #
         #     print("written")
 
-        mc.qualifiction()
+        mc.qualification()
 
         # tiles = {}
         # mc.capture_to_map()
