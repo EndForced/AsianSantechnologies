@@ -424,6 +424,8 @@ if __name__ == "__main__":
     mc = MainComputer(mat, serial)
 
     if mc.OS == "Linux":
+        import sputnic
+
         mc.slam_parameters_init()
 
         mc.start_website()
