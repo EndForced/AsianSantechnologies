@@ -443,7 +443,7 @@ if __name__ == "__main__":
         #     mc.robot.set_frame(frame)
         #
         #     print("written")
-
+        mc.robot.do("Beep 1000 1000")
         mc.qualification()
 
         # tiles = {}
