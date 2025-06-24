@@ -253,7 +253,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             if res: res = str(res[0])
 
         # self.robot.do("OK")
-        time.sleep(0.1)
+        time.sleep(0.7)
         self.robot.do("Beep")
 
         unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
@@ -428,6 +428,10 @@ if __name__ == "__main__":
     if mc.OS == "Linux":
         # mc.slam_parameters_init()
 
+
+        mc.start_website()
+        while 1:
+            pass
         # mc.start_website()
         # c = 1
         # while 1:
@@ -439,7 +443,7 @@ if __name__ == "__main__":
         #
         #     print("written")
 
-        mc.qualification()
+        # mc.qualification()
 
         # tiles = {}
         # mc.capture_to_map()
