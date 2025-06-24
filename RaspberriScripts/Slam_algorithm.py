@@ -408,10 +408,20 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             self.robot.do(i)
 
 if __name__ == "__main__":
-    mat = [[0 for _ in range(17)] for _ in range(17)]
+    # mat = [[0 for _ in range(17)] for _ in range(17)]
+    mat = [[20,20, 61, 61, 61, 10, 32, 20],
+        [20, 10 , 10 ,10 ,10, 10, 10, 20],
+        [33, 10, 10, 20 , 20, 33, 10, 33],
+        [10, 10, 10 ,10 , 42, 33, 10, 33],
+        [10, 10 ,10, 32, 20, 20 , 34, 10],
+          [33, 10, 10, 10, 32, 20 ,34, 10],
+           [20, 10, 10, 10, 10, 71, 10 ,10],
+           [51, 10, 10, 32, 34, 10,10 , 41]]
+
     mc = MainComputer(mat, serial)
-    mc.robot.Orientation = "U"
-    mc.robot.Position = (8,8)
+
+    # mc.robot.Orientation = "U"
+    # mc.robot.Position = (8,8)
 
     if mc.OS == "Linux":
         mc.slam_parameters_init()
@@ -459,57 +469,57 @@ if __name__ == "__main__":
         #     # mc.robot.set_frame(frame)
         #     pass
     else:
-        m = 0
-        se = ScanEmulator(fm.copy())
-        mc.robot.Orientation = "U"
-        mc._matrix[mc.robot.Position[0]][mc.robot.Position[1]] = 10
+        # m = 0
+        # se = ScanEmulator(fm.copy())
+        # mc.robot.Orientation = "U"
+        # mc._matrix[mc.robot.Position[0]][mc.robot.Position[1]] = 10
         # mc._matrix = fm
         # mc.update_matrix()
         # mc.show()
 
-        for i in range(4):
-            cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
-            # print(cells)
-            if borders: mc._matrix = edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation)
-            mc._matrix = mc.insert(cells)
-            mc.update_matrix()
-            mc.robot.do("Turn Right")
-            mc.show()
-            m+=1
-            # print(mc.robot.Orientation)
+        # for i in range(4):
+        #     cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
+        #     # print(cells)
+        #     if borders: mc._matrix = edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation)
+        #     mc._matrix = mc.insert(cells)
+        #     mc.update_matrix()
+        #     mc.robot.do("Turn Right")
+        #     mc.show()
+        #     m+=1
+        #     # print(mc.robot.Orientation)
+        #
+        #
+        # while not mc.solve(mc.robot.Position):
+        #     cell_to_go, used_cells = coolest_route(mc)
+        #     way = mc.create_way(mc.robot.Position, cell_to_go)
+        #     roadmap = mc.way_to_commands_single(way, mc.robot.Orientation, False)[0]
+        #
+        #     if roadmap[0] == "R2":
+        #         roadmap.pop(0)
+        #         roadmap = roadmap[::-1]
+        #         roadmap.append("R1")
+        #         roadmap.append("R1")
+        #         roadmap = roadmap[::-1]
+        #     way_c = dummy_def(roadmap)
+        #     for i in way_c:
+        #         mc.robot.do(i)
+        #         cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
+        #         if borders: mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
+        #         mc._matrix = mc.insert(cells)
+        #
+        #         mc.update_matrix()
+        #         mc.visualize_wave(used_cells)
+        #         mc.put_frame(mc.robot.Position, (0,0, 65000))
+        #         m += 1
+        #         print(m)
+        #         mc.show()
 
 
-        while not mc.solve(mc.robot.Position):
-            cell_to_go, used_cells = coolest_route(mc)
-            way = mc.create_way(mc.robot.Position, cell_to_go)
-            roadmap = mc.way_to_commands_single(way, mc.robot.Orientation, False)[0]
 
-            if roadmap[0] == "R2":
-                roadmap.pop(0)
-                roadmap = roadmap[::-1]
-                roadmap.append("R1")
-                roadmap.append("R1")
-                roadmap = roadmap[::-1]
-            way_c = dummy_def(roadmap)
-            for i in way_c:
-                mc.robot.do(i)
-                cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
-                if borders: mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
-                mc._matrix = mc.insert(cells)
-
-                mc.update_matrix()
-                mc.visualize_wave(used_cells)
-                mc.put_frame(mc.robot.Position, (0,0, 65000))
-                m += 1
-                print(m)
-                mc.show()
-
-
-
-        way = mc.solve(mc.robot.Position )
+        way = mc.solve()
         print(way)
-        w = mc.create_wave(mc.robot.Position)
-        mc.visualize_wave(w)
+        # w = mc.create_wave()
+        # mc.visualize_wave(w)
         mc.draw_multiple_paths( way)
         mc.show()
 

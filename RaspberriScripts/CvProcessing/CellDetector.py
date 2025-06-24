@@ -22,13 +22,24 @@ zones = {
     'first_right2c': [(353, 334), (333, 583), (621, 591), (557, 329), (350, 335)],
     'first_right2f': [(358, 192), (346, 300), (553, 300), (529, 186), (354, 188)],
     'first_left2c': [(328, 602), (74, 597), (162, 362), (342, 364), (329, 601)],
-    'first_left2f': [(216, 179), (169, 300), (345, 300), (352, 180), (216, 180)]
+    'first_left2f': [(216, 179), (169, 300), (345, 300), (352, 180), (216, 180)],
+
+    'first_right_1c2': [(467, 313), (466, 601), (802, 596), (741, 327), (473, 313)],
+    'first_right_1f2': [(743, 336), (659, 168), (464, 167), (475, 330), (743, 336)],
+    'first_left_2f2': [(459, 96), (469, 238), (775, 254), (667, 109), (459, 97)],
+    'first_left_2c2': [(479, 259), (538, 596), (801, 596), (796, 272), (481, 259)],
+
+
+
 }
 
 cam1floor1 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1f'], zones['first_left1f'],
               zones['sec_right1c'], zones['sec_left1c'], zones['sec_fl_right1f'], zones['sec_fl_left1f']]
 cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1f'], zones['first_left1f'],
               zones['first_right2c'], zones['first_left2c'], zones['first_right2f'], zones['first_left2f'],]
+
+cam2floor1 = [zones["first_right_1c2"], zones["first_left_2c2"], zones["first_right_1f2"], zones["first_left_2f2"]]
+
 
 mean_const = 160
 
@@ -236,7 +247,7 @@ def tile_to_code(frame):
 
     return elevation * 10
 
-def process_borders(slices, borders, leads, floor):
+def process_borders(slices, borders, leads, floor, camnum = 1):
     ignore_mask = {i: False for i in range(4)}  # Инициализируем маску
 
     border_flags = {
@@ -250,23 +261,28 @@ def process_borders(slices, borders, leads, floor):
     if border_flags['fc']:
         return {i: True for i in range(4)}
 
-    for i in range(4):
-        # front far
-        if (i == 2 or i == 3) and border_flags['ff']:
-            ignore_mask[i] = True
-
-        if floor == 1:
-            # ignore  behind white
-            if i == 2 and leads[0] == "black"and tile_to_code(slices[0]) != 31:
+    if camnum == 1:
+        for i in range(4):
+            # front far
+            if (i == 2 or i == 3) and border_flags['ff']:
                 ignore_mask[i] = True
-                # print("heh")
 
-            if i == 3 and leads[1] == "black"  and tile_to_code(slices[1]) != 31:
-                ignore_mask[i] = True
-                # print("huh")
-        # elif floor == 2:
+            if floor == 1:
+                # ignore  behind white
+                if i == 2 and leads[0] == "black"and tile_to_code(slices[0]) != 31:
+                    ignore_mask[i] = True
+                    # print("heh")
 
-    print("ignore", ignore_mask)
+                if i == 3 and leads[1] == "black"  and tile_to_code(slices[1]) != 31:
+                    ignore_mask[i] = True
+                    # print("huh")
+            # elif floor == 2:
+
+    elif camnum == 0:
+        pass
+
+
+        print("ignore", ignore_mask)
     return ignore_mask
 
 def analyze_frame(frame, floor):
