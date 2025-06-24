@@ -240,7 +240,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         return res, rob_dir
 
-    def qualifiction(self):
+    def qualification(self):
         print("Starting qualification...")
 
         res = str(self.robot.read())
@@ -424,6 +424,7 @@ if __name__ == "__main__":
     mc = MainComputer(mat, serial)
 
     if mc.OS == "Linux":
+        mc.robot.do("Beep")
         import sputnic
 
         # mc.slam_parameters_init()
