@@ -13,6 +13,7 @@ from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatri
 import time
 import cv2
 import base64
+
 serial = 1
 if platform.system() == "Windows":
     class RobotAPI:
@@ -110,7 +111,6 @@ if platform.system() == "Windows":
                     elif self.Orientation == "D":
                         self.Orientation = "U"
 
-
             x, y = self.Position
             if "Up" in args:
                 if self.Orientation == "U":
@@ -132,16 +132,15 @@ if platform.system() == "Windows":
                     # print(self.Position, "mycord")
                     self.Position = (x, y - 1)
 
-
-
             # print(f"doing {args} ... ")
             #
             # print(f"done {args}, res:  ... ")
 
             # time.sleep(0.1)
 
+
     class WebsiteHolder:
-        robot = RobotAPI((8,8), "U", None)
+        robot = RobotAPI((8, 8), "U", None)
 
 if platform.system() == "Linux":
     from StreamVideo import WebsiteHolder
@@ -261,6 +260,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         moves = self.solve()
         unload_type = self.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
+        # print(unload_type)
         moves = self.way_to_commands(moves, "U")
 
         if unload_type[1] != moves[1]:
@@ -286,13 +286,13 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         # Сначала вычисляем базовые координаты с учетом смещения вверх
         if direction == 'U':
-            base_x, base_y = x+1, y - 1  # Смещаем на 1 вверх и влево
+            base_x, base_y = x + 1, y - 1  # Смещаем на 1 вверх и влево
         elif direction == 'D':
-            base_x, base_y = x-1, y + 1  # Смещаем на 1 вниз
+            base_x, base_y = x - 1, y + 1  # Смещаем на 1 вниз
         elif direction == 'L':
-            base_x, base_y = x-1 , y -1   # Смещаем на 1 влево и вниз
+            base_x, base_y = x - 1, y - 1  # Смещаем на 1 влево и вниз
         elif direction == 'R':
-            base_x, base_y = x + 2, y + 1   # Смещаем на 1 вправо
+            base_x, base_y = x + 2, y + 1  # Смещаем на 1 вправо
         else:
             raise ValueError("Неправильное направление")
 
@@ -320,10 +320,10 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         elif direction == 'L':
             positions = [
                 (base_x, base_y, 1),
-                (base_x, base_y+1 , 2),
-                (base_x, base_y + 2 , 3),
-                (base_x - 1 , base_y, 4),
-                (base_x - 1, base_y+1 , 5),
+                (base_x, base_y + 1, 2),
+                (base_x, base_y + 2, 3),
+                (base_x - 1, base_y, 4),
+                (base_x - 1, base_y + 1, 5),
                 (base_x - 1, base_y + 2, 6)
             ]
         elif direction == 'R':
@@ -338,9 +338,9 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         for px, py, idx in positions:
             if 0 <= px < 16 and 0 <= py < 16:  # Проверяем границы
-                if cells[idx-1] != 'unr':
-                    if self._matrix [py][px] != 99:
-                        new_matrix[py][px] = cells[idx-1]
+                if cells[idx - 1] != 'unr':
+                    if self._matrix[py][px] != 99:
+                        new_matrix[py][px] = cells[idx - 1]
 
         self._matrix = new_matrix
         return new_matrix
@@ -359,10 +359,12 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         frame = self.robot.get_uncompressed_frames(0)[1]
         frame = fix_perspective(frame)
         # cv2.imwrite("Warped.png", frame)
+        tiles = {}
         frame, slices, borders = analyze_frame(frame, self.floor)
 
         if borders:
-            mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], self.robot.Position, self.robot.Orientation))
+            mc._matrix = list(
+                edge_to_matrix(np.array(mc._matrix), borders[0], self.robot.Position, self.robot.Orientation))
 
         for key, item in slices.items():
             if str(item) != "unr":
@@ -379,7 +381,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def drive_and_capture(self, cell):
         commands = self.create_way(self.robot.Position, cell)
-        commands = self.way_to_commands_single(commands, self.robot.Orientation, 0 )[0]
+        commands = self.way_to_commands_single(commands, self.robot.Orientation, 0)[0]
         print(commands)
         # command_prev = []
 
@@ -407,21 +409,19 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             i = i.replace("Forward", "Backwards")
             self.robot.do(i)
 
+
 if __name__ == "__main__":
     # mat = [[0 for _ in range(17)] for _ in range(17)]
-    mat = [[20,20, 61, 61, 61, 10, 32, 20],
-        [20, 10 , 10 ,10 ,10, 10, 10, 20],
-        [33, 10, 10, 20 , 20, 33, 10, 33],
-        [10, 10, 10 ,10 , 42, 33, 10, 33],
-        [10, 10 ,10, 32, 20, 20 , 34, 10],
-          [33, 10, 10, 10, 32, 20 ,34, 10],
-           [20, 10, 10, 10, 10, 71, 10 ,10],
-           [51, 10, 10, 32, 34, 10,10 , 41]]
+    mat = [[20, 20, 10, 10, 10, 10, 32, 20],
+           [20, 10, 10, 10, 10, 10, 10, 20],
+           [64, 10, 10, 20, 20, 33, 10, 33],
+           [64, 10, 10, 10, 42, 33, 10, 33],
+           [64, 10, 10, 32, 20, 52, 10, 10],
+           [33, 10, 10, 10, 32, 20, 10, 10],
+           [20, 10, 10, 10, 10, 71, 10, 10],
+           [20, 10, 10, 32, 34, 10, 10, 42]]
 
     mc = MainComputer(mat, serial)
-
-    # mc.robot.Orientation = "U"
-    # mc.robot.Position = (8,8)
 
     if mc.OS == "Linux":
         mc.slam_parameters_init()
@@ -437,91 +437,7 @@ if __name__ == "__main__":
 
             print("written")
 
-
-        # tiles = {}
-        # mc.capture_to_map()
-
-                    # print(mc.robot.Position)
-                    # print(mc.robot.Orientation)
-                    # print(tiles)
-                    # print(np.array(mc._matrix))
-                    # print("floor:", mc.floor)
-                    # _ = input()
-
-
-
-
-
-            # _ = input()
-            # mc.robot.do(_)
-        # mc.qualifiction()
-        # time.sleep(1000)
-        # while 1:
-        #     # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
-        #     # frame, slices = update_frame_smart(frame)
-        #     # for i in range(len(slices)):
-        #     #     print(i)
-        #     #     cv2.imwrite(f"{i}.jpg", slices[i])
-        #     #
-        #     # print("upd!!")
-        #     # exit()git
-        #     # # cv2.imwrite("testing.jpg", frame)
-        #     # mc.robot.set_frame(frame)
-        #     pass
     else:
-        # m = 0
-        # se = ScanEmulator(fm.copy())
-        # mc.robot.Orientation = "U"
-        # mc._matrix[mc.robot.Position[0]][mc.robot.Position[1]] = 10
-        # mc._matrix = fm
-        # mc.update_matrix()
-        # mc.show()
-
-        # for i in range(4):
-        #     cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
-        #     # print(cells)
-        #     if borders: mc._matrix = edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation)
-        #     mc._matrix = mc.insert(cells)
-        #     mc.update_matrix()
-        #     mc.robot.do("Turn Right")
-        #     mc.show()
-        #     m+=1
-        #     # print(mc.robot.Orientation)
-        #
-        #
-        # while not mc.solve(mc.robot.Position):
-        #     cell_to_go, used_cells = coolest_route(mc)
-        #     way = mc.create_way(mc.robot.Position, cell_to_go)
-        #     roadmap = mc.way_to_commands_single(way, mc.robot.Orientation, False)[0]
-        #
-        #     if roadmap[0] == "R2":
-        #         roadmap.pop(0)
-        #         roadmap = roadmap[::-1]
-        #         roadmap.append("R1")
-        #         roadmap.append("R1")
-        #         roadmap = roadmap[::-1]
-        #     way_c = dummy_def(roadmap)
-        #     for i in way_c:
-        #         mc.robot.do(i)
-        #         cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
-        #         if borders: mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
-        #         mc._matrix = mc.insert(cells)
-        #
-        #         mc.update_matrix()
-        #         mc.visualize_wave(used_cells)
-        #         mc.put_frame(mc.robot.Position, (0,0, 65000))
-        #         m += 1
-        #         print(m)
-        #         mc.show()
-
-
-
-        way = mc.solve()
-        print(way)
-        # w = mc.create_wave()
-        # mc.visualize_wave(w)
-        mc.draw_multiple_paths( way)
+        moves = mc.solve()
+        mc.draw_multiple_paths(moves)
         mc.show()
-
-
-

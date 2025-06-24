@@ -624,15 +624,23 @@ class PattersSolver(WaveCreator):
                 unload_direction = dummy_dict[key]
                 cord_to_detect = item[0]
                 break
+        cells_c = []
+
+        # print(cord_to_detect, unload_direction)
+        if unload_direction == "U": cells_c = ["right", "left"]
+        elif unload_direction == "D": cells_c = ["left", "right"]
+        elif unload_direction == "R": cells_c = ["down", "up"]
+        elif unload_direction == "L":cells_c = ["up", "down"]
+
 
         neighbor_cells = self.get_relative_cells(cord_to_detect)[0]
 
-        right_cell = neighbor_cells["right"]
-        if right_cell and np.array(self._matrix)[right_cell[0]] not in [61, 62, 63, 64]:
+        right_cell = neighbor_cells[cells_c[0]]
+        if right_cell and np.array(self._matrix)[right_cell[0]] in [61, 62, 63, 64]:
             return "R", unload_direction  # Разгрузка справа
 
-        left_cell = neighbor_cells["left"]
-        if left_cell and np.array(self._matrix)[left_cell[0]] not in [61, 62, 63, 64]:
+        left_cell = neighbor_cells[cells_c[1]]
+        if left_cell and np.array(self._matrix)[left_cell[0]] in [61, 62, 63, 64]:
             return "L", unload_direction  # Разгрузка слева
 
         if (right_cell and left_cell and

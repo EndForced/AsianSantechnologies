@@ -29,15 +29,15 @@ int raw(int dat) {
 float sensor(int dat) {
   float data = 0;
 
-  uint16_t datamin = 1300;
-  uint16_t datbmin = 1490;
-  uint16_t datcmin = 1680;
-  uint16_t datdmin = 1430;
+  uint16_t datamin = 1200;
+  uint16_t datbmin = 1200;
+  uint16_t datcmin = 1300;
+  uint16_t datdmin = 1200;
 
-  uint16_t datamax = 3890;
-  uint16_t datbmax = 3960;
-  uint16_t datcmax = 4010;
-  uint16_t datdmax = 3990;
+  uint16_t datamax = 4050;
+  uint16_t datbmax = 4050;
+  uint16_t datcmax = 4050;
+  uint16_t datdmax = 4050;
 
   switch (dat) {
     case 1:
@@ -65,10 +65,10 @@ float sensor_x(int dat) {
   uint16_t datcmin = 1360;
   uint16_t datdmin = 1390;
 
-  uint16_t datamax = 3800;
-  uint16_t datbmax = 3320;
+  uint16_t datamax = 4050;
+  uint16_t datbmax = 4050;
   uint16_t datcmax = 4050;
-  uint16_t datdmax = 3990;
+  uint16_t datdmax = 4050;
 
   switch (dat) {
     case 1:

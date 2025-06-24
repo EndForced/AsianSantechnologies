@@ -285,7 +285,7 @@ def process_borders(slices, borders, leads, floor, camnum = 1):
         print("ignore", ignore_mask)
     return ignore_mask
 
-def analyze_frame(frame, floor):
+def analyze_frame(frame, frame1, floor):
     # я пытался делать модульный код (вроде работает)
     result_frame = frame.copy()
     dict_of_slices = {}

@@ -158,8 +158,10 @@ void handleMyFloorCommand() {
   }
   if (datvals / 4 < 500) {
     SendData("2");
+    inverse = 1;
   } else {
     SendData("1");
+    inverse = 0;
   }
 }
 
@@ -234,7 +236,7 @@ void handleTubesCommand() {
 }
 
 
-void handleRoute(){
+void handleRoute() {
 
 }
 
@@ -304,4 +306,72 @@ void SendData(String message) {
   //for uarts stability
   Serial1.flush();
   Serial1.println(message);
+}
+
+
+
+
+
+void do_smth(String str)
+{
+  char ch = str[0];
+  int num = str[1] - '0';
+
+  switch (ch)
+  {
+    case 'X':
+      if (num > 0)
+        pidXN(1000, num % 8);
+      break;
+    case 'x':
+      if (num > 0)
+        pidXN(-1000, num % 8);
+      break;
+    case 'R':
+      if (num > 0)
+        turn_to_line(900, 1, 1, num % 4);
+      break;
+    case 'r':
+      if (num > 0)
+        turn_to_line(900, 1, -1, num % 4);
+      break;
+    case 'L':
+      if (num > 0)
+        turn_to_line(900, -1, 1, num % 4);
+      break;
+    case 'l':
+      if (num > 0)
+        turn_to_line(900, -1, -1, num % 4);
+      break;
+
+    case 'G':
+      grab();
+      break;
+
+    case 'P':
+      put();
+      break;
+
+    case 'U':
+      go_up(1);
+      break;
+    case 'u':
+      go_up(-1);
+      break;
+
+    case 'D':
+      go_down(1);
+      break;
+    case 'd':
+      go_down(-1);
+      break;
+  }
+}
+void read_string_and_do() {
+  int index = 0;
+  while (moves[index]) {
+    do_smth(moves[index]);
+    index++;
+  }
+  buttonWait(0);
 }

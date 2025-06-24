@@ -15,6 +15,7 @@ float dat1, dat2;
 
 byte collected_tubes = 0;
 
+String moves[] = {"L1","X1","D1","X1","R1","X1","R1","X1","G1","x1","R1","X2","R1","X1","L1","G1","L1","X1","R1","X1","L1","X6","L1","X2","U1","X2","G1","OO"};
 void setup() {
   Serial.begin(115200);
   Serial1.begin(115200, SERIAL_8N1, 16, 17);
@@ -47,14 +48,10 @@ void setup() {
 }
 
 void loop() {
+//  handleMyFloorCommand();
+//  read_string_and_do();
   uartProcessing();
-  // for (int i = 0; i < 4; i++) {
-  //   pidXN(1000, 2);
-  //   turn_to_line(950, 1, 1, 1);
-  // }
-  // otrovnyat(150000);
-  // stop();
-  // buttonWait(0);
+
 }
 
 
@@ -66,7 +63,7 @@ void buttonWait(int flag) {
       // while (Serial1.readStringUntil('\n') != "OK") {  // for fun
       //   SendData("Activated");
       // }
-      // SendData("OK Accepted!");
+       SendData("Activated");
       break;
     } else if (millis() - tim > 200) {
       tim = millis();

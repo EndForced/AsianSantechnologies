@@ -171,7 +171,7 @@ void close_claws() {
   Wire.endTransmission();
 }
 
-const byte cam_pos[] = { 153, 52 };
+const byte cam_pos[] = { 153, 137,52 };
 const byte cam_num = 5;
 byte last_cam = 0;
 
