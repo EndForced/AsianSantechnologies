@@ -1,5 +1,8 @@
 # тут типо жоски слем алгоритме
-import sys, os, platform, math
+import math
+import os
+import platform
+import sys
 
 import numpy as np
 
@@ -7,12 +10,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
 from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code
-from SlamLogic.SlamLogic import prepare_to_insert, edge_to_matrix, coolest_route, optimal_cell_scanning
-from SlamLogic.scan_emulator import ScanEmulator, fm, dummy_def
+from SlamLogic.SlamLogic import edge_to_matrix
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
 import cv2
 import base64
+
 serial = 1
 if platform.system() == "Windows":
     class RobotAPI:
@@ -110,7 +113,6 @@ if platform.system() == "Windows":
                     elif self.Orientation == "D":
                         self.Orientation = "U"
 
-
             x, y = self.Position
             if "Up" in args:
                 if self.Orientation == "U":
@@ -132,16 +134,15 @@ if platform.system() == "Windows":
                     # print(self.Position, "mycord")
                     self.Position = (x, y - 1)
 
-
-
             # print(f"doing {args} ... ")
             #
             # print(f"done {args}, res:  ... ")
 
             # time.sleep(0.1)
 
+
     class WebsiteHolder:
-        robot = RobotAPI((8,8), "U", None)
+        robot = RobotAPI((8, 8), "U", None)
 
 if platform.system() == "Linux":
     from StreamVideo import WebsiteHolder
@@ -251,7 +252,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             res = self.robot.read()
             if res: res = str(res[0])
 
-        self.robot.do("OK")
+        # self.robot.do("OK")
         time.sleep(0.1)
         self.robot.do("Beep")
 
@@ -286,13 +287,13 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         # Сначала вычисляем базовые координаты с учетом смещения вверх
         if direction == 'U':
-            base_x, base_y = x+1, y - 1  # Смещаем на 1 вверх и влево
+            base_x, base_y = x + 1, y - 1  # Смещаем на 1 вверх и влево
         elif direction == 'D':
-            base_x, base_y = x-1, y + 1  # Смещаем на 1 вниз
+            base_x, base_y = x - 1, y + 1  # Смещаем на 1 вниз
         elif direction == 'L':
-            base_x, base_y = x-1 , y -1   # Смещаем на 1 влево и вниз
+            base_x, base_y = x - 1, y - 1  # Смещаем на 1 влево и вниз
         elif direction == 'R':
-            base_x, base_y = x + 2, y + 1   # Смещаем на 1 вправо
+            base_x, base_y = x + 2, y + 1  # Смещаем на 1 вправо
         else:
             raise ValueError("Неправильное направление")
 
@@ -320,10 +321,10 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         elif direction == 'L':
             positions = [
                 (base_x, base_y, 1),
-                (base_x, base_y+1 , 2),
-                (base_x, base_y + 2 , 3),
-                (base_x - 1 , base_y, 4),
-                (base_x - 1, base_y+1 , 5),
+                (base_x, base_y + 1, 2),
+                (base_x, base_y + 2, 3),
+                (base_x - 1, base_y, 4),
+                (base_x - 1, base_y + 1, 5),
                 (base_x - 1, base_y + 2, 6)
             ]
         elif direction == 'R':
@@ -338,9 +339,9 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         for px, py, idx in positions:
             if 0 <= px < 16 and 0 <= py < 16:  # Проверяем границы
-                if cells[idx-1] != 'unr':
-                    if self._matrix [py][px] != 99:
-                        new_matrix[py][px] = cells[idx-1]
+                if cells[idx - 1] != 'unr':
+                    if self._matrix[py][px] != 99:
+                        new_matrix[py][px] = cells[idx - 1]
 
         self._matrix = new_matrix
         return new_matrix
@@ -379,7 +380,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
     def drive_and_capture(self, cell):
         commands = self.create_way(self.robot.Position, cell)
-        commands = self.way_to_commands_single(commands, self.robot.Orientation, 0 )[0]
+        commands = self.way_to_commands_single(commands, self.robot.Orientation, 0)[0]
         print(commands)
         # command_prev = []
 
@@ -407,16 +408,17 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             i = i.replace("Forward", "Backwards")
             self.robot.do(i)
 
+
 if __name__ == "__main__":
     # mat = [[0 for _ in range(17)] for _ in range(17)]
-    mat = [[20,20, 61, 61, 61, 10, 32, 20],
-        [20, 10 , 10 ,10 ,10, 10, 10, 20],
-        [33, 10, 10, 20 , 20, 33, 10, 33],
-        [10, 10, 10 ,10 , 42, 33, 10, 33],
-        [10, 10 ,10, 32, 20, 20 , 34, 10],
-          [33, 10, 10, 10, 32, 20 ,34, 10],
-           [20, 10, 10, 10, 10, 71, 10 ,10],
-           [51, 10, 10, 32, 34, 10,10 , 41]]
+    mat = [[20, 20, 61, 61, 61, 34, 20, 20],
+           [20, 20, 10, 10, 10, 10, 10, 51],
+           [31, 10, 20, 20, 20, 33, 10, 20],
+           [33, 10, 10, 42, 10, 20, 10, 31],
+           [31, 10, 32, 20, 81, 20, 10, 10],
+           [10, 10, 10, 32, 20, 20, 34, 10],
+           [10, 41, 10, 10, 10, 10, 10, 10],
+           [10, 10, 10, 32, 20, 20, 20, 34]]
 
     mc = MainComputer(mat, serial)
 
@@ -424,36 +426,33 @@ if __name__ == "__main__":
     # mc.robot.Position = (8,8)
 
     if mc.OS == "Linux":
-        mc.slam_parameters_init()
+        # mc.slam_parameters_init()
 
-        mc.start_website()
-        c = 1
-        while 1:
-            frame = mc.robot.get_uncompressed_frames(1)[0]
-            frame = fix_perspective(frame, 0)
-            # frame, borders, cells = analyze_frame(frame, 1)
-            cv2.imwrite(f"test0.png", frame)
-            mc.robot.set_frame(frame)
+        # mc.start_website()
+        # c = 1
+        # while 1:
+        #     frame = mc.robot.get_uncompressed_frames(1)[0]
+        #     frame = fix_perspective(frame, 0)
+        #     # frame, borders, cells = analyze_frame(frame, 1)
+        #     cv2.imwrite(f"test0.png", frame)
+        #     mc.robot.set_frame(frame)
+        #
+        #     print("written")
 
-            print("written")
-
+        mc.qualifiction()
 
         # tiles = {}
         # mc.capture_to_map()
 
-                    # print(mc.robot.Position)
-                    # print(mc.robot.Orientation)
-                    # print(tiles)
-                    # print(np.array(mc._matrix))
-                    # print("floor:", mc.floor)
-                    # _ = input()
+        # print(mc.robot.Position)
+        # print(mc.robot.Orientation)
+        # print(tiles)
+        # print(np.array(mc._matrix))
+        # print("floor:", mc.floor)
+        # _ = input()
 
-
-
-
-
-            # _ = input()
-            # mc.robot.do(_)
+        # _ = input()
+        # mc.robot.do(_)
         # mc.qualifiction()
         # time.sleep(1000)
         # while 1:
@@ -514,14 +513,9 @@ if __name__ == "__main__":
         #         print(m)
         #         mc.show()
 
-
-
         way = mc.solve()
         print(way)
         # w = mc.create_wave()
         # mc.visualize_wave(w)
-        mc.draw_multiple_paths( way)
+        mc.draw_multiple_paths(way)
         mc.show()
-
-
-
