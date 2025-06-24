@@ -247,7 +247,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         res = str(self.robot.read())
 
-        while res != "Activated":
+        while res != 'Activated':
             if res: print(res)
             res = self.robot.read()
             if res: res = str(res[0])
@@ -429,9 +429,10 @@ if __name__ == "__main__":
         # mc.slam_parameters_init()
 
 
-        mc.start_website()
-        # while 1:
-        #     pass
+        # mc.start_website()
+        while 1:
+            a = input()
+            mc.robot.do(a)
         # mc.start_website()
         # c = 1
         # while 1:
@@ -443,7 +444,7 @@ if __name__ == "__main__":
         #
         #     print("written")
 
-        mc.qualification()
+        # mc.qualification()
 
         # tiles = {}
         # mc.capture_to_map()
