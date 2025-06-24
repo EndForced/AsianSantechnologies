@@ -412,34 +412,26 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
 if __name__ == "__main__":
     # mat = [[0 for _ in range(17)] for _ in range(17)]
-    mat = [[20, 20, 10, 10, 10, 10, 32, 20],
-           [20, 10, 10, 10, 10, 10, 10, 20],
-           [64, 10, 10, 20, 20, 33, 10, 33],
-           [64, 10, 10, 10, 42, 33, 10, 33],
-           [64, 10, 10, 32, 20, 52, 10, 10],
-           [33, 10, 10, 10, 32, 20, 10, 10],
-           [20, 10, 10, 10, 10, 71, 10, 10],
-           [20, 10, 10, 32, 34, 10, 10, 42]]
+    mat = [[10, 32, 20, 20, 20, 34, 10, 10],
+           [10, 10, 10, 10, 10, 10, 41, 10],
+           [10, 32, 20, 20, 34, 10, 10, 33],
+           [10, 10, 20, 52, 20, 34, 10, 31],
+           [33, 10, 20, 10, 10, 10, 10, 10],
+           [20, 10, 31, 52, 20, 20, 10, 33],
+           [20, 10, 71, 10, 10, 10, 20, 20],
+           [20, 34, 10, 61, 61, 61, 20, 20]]
 
     mc = MainComputer(mat, serial)
 
     if mc.OS == "Linux":
         import sputnic
 
-        mc.slam_parameters_init()
-
-        mc.start_website()
-        c = 1
-        while 1:
-            frame = mc.robot.get_uncompressed_frames(1)[0]
-            frame = fix_perspective(frame, 0)
-            # frame, borders, cells = analyze_frame(frame, 1)
-            cv2.imwrite(f"test0.png", frame)
-            mc.robot.set_frame(frame)
-
-            print("written")
+        # mc.slam_parameters_init()
+        #
+        # mc.start_website()
 
     else:
-        moves = mc.solve()
-        mc.draw_multiple_paths(moves)
+        # moves = mc.solve()
+        # mc.draw_multiple_paths(moves)
+        mc.visualize_matrix()
         mc.show()

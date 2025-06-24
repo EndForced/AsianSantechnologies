@@ -398,8 +398,8 @@ class PattersSolver(WaveCreator):
         self.matrix = matrix_for_solving
         super().__init__(self.matrix)
         self.tubes = self.find_tubes()
-        self.holders = self.find_holders()
-        self.pick_up = self.pick_tubes_cords()
+        # self.holders = self.find_holders()
+        # self.pick_up = self.pick_tubes_cords()
         self.floor = 1
         self.robot_cord = (8,8)
         # print(tubes)
