@@ -441,9 +441,9 @@ if __name__ == "__main__":
 
             frame, cells, borders = analyze_frame(frames[1], frames[0],mc.floor)
 
-            print("cells", cells)
+            print("cells", cells, cells.keys())
             for i in range(len(cells)):
-                cells[i] = tile_to_code(cells[i])
+                cells[i] = tile_to_code(cells[i+1])
 
             print("cells", cells)
 
