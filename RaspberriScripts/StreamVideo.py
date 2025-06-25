@@ -257,7 +257,7 @@ class RobotAPI:
                 if save_as_file: cv2.imwrite("frame_1.png", primary_frame)
                 if save_as_file: cv2.imwrite("frame_2.png", secondary_frame)
 
-                return primary_frame, secondary_frame
+                return [primary_frame, secondary_frame]
 
             elif frame_data.get('type') == 'error':
                 print(f"Server error: {frame_data['message']}")

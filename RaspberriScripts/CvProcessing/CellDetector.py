@@ -39,6 +39,7 @@ cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1
               zones['first_right2c'], zones['first_left2c'], zones['first_right2f'], zones['first_left2f'],]
 
 cam2floor1 = [zones["first_right_1c2"], zones["first_left_2c2"], zones["first_right_1f2"], zones["first_left_2f2"]]
+cam2floor2 = []
 
 
 mean_const = 160
@@ -294,8 +295,12 @@ def analyze_frame(frame, frame1, floor):
 
     if floor == 1:
         slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
+        slices2 = [cv2.resize(extract_warped(frame1, cam2floor1[i]), (200, 200)) for i in range(8)]
+
     elif floor == 2:
-        slices = [cv2.resize(extract_warped(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
+        slices= [cv2.resize(extract_warped(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
+        slices2 = [cv2.resize(extract_warped(frame1, cam2floor2[i]), (200, 200)) for i in range(8)]
+
 
     borders, frame = check_for_borders(frame, 1)
 

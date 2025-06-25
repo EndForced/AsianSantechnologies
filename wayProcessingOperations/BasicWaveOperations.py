@@ -10,30 +10,32 @@ import copy
 
 # from ClientClasses.VisualizationProcessing import VisualizeMatrix
 
-possible_codes = [0, 10, 20, 31,32,33,34, 41,42, 51,52, 61,62,63,64, 71,72,73,74, 81,82,83,84, 91,92,93,94,99]
+possible_codes = [0, 10, 20, 31, 32, 33, 34, 41, 42, 51, 52, 61, 62, 63, 64, 71, 72, 73, 74, 81, 82, 83, 84, 91, 92, 93,
+                  94, 99]
+
 
 class WaveCreator:
-    def __init__(self,matrix_in:list[list[int]]):
+    def __init__(self, matrix_in: list[list[int]]):
         self._matrix = matrix_in
 
         if not self._matrix or max(self.matrix_max_dimensions(self._matrix)) == 1:
-            raise ValueError("Can't create neighbor dictionary with this matrix:" , self._matrix)
+            raise ValueError("Can't create neighbor dictionary with this matrix:", self._matrix)
 
         self.Waves = []
         self.Ways = []
 
-        self.cellsConnections = {10:{"up":[31,10, ], "left":[34,10, ], "down":[33,10, ], "right":[32,10, ]},
-                                 20:{"up":[33,20, ], "left":[32,20, ], "down":[31,20, ], "right":[34,20, ]},
+        self.cellsConnections = {10: {"up": [31, 10, ], "left": [34, 10, ], "down": [33, 10, ], "right": [32, 10, ]},
+                                 20: {"up": [33, 20, ], "left": [32, 20, ], "down": [31, 20, ], "right": [34, 20, ]},
 
-                                 31:{"up":[33,20], "left":[None], "down":[33,10], "right":[None]},
-                                 32:{"up":[None], "left":[10, 34], "down":[None], "right":[20, 34]},
-                                 33:{"up":[31, 10], "left":[None], "down":[31,20], "right":[None]},
-                                 34:{"up":[None], "left":[20,32], "down":[None], "right":[10, 32]},
+                                 31: {"up": [33, 20], "left": [None], "down": [33, 10], "right": [None]},
+                                 32: {"up": [None], "left": [10, 34], "down": [None], "right": [20, 34]},
+                                 33: {"up": [31, 10], "left": [None], "down": [31, 20], "right": [None]},
+                                 34: {"up": [None], "left": [20, 32], "down": [None], "right": [10, 32]},
 
-                                 71:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
-                                 72:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
-                                 73:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
-                                 74:{"up":[31,10], "left":[34,10], "down":[33,10], "right":[32,10]},
+                                 71: {"up": [31, 10], "left": [34, 10], "down": [33, 10], "right": [32, 10]},
+                                 72: {"up": [31, 10], "left": [34, 10], "down": [33, 10], "right": [32, 10]},
+                                 73: {"up": [31, 10], "left": [34, 10], "down": [33, 10], "right": [32, 10]},
+                                 74: {"up": [31, 10], "left": [34, 10], "down": [33, 10], "right": [32, 10]},
 
                                  81: {"up": [33, 20], "left": [32, 20], "down": [31, 20], "right": [34, 20]},
                                  82: {"up": [33, 20], "left": [32, 20], "down": [31, 20], "right": [34, 20]},
@@ -54,30 +56,30 @@ class WaveCreator:
                                  0: {"up": [None], "left": [None], "down": [None], "right": [None]},
                                  99: {"up": [None], "left": [None], "down": [None], "right": [None]},
 
-                                 94: {"up": [31, 10, 41], "left": [34, 10, 42], "down": [33, 10, 41],"right": [32, 10, 42]},
+                                 94: {"up": [31, 10, 41], "left": [34, 10, 42], "down": [33, 10, 41],
+                                      "right": [32, 10, 42]},
                                  }
 
         self.matrixConnections = self._process_cells_connections()
 
     def _process_cells_connections(self):
-        #возвращает список вида [ {(y1,x1):[(y2,x2),(y3,x3)]}, ...]
-        #где y1 и x1 - координаты клетки, а y2,x2,y3,x3 - координаты клеток в которые можно из нее пройти
+        # возвращает список вида [ {(y1,x1):[(y2,x2),(y3,x3)]}, ...]
+        # где y1 и x1 - координаты клетки, а y2,x2,y3,x3 - координаты клеток в которые можно из нее пройти
 
         connections_dict = {}
         for i in range(len(self._matrix)):
             for j in range(len(self._matrix[i])):
-
-                res = self.get_relative_cells((i,j))
+                res = self.get_relative_cells((i, j))
                 res = self._find_valid_connections(res[0], res[1])
                 connections_dict[res[1]] = res[0]
 
         return connections_dict
 
     def _find_valid_connections(self, cell_dict, cell):
-        #принимает словарь вида {"up":[], "right":[(0,1)], "down":[(1,0)], "left":[]} и координаты клетки вида (y,x)
-        #исключает из исходного словаря те клетки в которые нельзя пройти по правилам в cellsConnections
-        #перед return убирает направления т.к они больше не нужны
-        #пример return [[(1, 0)], [(0, 1)]], (0, 0)
+        # принимает словарь вида {"up":[], "right":[(0,1)], "down":[(1,0)], "left":[]} и координаты клетки вида (y,x)
+        # исключает из исходного словаря те клетки в которые нельзя пройти по правилам в cellsConnections
+        # перед return убирает направления т.к они больше не нужны
+        # пример return [[(1, 0)], [(0, 1)]], (0, 0)
 
         mat_tmp = np.array(self._matrix)
         valid_cells = []
@@ -100,9 +102,9 @@ class WaveCreator:
 
         return valid_cells, cell
 
-    def get_relative_cells(self,pos, mat = None):
-        #возвращает словарь из четырёх клеток расположенных вокруг какой-то клетки и саму клетку
-        #пример return [{"up":[], "right":[(0,1)], "down":[(1,0)], "left":[]}, (0,0)]
+    def get_relative_cells(self, pos, mat=None):
+        # возвращает словарь из четырёх клеток расположенных вокруг какой-то клетки и саму клетку
+        # пример return [{"up":[], "right":[(0,1)], "down":[(1,0)], "left":[]}, (0,0)]
 
         mat = mat or self._matrix
         y, x = pos
@@ -123,7 +125,7 @@ class WaveCreator:
         return len(matrix), max(len(row) for row in matrix) if len(matrix) > 0 else 0
 
     def create_wave(self, start_point):
-        #делает волну с учетом рамп, нужна только стартовая точка
+        # делает волну с учетом рамп, нужна только стартовая точка
 
         def get_ramp_chain_length(start_cell, matrix, connections, used, ramp_values=[31, 32, 33, 34]):
 
@@ -188,12 +190,12 @@ class WaveCreator:
         return waves
 
     def find_index_by_cord(self, cord):
-        #возвращает индекс волны по ее элементу
+        # возвращает индекс волны по ее элементу
         for i in self.Waves:
             if cord in i:
                 return self.Waves.index(i)
 
-    def is_in_waves(self,cord):
+    def is_in_waves(self, cord):
         for i in self.Waves:
             for j in i:
                 if cord == j:
@@ -206,7 +208,7 @@ class WaveCreator:
         neighbour_cells = self.get_relative_cells(cord)[0]
 
         for key, value in neighbour_cells.items():
-            if value and (self.is_in_waves(value[0]))and value[0] in self.matrixConnections[cord]:
+            if value and (self.is_in_waves(value[0])) and value[0] in self.matrixConnections[cord]:
                 indexes[value[0]] = self.find_index_by_cord(value[0])
 
         for key, value in indexes.items():
@@ -256,7 +258,7 @@ class WaveCreator:
             if not ways:
                 break
 
-        #переворачиваем все пути
+        # переворачиваем все пути
         for i in range(len(ways)):
             ways[i] = ways[i][::-1]
 
@@ -308,7 +310,7 @@ class WaveCreator:
         elif diff == 3:
             return "L1"
 
-    def way_to_commands_single(self, path, my_dir, optimize = 1):
+    def way_to_commands_single(self, path, my_dir, optimize=1):
         mat = np.array(self._matrix)
         res = []
         floor = 1 if mat[path[0]] == 10 else 2
@@ -392,7 +394,6 @@ class WaveCreator:
             return "D" if x2 > x1 else "U"
 
 
-
 class PattersSolver(WaveCreator):
     def __init__(self, matrix_for_solving):
         self.matrix = matrix_for_solving
@@ -401,23 +402,22 @@ class PattersSolver(WaveCreator):
         # self.holders = self.find_holders()
         # self.pick_up = self.pick_tubes_cords()
         self.floor = 1
-        self.robot_cord = (8,8)
+        self.robot_cord = (8, 8)
         # print(tubes)
 
-
     def find_tubes(self):
-        #возвращает словарь вида {(yt, xt): []}
+        # возвращает словарь вида {(yt, xt): []}
         tubes = []
 
         for i in range(len(self._matrix)):
             for j in range(len(self._matrix[i])):
                 if str(self._matrix[i][j])[0] in ["4", "5"]:
-                    tubes.append((i,j))
+                    tubes.append((i, j))
 
         return tubes
 
     def pick_tubes_cords(self):
-        #возвращает координаты с которых можно забрать трубы вида {(yt,xt):[(yp,xp)...]}
+        # возвращает координаты с которых можно забрать трубы вида {(yt,xt):[(yp,xp)...]}
 
         tubes_out = {}
         for i in self.tubes:
@@ -442,7 +442,6 @@ class PattersSolver(WaveCreator):
                 if cells["right"] and np.array(self._matrix)[cells["right"][0]] in [10, 32]:
                     res.append(cells["right"][0])
 
-
                 tubes_out[i] = res
 
             if tube == 51:
@@ -463,36 +462,42 @@ class PattersSolver(WaveCreator):
                 if cells["right"] and np.array(self._matrix)[cells["right"][0]] in [20, 34]:
                     res.append(cells["right"][0])
 
-
                 tubes_out[i] = res
 
         return tubes_out
 
     def get_unload_type(self):
-        mat  = np.array(self._matrix)
+        mat = np.array(self._matrix)
 
-
-        if 61 in mat: return "up"
-        elif 62 in mat: return "right"
-        elif 63 in mat: return "down"
-        elif 64 in mat:return "left"
+        if 61 in mat:
+            return "up"
+        elif 62 in mat:
+            return "right"
+        elif 63 in mat:
+            return "down"
+        elif 64 in mat:
+            return "left"
 
         print("no holders")
 
     def find_holders(self):
         holders = []
-        #база
+        # база
         type_u = self.get_unload_type()
 
-        if type_u == "right": type_u = "left"
-        elif type_u == "left": type_u = "right"
-        elif type_u == "down": type_u = "up"
-        elif type_u == "up": type_u = "down"
+        if type_u == "right":
+            type_u = "left"
+        elif type_u == "left":
+            type_u = "right"
+        elif type_u == "down":
+            type_u = "up"
+        elif type_u == "up":
+            type_u = "down"
 
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
                 if str(self.matrix[i][j])[0] == "6":
-                    holders.append((i,j))
+                    holders.append((i, j))
 
         holders = [self.get_relative_cells(i)[0][type_u][0] for i in holders]
 
@@ -501,21 +506,19 @@ class PattersSolver(WaveCreator):
     def find_robot(self):
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
-                if str(self.matrix[i][j])[0] in ["7","8"]:
-                    robot_cord = (i,j)
+                if str(self.matrix[i][j])[0] in ["7", "8"]:
+                    robot_cord = (i, j)
                     self.floor = 1 if str(self.matrix[i][j])[0] == "7" else 2
                     return robot_cord
 
-    def generate_combinations(self,start):
+    def generate_combinations(self, start):
         if not start:
             raise ValueError("Can't solve: no robot \n", np.array(self._matrix))
-
 
         tube_permutations = list(itertools.permutations(self.tubes, len(self.tubes)))
         combinations = [[start] + list(perm) for perm in tube_permutations]
 
         full_combinations = []
-
 
         for holder in self.holders:
             for comb in combinations:
@@ -526,16 +529,17 @@ class PattersSolver(WaveCreator):
         return full_combinations
 
     def weight_calculator(self, way):
-        #считает вес маршрута
+        # считает вес маршрута
         if len(way) == 1:
             return 0
 
         # print(way)
         weight = 0
         for i in way:
-            if np.array(self._matrix)[i] not in [31,32,33,34]:
+            if np.array(self._matrix)[i] not in [31, 32, 33, 34]:
                 weight += 1
-            else: weight += 3
+            else:
+                weight += 3
 
         return weight
 
@@ -551,28 +555,28 @@ class PattersSolver(WaveCreator):
         for i in self.pick_up[cord]:
 
             if self.create_way(start, i) != "No way":
-                index = self.weight_calculator(self.create_way(start,i))
+                index = self.weight_calculator(self.create_way(start, i))
                 cord_p[index] = i
 
         return cord_p[min(cord_p.keys())]
 
     def process_combinations(self, combs):
-        #принимает все возможные комбинации сборки труб и выбирает одну (самую короткую)
+        # принимает все возможные комбинации сборки труб и выбирает одну (самую короткую)
         combins = {}
 
         for comb in combs:
             weight = 0
             way = []
             way_single = []
-            for cell_num in range(len(comb)-1):
+            for cell_num in range(len(comb) - 1):
 
-                if cell_num == 0: #если это начало маршрута то обрабатываем случай так
+                if cell_num == 0:  # если это начало маршрута то обрабатываем случай так
                     start = comb[0]
 
                 else:
-                    start = way_single[-1] # а иначе старт это последняя клетка последнего маршрута
+                    start = way_single[-1]  # а иначе старт это последняя клетка последнего маршрута
 
-                way_single = self.create_way(start, self.choose_tube(comb[cell_num+1], start))
+                way_single = self.create_way(start, self.choose_tube(comb[cell_num + 1], start))
 
                 if way_single == "No way":
                     print("Unsolvable")
@@ -581,13 +585,13 @@ class PattersSolver(WaveCreator):
                 weight += self.weight_calculator(way_single)
                 way.append(way_single)
             combins[weight] = way
-        return  combins[min(combins.keys())]
+        return combins[min(combins.keys())]
 
-    def solve(self, start = None):
+    def solve(self, start=None):
         if not start: start = self.find_robot()
         self.matrix = self._matrix
         self.robot_cord = start
-        self._matrix[start[0]][start[1]] = 10 if self._matrix[start[0]][start[1]] in [71,72,73,74, 10] else 20
+        self._matrix[start[0]][start[1]] = 10 if self._matrix[start[0]][start[1]] in [71, 72, 73, 74, 10] else 20
         self.tubes = self.find_tubes()
 
         # print("coordst :",self.tubes)
@@ -600,24 +604,21 @@ class PattersSolver(WaveCreator):
             print("can't solve holders", self.holders)
             return
 
-
         self.pick_up = self.pick_tubes_cords()
         for i in self.pick_up.keys():
             if not self.pick_up[i]:
                 print("pick up err", self.pick_up)
                 return
 
-
         combs = self.generate_combinations(start)
         d = self.process_combinations(combs)
         return d
-
 
     def detect_unload_type(self, cord):
         cells = self.get_relative_cells(cord)
         unload_direction = []
         cord_to_detect = []
-        dummy_dict = {"left":"L", "right":"R", "up":"U", "down":"D",}
+        dummy_dict = {"left": "L", "right": "R", "up": "U", "down": "D", }
 
         for key, item in cells[0].items():
             if np.array(self._matrix)[item[0]] in [61, 62, 63, 64]:
@@ -627,11 +628,14 @@ class PattersSolver(WaveCreator):
         cells_c = []
 
         # print(cord_to_detect, unload_direction)
-        if unload_direction == "U": cells_c = ["right", "left"]
-        elif unload_direction == "D": cells_c = ["left", "right"]
-        elif unload_direction == "R": cells_c = ["down", "up"]
-        elif unload_direction == "L":cells_c = ["up", "down"]
-
+        if unload_direction == "U":
+            cells_c = ["right", "left"]
+        elif unload_direction == "D":
+            cells_c = ["left", "right"]
+        elif unload_direction == "R":
+            cells_c = ["down", "up"]
+        elif unload_direction == "L":
+            cells_c = ["up", "down"]
 
         neighbor_cells = self.get_relative_cells(cord_to_detect)[0]
 
@@ -646,19 +650,30 @@ class PattersSolver(WaveCreator):
         if (right_cell and left_cell and
                 np.array(self._matrix)[right_cell[0]] in [61, 62, 63, 64] and
                 np.array(self._matrix)[left_cell[0]] in [61, 62, 63, 64]):
-            return "C", unload_direction # Разгрузка центр
+            return "C", unload_direction  # Разгрузка центр
 
-        else: return "idktbh"
-
-
+        else:
+            return "idktbh"
 
 
 if __name__ == "__main__":
-    mat = [[42, 10, 10, 10, 10, 20, 10, 10], [10, 10, 32, 20, 20, 34, 41, 20], [10, 10, 71, 20, 20, 34, 10, 20],
-     [20, 20, 20, 34, 20, 10, 10, 33], [10, 10, 31, 10, 10, 10, 10, 62], [10, 10, 33, 10, 20, 20, 10, 62],
-     [10, 20, 20, 20, 34, 10, 10, 62], [10, 20, 32, 20, 20, 20, 34, 10]]
-    mat = [[10, 10, 42, 10, 20, 10, 10, 41], [10, 10, 20, 20, 34, 10, 20, 10], [10, 10, 10, 10, 10, 10, 10, 10], [31, 20, 10, 32, 20, 20, 34, 10], [20, 20, 20, 20, 20, 20, 34, 10], [20, 20, 10, 20, 52, 20, 34, 71], [20, 20, 10, 10, 10, 32, 34, 10], [33, 33, 63, 63, 63, 10, 10, 10]]
-    mat = [[64, 10, 10, 10, 42, 10, 20, 10], [64, 10, 20, 20, 20, 34, 71, 10], [64, 10, 32, 20, 20, 20, 34, 10], [42, 10, 10, 10, 10, 10, 10, 20], [20, 20, 34, 10, 20, 10, 20, 20], [10, 10, 10, 10, 10, 10, 20, 20], [31, 20, 10, 32, 20, 20, 34, 33], [33, 10, 10, 10, 20, 20, 34, 42]]
+    mat = [[42, 10, 10, 10, 10, 20, 10, 10],
+           [10, 10, 32, 20, 20, 34, 41, 20],
+           [10, 10, 71, 20, 20, 34, 10, 20],
+           [20, 20, 20, 34, 20, 10, 10, 33], [10, 10, 31, 10, 10, 10, 10, 62], [10, 10, 33, 10, 20, 20, 10, 62],
+           [10, 20, 20, 20, 34, 10, 10, 62], [10, 20, 32, 20, 20, 20, 34, 10]]
+    mat = [[10, 10, 42, 10, 20, 10, 10, 41], [10, 10, 20, 20, 34, 10, 20, 10], [10, 10, 10, 10, 10, 10, 10, 10],
+           [31, 20, 10, 32, 20, 20, 34, 10], [20, 20, 20, 20, 20, 20, 34, 10], [20, 20, 10, 20, 52, 20, 34, 71],
+           [20, 20, 10, 10, 10, 32, 34, 10], [33, 33, 63, 63, 63, 10, 10, 10]]
+
+    mat = [[10, 10, 20, 20, 20, 10, 41, 20],
+           [10, 32, 20, 20, 20, 34, 10, 62],
+           [10, 32, 32, 20, 20, 20, 10, 62],
+           [10, 10, 20, 20, 20, 34, 10, 62],
+           [10, 41, 34, 20, 20, 20, 34, 10],
+           [10, 10, 10, 32, 34, 10, 10, 71],
+           [10, 10, 20, 20, 34, 10, 10, 10],
+           [10, 10, 32, 20, 52, 20, 10, 10]]
 
     w = PattersSolver(mat)
     # w.create_wave((0,0))
@@ -670,6 +685,3 @@ if __name__ == "__main__":
     # w = PattersSolver(mat)
     res = w.solve()
     print(res)
-
-
-

@@ -250,8 +250,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             res = self.robot.read()
             if res: res = str(res[0])
 
-        self.robot.do("OK")
-        time.sleep(0.1)
+        # self.robot.do("OK")
+        # time.sleep(0.1)
         # self.robot.do("Beep")
 
         unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
@@ -412,27 +412,45 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
 if __name__ == "__main__":
     # mat = [[0 for _ in range(17)] for _ in range(17)]
-    mat = [[10, 32, 20, 20, 20, 34, 10, 10],
-           [10, 10, 10, 10, 10, 10, 41, 10],
-           [10, 32, 20, 20, 34, 10, 10, 33],
-           [10, 10, 20, 52, 20, 34, 10, 31],
-           [33, 10, 20, 42, 10, 10, 10, 10],
-           [20, 10, 31, 10, 20, 20, 10, 33],
-           [20, 10, 71, 10, 10, 10, 20, 20],
-           [20, 34, 10, 63, 63, 63, 20, 20]]
+    mat = [[10, 10, 20, 20, 20, 10, 41, 20],
+           [10, 32, 20, 20, 34, 10, 10, 62],
+           [10, 32, 20, 20, 10, 20, 10, 62],
+           [10, 10, 20, 20, 20, 34, 10, 62],
+           [10, 41, 34, 20, 20, 20, 34, 10],
+           [10, 10, 10, 32, 34, 10, 10, 71],
+           [10, 10, 20, 20, 34, 10, 10, 10],
+           [10, 10, 32, 20, 52, 20, 10, 10]]
 
     mc = MainComputer(mat, serial)
 
     if mc.OS == "Linux":
+        c = 0
         mc.robot.do("Beep")
-        import sputnic
+        # import sputnic
+        while 1:
+            _ = input()
+            mc.robot.do(_)
+            frames = mc.robot.get_uncompressed_frames()
+            cv2.imwrite(f"{c}.png", frames[0])
+            c+=1
+            cv2.imwrite(f"{c}.png", frames[1])
+            c+=1
+            frames[0] = fix_perspective(frames[0], 0)
+            frames[1] = fix_perspective(frames[1], 1)
 
+            frame, borders, cells = analyze_frame(frames[1], frames[0],mc.floor)
+            mc.robot.set_frame(frame)
+            print(cells, borders)
         # mc.slam_parameters_init()
         #
         # mc.start_website()
 
     else:
+        # if not mc.solve():
+        #     print("unr")
         moves = mc.solve()
         mc.draw_multiple_paths(moves)
-        mc.visualize_matrix()
+        # w = mc.create_wave(mc.robot.Position)
+        # mc.visualize_wave(w)
+        # mc.visualize_matrix()
         mc.show()
