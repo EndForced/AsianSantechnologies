@@ -445,7 +445,7 @@ if __name__ == "__main__":
             for i in range(len(cel)):
                 print("dogjdjig", cel[i])
                 cv2.imwrite("bebra.png", cel[i])
-                cels[i] = tile_to_code(cel[i])
+                cels.append(tile_to_code(cel[i]))
 
             print("cells", cels)
 
