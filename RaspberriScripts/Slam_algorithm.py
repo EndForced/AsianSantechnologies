@@ -187,7 +187,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         quality = max(0, min(100, self.robot.mapQuality))
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
 
-        success, buffer = cv2.imencode('.jpg', self.to_encode, encode_params)
+        success, buffer = cv2.imencode('.jpg', to_encode, encode_params)
         if not success:
             print("FAIL: Image encoding failed")
             return
