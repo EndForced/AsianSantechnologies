@@ -81,7 +81,7 @@ def fix_perspective(img, camnum):
         ])
 
     elif camnum == 0:
-        D = np.array([[-0.14], [0.301], [-0.0318], [-0.05]])
+        D = np.array([[-0.11,   0.334, -0.05,  -0.05 ]])
 
     border_size = 100
     img_with_border = cv2.copyMakeBorder(
