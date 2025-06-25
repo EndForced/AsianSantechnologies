@@ -298,6 +298,8 @@ def shuffle_slices(slices, slices2):
 def analyze_frame(frame, frame1, floor):
     # я пытался делать модульный код (вроде работает)
     result_frame = frame.copy()
+
+
     slices = []
     slices2 = []
 
@@ -325,7 +327,7 @@ def analyze_frame(frame, frame1, floor):
 
     ignore_mask = process_borders(dict_of_slices, borders, leads, floor)
 
-    for i in range(6):
+    for i in range(4):
         if ignore_mask[i]:
             dict_of_slices[i] = "unr"
             continue
