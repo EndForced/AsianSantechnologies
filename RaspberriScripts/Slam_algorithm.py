@@ -179,7 +179,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             self.resizedPicture = (self.resizedPicture // 257).astype('uint8')
 
         to_encode = []
-        if not bool(pic):
+        if not list(pic):
             to_encode = self.resizedPicture
         else: to_encode = pic
 
