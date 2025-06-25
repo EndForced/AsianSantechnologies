@@ -46,8 +46,8 @@ camfloor1=[cam2floor1[0],cam1floor1[0],cam1floor1[1],
 
 camfloor2=[cam2floor2[0],cam1floor2[0],cam1floor2[1],
            cam2floor2[1],cam1floor2[2],cam1floor2[3],
-           cam2floor2[3],cam1floor2[4],cam1floor2[5],
-           cam2floor2[4],cam1floor2[6],cam1floor2[7],]
+           cam2floor2[2],cam1floor2[4],cam1floor2[5],
+           cam2floor2[3],cam1floor2[6],cam1floor2[7],]
 
 
 
