@@ -37,7 +37,7 @@ cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1
               zones['first_right2c'], zones['first_left2c'], zones['first_right2f'], zones['first_left2f'], ]
 
 cam2floor1 = [zones["first_right_1c2"], zones["first_left_2c2"], zones["first_right_1f2"], zones["first_left_2f2"]]
-cam2floor2 = [11,11]
+cam2floor2 = [11,11,11,11]
 
 camfloor1=[cam2floor1[0],cam1floor1[0],cam1floor1[1],
            cam2floor1[1],cam1floor1[2],cam1floor1[3],
