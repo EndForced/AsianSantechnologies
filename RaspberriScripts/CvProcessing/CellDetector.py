@@ -2,7 +2,7 @@ import os
 import sys
 from itertools import combinations
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(file))))
 import cv2
 import numpy as np
 
@@ -29,17 +29,26 @@ zones = {
     'first_left_2f2': [(459, 96), (469, 238), (775, 254), (667, 109), (459, 97)],
     'first_left_2c2': [(479, 259), (538, 596), (801, 596), (796, 272), (481, 259)],
 
-
-
 }
 
 cam1floor1 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1f'], zones['first_left1f'],
               zones['sec_right1c'], zones['sec_left1c'], zones['sec_fl_right1f'], zones['sec_fl_left1f']]
 cam1floor2 = [zones['first_right1c'], zones['first_left1c'], zones['first_right1f'], zones['first_left1f'],
-              zones['first_right2c'], zones['first_left2c'], zones['first_right2f'], zones['first_left2f'],]
+              zones['first_right2c'], zones['first_left2c'], zones['first_right2f'], zones['first_left2f'], ]
 
 cam2floor1 = [zones["first_right_1c2"], zones["first_left_2c2"], zones["first_right_1f2"], zones["first_left_2f2"]]
-cam2floor2 = []
+cam2floor2 = [11,11]
+
+camfloor1=[cam2floor1[0],cam1floor1[0],cam1floor1[1],
+           cam2floor1[1],cam1floor1[2],cam1floor1[3],
+           cam2floor1[3],cam1floor1[4],cam1floor1[5],
+           cam2floor1[4],cam1floor1[6],cam1floor1[7],]
+
+camfloor2=[cam2floor2[0],cam1floor2[0],cam1floor2[1],
+           cam2floor2[1],cam1floor2[2],cam1floor2[3],
+           cam2floor2[3],cam1floor2[4],cam1floor2[5],
+           cam2floor2[4],cam1floor2[6],cam1floor2[7],]
+
 
 
 mean_const = 160
@@ -63,7 +72,6 @@ def fix_perspective(img, camnum):
             [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
         ])
 
-
     if camnum == 1:
         D = np.array([
             [0.05878302],
@@ -73,8 +81,7 @@ def fix_perspective(img, camnum):
         ])
 
     elif camnum == 0:
-        D = np.array([[-0.14],    [0.301],  [-0.0318], [-0.05]  ])
-
+        D = np.array([[-0.14], [0.301], [-0.0318], [-0.05]])
 
     border_size = 100
     img_with_border = cv2.copyMakeBorder(
@@ -98,7 +105,6 @@ def fix_perspective(img, camnum):
     )
 
     return undistorted
-
 
 def extract_warped(image, points, output_size=500):
     # если бы я только знал что тут происходит...
@@ -134,34 +140,26 @@ def extract_warped(image, points, output_size=500):
     return cv2.warpPerspective(image, M, (output_size, output_size))
 
 
-def check_for_borders(frame, cam_num):
+def check_for_borders(frame):
     found = []
-    if cam_num == 1:
-        # front close
-        fr = frame[580:680, 360:740]
-        fr = cv2.cvtColor(fr, cv2.COLOR_BGR2HSV)
-        width = fr.shape[1]
-        _, __, w, h = search_for_color(fr, "Red1", min_area=20)
-        if w > 0.5 * width:
-            print(w, "fc")
-            found.append("fc")
+    # front close
+    fr = frame[580:680, 360:740]
+    fr = cv2.cvtColor(fr, cv2.COLOR_BGR2HSV)
+    width = fr.shape[1]
+    _, _ , w, h = search_for_color(fr, "Red1", min_area=20)
+    if w > 0.5 * width:
+        print(w, "fc")
+        found.append("fc")
 
-        # front far
-        fr = frame[260:330, -450:-100]
-        fr = cv2.cvtColor(fr, cv2.COLOR_BGR2HSV)
-        width = fr.shape[1]
-        # cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
-        _, __, w, h = search_for_color(fr, "Red1", min_area=20)
-        if w > 0.5 * width:
-            print(w, "ff")
-            found.append("ff")
-
-        # side close
-        # fr = frame[100:550, 300:400]
-        # red_count_side = count_pixels(fr, hgsw_red[0], hsw_red[1])[0]
-        # print(red_count_side, "sc")
-        # if red_count_side > 5000:
-        #     found.append("sc")
+    # front far
+    fr = frame[260:330, -450:-100]
+    fr = cv2.cvtColor(fr, cv2.COLOR_BGR2HSV)
+    width = fr.shape[1]
+    # cv2.rectangle(frame, (390, 610), (740, 650), (100, 0, 200), 3)
+    _, _ , w, h = search_for_color(fr, "Red1", min_area=20)
+    if w > 0.5 * width:
+        print(w, "ff")
+        found.append("ff")
     return found, frame
 
 
@@ -172,6 +170,7 @@ def count_pixels(image, lower_hsv, upper_hsv):
     mask = cv2.inRange(hsv_image, lower, upper)
     return cv2.countNonZero(mask), mask
 
+
 def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     pts = np.array(coordinates, dtype=np.int32)
     if fill:
@@ -179,6 +178,7 @@ def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     else:
         cv2.polylines(img, [pts], isClosed=True, color=color, thickness=thickness)
     return img
+
 
 def search_for_color(frame, color, min_area=50):
     if color not in COLOR_RANGES:
@@ -209,6 +209,7 @@ def search_for_color(frame, color, min_area=50):
 
     return x, y, w, h
 
+
 def tile_to_code(frame):
     if frame.shape[:2] != (200, 200):
         frame = cv2.resize(frame, (200, 200))
@@ -224,7 +225,7 @@ def tile_to_code(frame):
         else:
             return 62 if (x + w / 2) > 100 else 64
 
-    # Поиск синих объектов (рампа)
+# Поиск синих объектов (рампа)
     xb, yb, wb, hb = search_for_color(hsv, "Blue")
     if hb * wb:
         xr, yr, wr, hr = search_for_color(hsv, "Red")
@@ -248,79 +249,84 @@ def tile_to_code(frame):
 
     return elevation * 10
 
-def process_borders(slices, borders, leads, floor, camnum = 1):
-    ignore_mask = {i: False for i in range(4)}  # Инициализируем маску
+
+def process_borders(slices, borders, leads, floor):
+    ignore_mask = {i: False for i in range(6)}  # Инициализируем маску
 
     border_flags = {
         'fc': 'fc' in borders,
         'ff': 'ff' in borders,
-        'sc': 'sc' in borders,
-        'sf': 'sf' in borders
     }
 
     # front close = skip
     if border_flags['fc']:
-        return {i: True for i in range(4)}
+        return {i: True for i in range(6)}
 
-    if camnum == 1:
-        for i in range(4):
-            # front far
-            if (i == 2 or i == 3) and border_flags['ff']:
+    for i in range(6):
+        # front far
+        if (i >= 3) and border_flags['ff']:
+            ignore_mask[i] = True
+
+        if floor == 1:
+            # ignore  behind black
+            if i >=3 and leads[i-3] == "black" and tile_to_code(slices[i-3]) != 31:
                 ignore_mask[i] = True
 
-            if floor == 1:
-                # ignore  behind white
-                if i == 2 and leads[0] == "black"and tile_to_code(slices[0]) != 31:
-                    ignore_mask[i] = True
-                    # print("heh")
 
-                if i == 3 and leads[1] == "black"  and tile_to_code(slices[1]) != 31:
-                    ignore_mask[i] = True
-                    # print("huh")
-            # elif floor == 2:
-
-    elif camnum == 0:
-        pass
-
-
-        print("ignore", ignore_mask)
+    print("ignore", ignore_mask)
     return ignore_mask
+
+
+def shuffle_slices(slices, slices2):
+    all_slices  = {i: np.array([1488]) for i in range(12)}  # Инициализируем маску
+
+    all_slices[0] = slices2[0]
+    all_slices[1:2] = slices[0:1]
+    all_slices[3] = slices2[1]
+    all_slices[4:5] = slices[2:3]
+
+    all_slices[6] = slices2[2]
+    all_slices[7:8] = slices[4:5]
+    all_slices[9] = slices2[3]
+    all_slices[10:11] = slices[6:7]
+
+    return all_slices
 
 def analyze_frame(frame, frame1, floor):
     # я пытался делать модульный код (вроде работает)
     result_frame = frame.copy()
-    dict_of_slices = {}
-    borders = []
     slices = []
+    slices2 = []
 
     if floor == 1:
         slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
-        # slices2 = [cv2.resize(extract_warped(frame1, cam2floor1[i]), (200, 200)) for i in range(8)]
+        slices2 = [cv2.resize(extract_warped(frame1, cam2floor1[i]), (200, 200)) for i in range(4)]
 
     elif floor == 2:
-        slices= [cv2.resize(extract_warped(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
-        # slices2 = [cv2.resize(extract_warped(frame1, cam2floor2[i]), (200, 200)) for i in range(8)]
+        slices = [cv2.resize(extract_warped(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
+        slices2 = [cv2.resize(extract_warped(frame1, cam2floor2[i]), (200, 200)) for i in range(4)]
 
+    dict_of_slices = shuffle_slices(slices, slices2)
 
-    borders, frame = check_for_borders(frame, 1)
+    borders, frame = check_for_borders(frame)
 
     cv2.rectangle(result_frame, (780 - 450, 260), (680, 330), (100, 0, 200), 2)
     cv2.rectangle(result_frame, (360, 580), (740, 680), (100, 0, 200), 2)
 
     leads = []
-    for i in range(4):
+    for i in range(6):
         mini1 = slices[i][120:200, 30:70]
         mini2 = slices[i][120:200, 130:170]
         leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
     print(leads)
 
+    ignore_mask = process_borders(dict_of_slices, borders, leads, floor)
 
-    ignore_mask = process_borders(slices, borders, leads, floor)
-
-    for i in range(4):
+    for i in range(6):
         if ignore_mask[i]:
             dict_of_slices[i] = "unr"
             continue
+
         if floor == 1:
             if leads[i] == "white":
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
