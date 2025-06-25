@@ -435,10 +435,10 @@ if __name__ == "__main__":
             _ = input()
             mc.robot.do(_)
             frames = mc.robot.get_uncompressed_frames(1)
-            # frame1 = fix_perspective(frames[0], 0)
+            frame1 = fix_perspective(frames[0], 0)
             cv2.imwrite("cam0hehe.png", frames[0])
             frame2 = fix_perspective(frames[1], 1)
-            # frame, borders, cells = analyze_frame(frame2,frame1, mc.floor)
+            frame, borders, cells = analyze_frame(frame2,frame1, mc.floor)
             mc.robot.set_frame(frame)
 
             print("written")
