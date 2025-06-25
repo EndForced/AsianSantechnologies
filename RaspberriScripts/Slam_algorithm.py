@@ -169,7 +169,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
                                          [1, 1, 1, 1, 0],
                                          [0, 0, 1, 1, 0]])
 
-    def send_map(self):
+    def send_map(self, pic = None):
         # pozdno pozdno pozdno noch'u
         if self.resizedPicture is None:
             print("FAIL: No image to send")
@@ -178,10 +178,16 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         if self.resizedPicture.dtype == 'uint16':
             self.resizedPicture = (self.resizedPicture // 257).astype('uint8')
 
+        to_encode = []
+        if not bool(pic):
+            to_encode = self.resizedPicture
+        else: to_encode = pic
+
+
         quality = max(0, min(100, self.robot.mapQuality))
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
 
-        success, buffer = cv2.imencode('.jpg', self.resizedPicture, encode_params)
+        success, buffer = cv2.imencode('.jpg', self.to_encode, encode_params)
         if not success:
             print("FAIL: Image encoding failed")
             return
@@ -440,6 +446,7 @@ if __name__ == "__main__":
             frame2 = fix_perspective(frames[1], 1)
             frame, borders, cells = analyze_frame(frame2,frame1, mc.floor)
             mc.robot.set_frame(frame)
+            mc.send_map(frame1)
 
             print("written")
         # mc.robot.do("Beep")
