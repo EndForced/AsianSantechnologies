@@ -443,6 +443,7 @@ if __name__ == "__main__":
 
             print("cells", cells, cells.keys())
             for i in range(len(cells)):
+                print("dogjdjig", cells[i])
                 cells[i] = tile_to_code(cells[i+1])
 
             print("cells", cells)
