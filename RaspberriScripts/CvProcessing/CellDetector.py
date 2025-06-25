@@ -280,18 +280,18 @@ def process_borders(slices, borders, leads, floor):
 def shuffle_slices(slices, slices2):
     all_slices = {}
 
-    all_slices[0] = slices2[0]
-    all_slices[1] = slices[0]
-    all_slices[2] = slices[1]
-    all_slices[3] = slices2[1]
-    all_slices[4] = slices[2]
-    all_slices[5] = slices[3]
-    all_slices[6] = slices2[2]
-    all_slices[7] = slices[4]
-    all_slices[8] = slices[5]
-    all_slices[9] = slices2[3]
-    all_slices[10] = slices[6]
-    all_slices[11] = slices[7]
+    all_slices[0] = slices[0]
+    all_slices[1] = slices[1]
+    all_slices[2] = slices[2]
+    all_slices[3] = slices2[0]
+    all_slices[4] = slices2[1]
+    all_slices[5] = slices2[2]
+    all_slices[6] = slices2[3]
+    all_slices[7] = slices[3]
+    all_slices[8] = slices[4]
+    all_slices[9] = slices[5]
+    all_slices[10] = slices2[4]
+    all_slices[11] = slices2[5]
 
     return all_slices
 
