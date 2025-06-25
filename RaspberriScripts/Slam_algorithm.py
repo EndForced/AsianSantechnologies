@@ -429,22 +429,20 @@ if __name__ == "__main__":
         # mc.slam_parameters_init()
 
 
-        # mc.start_website()
-        # while 1:
-        #     a = input()
-        #     mc.robot.do(a)
-        # mc.start_website()
-        # c = 1
-        # while 1:
-        #     frame = mc.robot.get_uncompressed_frames(1)[0]
-        #     frame = fix_perspective(frame, 0)
-        #     # frame, borders, cells = analyze_frame(frame, 1)
-        #     cv2.imwrite(f"test0.png", frame)
-        #     mc.robot.set_frame(frame)
-        #
-        #     print("written")
-        mc.robot.do("Beep")
-        mc.qualification()
+        mc.start_website()
+        c = 1
+        while 1:
+            _ = input()
+            mc.robot.do(_)
+            frames = mc.robot.get_uncompressed_frames(1)
+            frame1 = fix_perspective(frames[0], 0)
+            frame2 = fix_perspective(frames[1], 1)
+            frame, borders, cells = analyze_frame(frame1,frame2, mc.floor)
+            mc.robot.set_frame(frame)
+
+            print("written")
+        # mc.robot.do("Beep")
+        # mc.qualification()
 
         # tiles = {}
         # mc.capture_to_map()
