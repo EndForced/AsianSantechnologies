@@ -55,33 +55,3 @@ def update(val=None):
 
     # Показываем результат
     cv2.imshow('Undistorted', result)
-
-
-# Загружаем изображение
-img = cv2.imread('1.png')  # Замените на путь к вашему изображению
-
-# Создаем окно с ползунками
-cv2.namedWindow('Controls', cv2.WINDOW_NORMAL)
-cv2.resizeWindow('Controls', 600, 400)
-
-# Создаем ползунки с начальными значениями
-# Матрица K параметры (умножены на 100 для точности)
-cv2.createTrackbar('fx', 'Controls', 320, 1000, update)  # 3.2 * 100
-cv2.createTrackbar('fy', 'Controls', 320, 1000, update)  # 3.2 * 100
-cv2.createTrackbar('cx', 'Controls', 280, 1000, update)  # 2.8 * 100
-cv2.createTrackbar('cy', 'Controls', 200, 1000, update)  # 2.0 * 100
-
-# Коэффициенты дисторсии (умножены на 10000 и сдвинуты на +0.5)
-cv2.createTrackbar('k1', 'Controls', int((0.05878302 + 0.5) * 10000), 10000, update)
-cv2.createTrackbar('k2', 'Controls', int((-0.02615866 + 0.5) * 10000), 10000, update)
-cv2.createTrackbar('k3', 'Controls', int((-0.04267542 + 0.5) * 10000), 10000, update)
-cv2.createTrackbar('k4', 'Controls', int((0.03454424 + 0.5) * 10000), 10000, update)
-
-# Размер границы
-cv2.createTrackbar('border', 'Controls', 100, 500, update)
-
-# Инициализация
-update()
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
