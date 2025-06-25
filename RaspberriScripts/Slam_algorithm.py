@@ -425,7 +425,8 @@ if __name__ == "__main__":
 
     if mc.OS == "Linux":
         c = 0
-        mc.robot.do("Beep")
+        mc.start_website()
+        # mc.robot.do("Beep")
         # import sputnic
         while 1:
             _ = input()
