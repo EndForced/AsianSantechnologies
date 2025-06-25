@@ -444,8 +444,11 @@ if __name__ == "__main__":
             print("cells", cel, cel.keys())
             for i in range(len(cel)):
                 print("dogjdjig", cel[i])
-                cv2.imwrite("bebra.png", cel[i])
-                cels.append(tile_to_code(cel[i]))
+                if cel[i] != "unr":
+                # cv2.imwrite("bebra.png", cel[i])
+                    cels.append(tile_to_code(cel[i]))
+                else:
+                    cels.append("unr")
 
             print("cells", cels)
 
