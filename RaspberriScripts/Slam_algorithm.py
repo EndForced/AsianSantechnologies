@@ -439,18 +439,18 @@ if __name__ == "__main__":
             frames[0] = fix_perspective(frames[0], 0)
             frames[1] = fix_perspective(frames[1], 1)
 
-            frame, cells, borders = analyze_frame(frames[1], frames[0],mc.floor)
+            frame, cel, borders = analyze_frame(frames[1], frames[0],mc.floor)
+            cels = []
+            print("cells", cel, cel.keys())
+            for i in range(len(cel)):
+                print("dogjdjig", cel[i])
+                cv2.imwrite("bebra.png", cel[i])
+                cels[i] = tile_to_code(cel[i])
 
-            print("cells", cells, cells.keys())
-            for i in range(len(cells)):
-                print("dogjdjig", cells[i])
-                cv2.imwrite("bebra.png", cells[i])
-                cells[i] = tile_to_code(cells[i])
-
-            print("cells", cells)
+            print("cells", cels)
 
             mc.robot.set_frame(frame)
-            print(cells, borders)
+            print(cels, borders)
         # mc.slam_parameters_init()
         #
         # mc.start_website()
