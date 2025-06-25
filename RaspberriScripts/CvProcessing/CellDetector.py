@@ -350,4 +350,27 @@ def analyze_frame(frame, frame1, floor):
                 result_frame = draw_on_image(result_frame, cam1floor2[i + 4], color=(0, 0, 255))
                 dict_of_slices[i] = slices[i + 4]
 
+    ignore_mask1 = [ignore_mask[2],ignore_mask[5]]
+
+    for i in range(2):
+        if ignore_mask1[i]:
+            dict_of_slices[i] = "unr"
+            continue
+
+        if floor == 1:
+            if leads[i] == "white":
+                result_frame = draw_on_image(result_frame, cam2floor1[i])
+                dict_of_slices[i] = slices[i]
+            else:
+                result_frame = draw_on_image(result_frame, cam2floor1[i + 2], color=(0, 0, 255))
+                dict_of_slices[i] = slices[i + 2]
+
+        elif floor == 2:
+            if leads[i] == "black":
+                result_frame = draw_on_image(result_frame, cam2floor2[i])
+                dict_of_slices[i] = slices[i]
+            else:
+                result_frame = draw_on_image(result_frame, cam2floor2[i + 4], color=(0, 0, 255))
+                dict_of_slices[i] = slices[i + 2]
+
     return result_frame, dict_of_slices, borders
