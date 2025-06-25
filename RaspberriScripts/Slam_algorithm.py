@@ -444,7 +444,7 @@ if __name__ == "__main__":
             frame1 = fix_perspective(frames[0], 0)
             cv2.imwrite("cam0hehe.png", frames[0])
             frame2 = fix_perspective(frames[1], 1)
-            frame, borders, cells = analyze_frame(frame2,frame1, mc.floor)
+            frame,frame1, borders, cells = analyze_frame(frame2,frame1, mc.floor)
             mc.robot.set_frame(frame)
             mc.send_map(frame1)
 

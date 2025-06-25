@@ -374,4 +374,4 @@ def analyze_frame(frame, frame1, floor):
                 result_frame = draw_on_image(result_frame, cam2floor2[i + 4], color=(0, 0, 255))
                 dict_of_slices[i] = slices[i + 2]
 
-    return result_frame1, dict_of_slices, borders
+    return result_frame,result_frame1, dict_of_slices, borders
