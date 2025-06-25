@@ -298,6 +298,7 @@ def shuffle_slices(slices, slices2):
 def analyze_frame(frame, frame1, floor):
     # я пытался делать модульный код (вроде работает)
     result_frame = frame.copy()
+    result_frame1 = frame1.copy()
 
 
     slices = []
@@ -359,10 +360,10 @@ def analyze_frame(frame, frame1, floor):
 
         if floor == 1:
             if leads[i] == "white":
-                result_frame = draw_on_image(result_frame, cam2floor1[i])
+                result_frame1 = draw_on_image(result_frame1, cam2floor1[i])
                 dict_of_slices[i] = slices[i]
             else:
-                result_frame = draw_on_image(result_frame, cam2floor1[i + 2], color=(0, 0, 255))
+                result_frame1 = draw_on_image(result_frame1, cam2floor1[i + 2], color=(0, 0, 255))
                 dict_of_slices[i] = slices[i + 2]
 
         elif floor == 2:
@@ -373,4 +374,4 @@ def analyze_frame(frame, frame1, floor):
                 result_frame = draw_on_image(result_frame, cam2floor2[i + 4], color=(0, 0, 255))
                 dict_of_slices[i] = slices[i + 2]
 
-    return result_frame, dict_of_slices, borders
+    return result_frame1, dict_of_slices, borders
