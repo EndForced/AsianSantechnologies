@@ -1,5 +1,8 @@
 # тут типо жоски слем алгоритме
-import sys, os, platform, math
+import math
+import os
+import platform
+import sys
 
 import numpy as np
 
@@ -7,8 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append("/home/pi2/AsianSantechnologies/RaspberriScripts/CvProcessing")
 
 from CvProcessing.CellDetector import fix_perspective, analyze_frame, tile_to_code
-from SlamLogic.SlamLogic import prepare_to_insert, edge_to_matrix, coolest_route, optimal_cell_scanning
-from SlamLogic.scan_emulator import ScanEmulator, fm, dummy_def
+from SlamLogic.SlamLogic import edge_to_matrix
 from ClientClasses.VisualizationProcessing import VisualizePaths, VisualizeMatrix
 import time
 import cv2
@@ -245,14 +247,14 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         res = str(self.robot.read())
 
-        while res != "Activated":
+        while res != 'Activated':
             if res: print(res)
             res = self.robot.read()
             if res: res = str(res[0])
 
         # self.robot.do("OK")
-        # time.sleep(0.1)
-        # self.robot.do("Beep")
+        time.sleep(0.7)
+        self.robot.do("Beep")
 
         unload_dict = {"R": ["P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"],
                        "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
@@ -260,7 +262,6 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         moves = self.solve()
         unload_type = self.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
-        # print(unload_type)
         moves = self.way_to_commands(moves, "U")
 
         if unload_type[1] != moves[1]:
@@ -359,12 +360,10 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         frame = self.robot.get_uncompressed_frames(0)[1]
         frame = fix_perspective(frame)
         # cv2.imwrite("Warped.png", frame)
-        tiles = {}
         frame, slices, borders = analyze_frame(frame, self.floor)
 
         if borders:
-            mc._matrix = list(
-                edge_to_matrix(np.array(mc._matrix), borders[0], self.robot.Position, self.robot.Orientation))
+            mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], self.robot.Position, self.robot.Orientation))
 
         for key, item in slices.items():
             if str(item) != "unr":
@@ -412,58 +411,116 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
 if __name__ == "__main__":
     # mat = [[0 for _ in range(17)] for _ in range(17)]
-    mat = [[10, 10, 20, 20, 20, 10, 41, 20],
-           [10, 32, 20, 20, 34, 10, 10, 62],
-           [10, 32, 20, 20, 10, 20, 10, 62],
-           [10, 10, 20, 20, 20, 34, 10, 62],
-           [10, 41, 34, 20, 20, 20, 34, 10],
-           [10, 10, 10, 32, 34, 10, 10, 71],
-           [10, 10, 20, 20, 34, 10, 10, 10],
-           [10, 10, 32, 20, 52, 20, 10, 10]]
+    mat = [[20, 20, 61, 61, 61, 34, 20, 20],
+           [20, 20, 10, 10, 10, 10, 10, 51],
+           [31, 10, 20, 20, 20, 33, 10, 20],
+           [33, 10, 10, 42, 10, 20, 10, 31],
+           [31, 10, 32, 20, 81, 20, 10, 10],
+           [10, 10, 10, 32, 20, 20, 34, 10],
+           [10, 41, 10, 10, 10, 10, 10, 10],
+           [10, 10, 10, 32, 20, 20, 20, 34]]
 
     mc = MainComputer(mat, serial)
 
+    # mc.robot.Orientation = "U"
+    # mc.robot.Position = (8,8)
+
     if mc.OS == "Linux":
-        c = 0
-        mc.start_website()
-        # mc.robot.do("Beep")
-        # import sputnic
-        while 1:
-            _ = input()
-            mc.robot.do(_)
-            frames = mc.robot.get_uncompressed_frames()
-            cv2.imwrite(f"{c}.png", frames[0])
-            c+=1
-            cv2.imwrite(f"{c}.png", frames[1])
-            c+=1
-            frames[0] = fix_perspective(frames[0], 0)
-            frames[1] = fix_perspective(frames[1], 1)
-
-            frame, cel, borders = analyze_frame(frames[1], frames[0],mc.floor)
-            cels = []
-            print("cells", cel, cel.keys())
-            for i in range(len(cel)):
-                print("dogjdjig", cel[i])
-                if str(cel[i]) != "unr":
-                # cv2.imwrite("bebra.png", cel[i])
-                    cels.append(tile_to_code(cel[i]))
-                else:
-                    cels.append("unr")
-
-            print("cells", cels)
-
-            mc.robot.set_frame(frame)
-            print(cels, borders)
         # mc.slam_parameters_init()
-        #
-        # mc.start_website()
 
+
+        # mc.start_website()
+        # while 1:
+        #     a = input()
+        #     mc.robot.do(a)
+        # mc.start_website()
+        # c = 1
+        # while 1:
+        #     frame = mc.robot.get_uncompressed_frames(1)[0]
+        #     frame = fix_perspective(frame, 0)
+        #     # frame, borders, cells = analyze_frame(frame, 1)
+        #     cv2.imwrite(f"test0.png", frame)
+        #     mc.robot.set_frame(frame)
+        #
+        #     print("written")
+        mc.robot.do("Beep")
+        mc.qualification()
+
+        # tiles = {}
+        # mc.capture_to_map()
+
+        # print(mc.robot.Position)
+        # print(mc.robot.Orientation)
+        # print(tiles)
+        # print(np.array(mc._matrix))
+        # print("floor:", mc.floor)
+        # _ = input()
+
+        # _ = input()
+        # mc.robot.do(_)
+        # mc.qualifiction()
+        # time.sleep(1000)
+        # while 1:
+        #     # frame = mc.robot.get_uncompressed_frames(1)[1].copy()
+        #     # frame, slices = update_frame_smart(frame)
+        #     # for i in range(len(slices)):
+        #     #     print(i)
+        #     #     cv2.imwrite(f"{i}.jpg", slices[i])
+        #     #
+        #     # print("upd!!")
+        #     # exit()git
+        #     # # cv2.imwrite("testing.jpg", frame)
+        #     # mc.robot.set_frame(frame)
+        #     pass
     else:
-        # if not mc.solve():
-        #     print("unr")
-        moves = mc.solve()
-        mc.draw_multiple_paths(moves)
-        # w = mc.create_wave(mc.robot.Position)
+        # m = 0
+        # se = ScanEmulator(fm.copy())
+        # mc.robot.Orientation = "U"
+        # mc._matrix[mc.robot.Position[0]][mc.robot.Position[1]] = 10
+        # mc._matrix = fm
+        # mc.update_matrix()
+        # mc.show()
+
+        # for i in range(4):
+        #     cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
+        #     # print(cells)
+        #     if borders: mc._matrix = edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation)
+        #     mc._matrix = mc.insert(cells)
+        #     mc.update_matrix()
+        #     mc.robot.do("Turn Right")
+        #     mc.show()
+        #     m+=1
+        #     # print(mc.robot.Orientation)
+        #
+        #
+        # while not mc.solve(mc.robot.Position):
+        #     cell_to_go, used_cells = coolest_route(mc)
+        #     way = mc.create_way(mc.robot.Position, cell_to_go)
+        #     roadmap = mc.way_to_commands_single(way, mc.robot.Orientation, False)[0]
+        #
+        #     if roadmap[0] == "R2":
+        #         roadmap.pop(0)
+        #         roadmap = roadmap[::-1]
+        #         roadmap.append("R1")
+        #         roadmap.append("R1")
+        #         roadmap = roadmap[::-1]
+        #     way_c = dummy_def(roadmap)
+        #     for i in way_c:
+        #         mc.robot.do(i)
+        #         cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
+        #         if borders: mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
+        #         mc._matrix = mc.insert(cells)
+        #
+        #         mc.update_matrix()
+        #         mc.visualize_wave(used_cells)
+        #         mc.put_frame(mc.robot.Position, (0,0, 65000))
+        #         m += 1
+        #         print(m)
+        #         mc.show()
+
+        way = mc.solve()
+        print(way)
+        # w = mc.create_wave()
         # mc.visualize_wave(w)
-        # mc.visualize_matrix()
+        mc.draw_multiple_paths(way)
         mc.show()
