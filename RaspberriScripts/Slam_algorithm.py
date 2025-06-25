@@ -440,6 +440,9 @@ if __name__ == "__main__":
             frames[1] = fix_perspective(frames[1], 1)
 
             frame, borders, cells = analyze_frame(frames[1], frames[0],mc.floor)
+            for i in range(len(cells)):
+                cells[i] = tile_to_code(cells[i])
+
             mc.robot.set_frame(frame)
             print(cells, borders)
         # mc.slam_parameters_init()
