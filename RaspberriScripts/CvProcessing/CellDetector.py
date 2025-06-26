@@ -286,8 +286,8 @@ def shuffle_slices(slices, slices2):
     all_slices[10] = slices[6]
     all_slices[11] = slices[7]
 
-    for i in range(12):
-        cv2.imwrite(f"tstslc{i}.png", all_slices[i])
+    for i in range(4):
+        cv2.imwrite(f"tstslcc{i}.png", slices2[i])
 
     return all_slices
 
