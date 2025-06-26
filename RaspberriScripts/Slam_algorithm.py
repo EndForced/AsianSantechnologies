@@ -321,7 +321,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
                 my_cord[0] += 2
 
         print(my_cord, 2)
-        dop_way = self.create_way(my_cord, dop_cord)
+        dop_way = self.create_way(tuple(my_cord), dop_cord)
         print("dop_way", dop_way)
         dop_way = self.way_to_commands_single(dop_way, mydir, 1)
         print("dop_way_cool", dop_way)
