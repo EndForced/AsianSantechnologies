@@ -306,31 +306,38 @@ def extract_slices(frame, frame1, floor):
 def analyze_frame(frame, frame1, floor):
     # я пытался делать модульный код (вроде работает)
     result_frame = frame.copy()
-    result_frame1 = frame1.copy()
+    dict_of_slices = {}
+    borders = []
+    slices = []
+
+    if floor == 1:
+        slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
+        slices2 = [cv2.resize(extract_warped(frame1, cam2floor1[i]), (200, 200)) for i in range(8)]
+
+    elif floor == 2:
+        slices= [cv2.resize(extract_warped(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
+        slices2 = [cv2.resize(extract_warped(frame1, cam2floor2[i]), (200, 200)) for i in range(8)]
 
 
-    slices,slices2 = extract_slices(frame, frame1, floor)
-    dict_of_slices = shuffle_slices(slices, slices2)
-    borders, frame = check_for_borders(frame)
+    borders, frame = check_for_borders(frame, 1)
 
     cv2.rectangle(result_frame, (780 - 450, 260), (680, 330), (100, 0, 200), 2)
     cv2.rectangle(result_frame, (360, 580), (740, 680), (100, 0, 200), 2)
 
     leads = []
-    for i in range(6):
-        mini1 = dict_of_slices[i][120:200, 30:70]
-        mini2 =dict_of_slices[i][120:200, 130:170]
+    for i in range(4):
+        mini1 = slices[i][120:200, 30:70]
+        mini2 = slices[i][120:200, 130:170]
         leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
-    print(leads, "leads")
+    print(leads)
 
-    ignore_mask = process_borders(dict_of_slices, borders, leads, floor)
-    ignore_mask1 = [ignore_mask[1],ignore_mask[2],ignore_mask[4], ignore_mask[5]]
+
+    ignore_mask = process_borders(slices, borders, leads, floor)
 
     for i in range(4):
-        if ignore_mask1[i]:
+        if ignore_mask[i]:
             dict_of_slices[i] = "unr"
             continue
-
         if floor == 1:
             if leads[i] == "white":
                 result_frame = draw_on_image(result_frame, cam1floor1[i])
@@ -346,28 +353,7 @@ def analyze_frame(frame, frame1, floor):
             else:
                 result_frame = draw_on_image(result_frame, cam1floor2[i + 4], color=(0, 0, 255))
                 dict_of_slices[i] = slices[i + 4]
+    d = dict_of_slices
+    final_d = {1:"unr", 2:d[1], 3:d[2], 4:"unr", 5:d[4], 6:d[5]}
 
-    ignore_mask1 = [ignore_mask[0],ignore_mask[3]]
-
-    for i in range(2):
-        if ignore_mask1[i]:
-            dict_of_slices[i] = "unr"
-            continue
-
-        if floor == 1:
-            if leads[i] == "white":
-                result_frame1 = draw_on_image(result_frame1, cam2floor1[i])
-                dict_of_slices[i] = slices[i]
-            else:
-                result_frame1 = draw_on_image(result_frame1, cam2floor1[i + 2], color=(0, 0, 255))
-                dict_of_slices[i] = slices[i + 2]
-
-        elif floor == 2:
-            if leads[i] == "black":
-                result_frame = draw_on_image(result_frame, cam2floor2[i])
-                dict_of_slices[i] = slices[i]
-            else:
-                result_frame = draw_on_image(result_frame, cam2floor2[i + 4], color=(0, 0, 255))
-                dict_of_slices[i] = slices[i + 2]
-
-    return result_frame,result_frame1, dict_of_slices, borders
+    return result_frame, dict_of_slices, borders
