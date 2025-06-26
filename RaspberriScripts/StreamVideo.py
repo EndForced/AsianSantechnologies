@@ -182,18 +182,18 @@ class RobotAPI:
             if args == "Reset":
                 return
 
-            # self.send(args)
-            # res = []
-            # print(f"doing {args} ... ")
-            #
-            #
-            # while not res:
-            #     res = self.read()
-            #     time.sleep(0.01)
-            #     _ += 1
-            #     if _ == 5000: break
+            self.send(args)
+            res = []
+            print(f"doing {args} ... ")
 
-                # print(f"\n {res}")
+
+            while not res:
+                res = self.read()
+                time.sleep(0.01)
+                _ += 1
+                if _ == 5000: break
+
+                print(f"\n {res}")
 
 
             if self.socket:

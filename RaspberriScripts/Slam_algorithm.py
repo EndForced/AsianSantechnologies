@@ -169,7 +169,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
                                          [1, 1, 1, 1, 0],
                                          [0, 0, 1, 1, 0]])
 
-    def send_map(self, pic = None):
+    def send_map(self, pic=None):
         # pozdno pozdno pozdno noch'u
         if self.resizedPicture is None:
             print("FAIL: No image to send")
@@ -181,8 +181,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         to_encode = []
         if not list(pic):
             to_encode = self.resizedPicture
-        else: to_encode = pic
-
+        else:
+            to_encode = pic
 
         quality = max(0, min(100, self.robot.mapQuality))
         encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), quality]
@@ -283,12 +283,46 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         dop_cord = self.find_dop()
         mydir = self.get_unload_type_dop()
+        my_cord = moves_f[-1][-1]
+        u_t = self.get_unload_type()
+
+        if u_t[1] == "U":
+            if u_t[0] == 'R':
+                my_cord[1] += 2
+            if u_t[0] == 'C':
+                my_cord[1] += 1
+            if u_t[0] == 'L':
+                my_cord[1] -= 2
+
+        if u_t[1] == "R":
+            if u_t[0] == 'R':
+                my_cord[0] += 2
+            if u_t[0] == 'C':
+                my_cord[0] += 1
+            if u_t[0] == 'L':
+                my_cord[0] -= 2
+
+        if u_t[1] == "D":
+            if u_t[0] == 'R':
+                my_cord[1] -= 2
+            if u_t[0] == 'C':
+                my_cord[1] -= 1
+            if u_t[0] == 'L':
+                my_cord[1] += 2
+
+        if u_t[1] == "L":
+            if u_t[0] == 'R':
+                my_cord[0] -= 2
+            if u_t[0] == 'C':
+                my_cord[0] -= 1
+            if u_t[0] == 'L':
+                my_cord[0] += 2
+
         dop_way = self.create_way(self.robot.Position, dop_cord)
         print("dop_way", dop_way)
         dop_way = self.way_to_commands_single(dop_way, mydir, 1)
         print("dop_way_cool", dop_way)
         self.robot.drive_through_roadmap(dop_way[0])
-
 
     def insert(self, cells):
         # josko insert
@@ -378,7 +412,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         frame, slices, borders = analyze_frame(frame, self.floor)
 
         if borders:
-            mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], self.robot.Position, self.robot.Orientation))
+            mc._matrix = list(
+                edge_to_matrix(np.array(mc._matrix), borders[0], self.robot.Position, self.robot.Orientation))
 
         for key, item in slices.items():
             if str(item) != "unr":
@@ -427,13 +462,13 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 if __name__ == "__main__":
     # mat = [[0 for _ in range(17)] for _ in range(17)]
     mat = [[10, 10, 10, 10, 10, 10, 41, 20],
-[10, 32, 20, 20, 34, 10, 10, 62],
-[10, 32, 20, 94, 10, 20, 71, 62],
-[10, 10, 20, 20, 20, 34, 10, 62],
-[10, 41, 32, 20, 20, 20, 10, 10],
-[10, 10, 10, 32, 34, 10, 10, 20],
-[10, 10, 20, 20, 34, 10, 10, 20],
-[20, 10, 32, 20, 52, 20, 10, 20],]
+           [10, 32, 20, 20, 34, 10, 10, 62],
+           [10, 32, 20, 94, 10, 20, 71, 62],
+           [10, 10, 20, 20, 20, 34, 10, 62],
+           [10, 41, 32, 20, 20, 20, 10, 10],
+           [10, 10, 10, 32, 34, 10, 10, 20],
+           [10, 10, 20, 20, 34, 10, 10, 20],
+           [20, 10, 32, 20, 52, 20, 10, 20], ]
 
     mc = MainComputer(mat, serial)
 
