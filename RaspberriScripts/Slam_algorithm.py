@@ -318,7 +318,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             if u_t[0] == 'L':
                 my_cord[0] += 2
 
-        dop_way = self.create_way(self.robot.Position, dop_cord)
+        dop_way = self.create_way(my_cord, dop_cord)
         print("dop_way", dop_way)
         dop_way = self.way_to_commands_single(dop_way, mydir, 1)
         print("dop_way_cool", dop_way)
