@@ -28,7 +28,7 @@ class PolygonDrawer:
         self.image_frame.pack(side=tk.TOP, padx=5, pady=5)
 
         # Canvas для отображения изображения
-        self.canvas = tk.Canvas(self.image_frame, width=700, height=700, cursor="cross")
+        self.canvas = tk.Canvas(self.image_frame, width=900, height=700, cursor="cross")
         self.canvas.pack()
         self.canvas.bind("<Button-1>", self.mouse_click)
         self.canvas.bind("<Motion>", self.mouse_move)
