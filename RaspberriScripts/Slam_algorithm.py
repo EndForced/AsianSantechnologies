@@ -283,7 +283,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
         dop_cord = self.find_dop()
         mydir = self.get_unload_type_dop()
-        dop_way = self.create_way(moves_f[-1][-1], dop_cord)
+        dop_way = self.create_way(self.robot.Position, dop_cord)
         print("dop_way", dop_way)
         dop_way = self.way_to_commands_single(dop_way, mydir, 1)
         print("dop_way_cool", dop_way)

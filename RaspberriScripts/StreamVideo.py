@@ -162,6 +162,17 @@ class RobotAPI:
                 elif self.Orientation == "D":
                     self.Orientation = "U"
 
+        if "Up" in args or "Down" in args:
+            if self.Orientation == "U":
+                self.Position = (x - 1, y)
+            elif self.Orientation == "D":
+                self.Position = (x + 1, y)
+            elif self.Orientation == "R":
+                self.Position = (x, y + 1)
+            elif self.Orientation == "L":
+                self.Position = (x, y - 1)
+
+
 
 
         _ = 0
