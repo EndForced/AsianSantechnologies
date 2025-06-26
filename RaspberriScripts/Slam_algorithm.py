@@ -481,7 +481,9 @@ if __name__ == "__main__":
     if mc.OS == "Linux":
         # mc.slam_parameters_init()
         mc.robot.do("Beep")
-        mc.qualification()
+        import sputnic
+        # mc.qualification()
+
 
         # mc.robot.do("Beep")
         # mc.qualification()
