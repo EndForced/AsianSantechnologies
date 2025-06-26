@@ -284,7 +284,8 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         dop_cord = self.find_dop()
         mydir = self.get_unload_type_dop()
         my_cord = moves_f[-1][-1]
-        u_t = self.get_unload_type()
+        u_t = unload_type
+        print("ut", u_t)
         print(my_cord, 1)
 
         if u_t[1] == "U":
