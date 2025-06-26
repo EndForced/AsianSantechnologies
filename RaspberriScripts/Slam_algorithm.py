@@ -279,13 +279,15 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         # _ = input()
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
-        self.robot.drive_through_roadmap(moves[0])
+        # self.robot.drive_through_roadmap(moves[0])
 
         dop_cord = self.find_dop()
         mydir = self.get_unload_type_dop()
         dop_way = self.create_way(moves_f[-1][-1], dop_cord)
+        print("dop_way", dop_way)
         dop_way = self.way_to_commands_single(dop_way, mydir, 1)
-        self.robot.drive_through_roadmap(dop_way)
+        print("dop_way_cool", dop_way)
+        self.robot.drive_through_roadmap(dop_way[0])
 
 
     def insert(self, cells):
