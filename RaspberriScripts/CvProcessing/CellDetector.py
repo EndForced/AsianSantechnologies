@@ -286,6 +286,9 @@ def shuffle_slices(slices, slices2):
     all_slices[10] = slices[6]
     all_slices[11] = slices[7]
 
+    for i in range(12):
+        cv2.imwrite(f"tstslc{i}.png", all_slices[i])
+
     return all_slices
 
 def analyze_frame(frame, frame1, floor):
