@@ -314,8 +314,8 @@ def analyze_frame(frame, frame1, floor):
 
     leads = []
     for i in range(6):
-        mini1 = slices[i][120:200, 30:70]
-        mini2 = slices[i][120:200, 130:170]
+        mini1 = dict_of_slices[i][120:200, 30:70]
+        mini2 =dict_of_slices[i][120:200, 130:170]
         leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
     print(leads)
 
