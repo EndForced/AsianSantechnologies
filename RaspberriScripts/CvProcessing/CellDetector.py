@@ -324,7 +324,6 @@ def analyze_frame(frame, frame1, floor):
     ignore_mask1 = [ignore_mask[0],ignore_mask[1],ignore_mask[4], ignore_mask[5]]
 
     for i in range(4):
-        if i > 2: i = i+2
         if ignore_mask1[i]:
             dict_of_slices[i] = "unr"
             continue
