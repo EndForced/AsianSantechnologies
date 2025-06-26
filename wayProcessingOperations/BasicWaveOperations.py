@@ -403,7 +403,24 @@ class PattersSolver(WaveCreator):
         # self.pick_up = self.pick_tubes_cords()
         self.floor = 1
         self.robot_cord = (8, 8)
+        self.dop_cord = self.find_dop()
         # print(tubes)
+
+
+    def find_dop(self):
+        cord = []
+        cell = []
+        for i in range(len(self._matrix)):
+            for j in range(len(self._matrix)):
+                if self.matrix[i][j] in [91,92,93,94]:
+                    cord = [i,j]
+                    cell = self.matrix[i][j]
+                    break
+        y,x = cord
+        if cell == 91: return (y-1, x)
+        elif cell == 92: return (y, x+1)
+        elif cell == 93: return (y+1,x)
+        elif cell == 94: return(y, x-1)
 
     def find_tubes(self):
         # возвращает словарь вида {(yt, xt): []}
@@ -480,6 +497,20 @@ class PattersSolver(WaveCreator):
 
         print("no holders")
 
+    def get_unload_type_dop(self):
+        mat = np.array(self._matrix)
+
+        if 61 in mat:
+            return "U"
+        elif 62 in mat:
+            return "R"
+        elif 63 in mat:
+            return "D"
+        elif 64 in mat:
+            return "L"
+
+        print("no holders")
+
     def find_holders(self):
         holders = []
         # база
@@ -502,6 +533,8 @@ class PattersSolver(WaveCreator):
         holders = [self.get_relative_cells(i)[0][type_u][0] for i in holders]
 
         return holders
+
+
 
     def find_robot(self):
         for i in range(len(self.matrix)):

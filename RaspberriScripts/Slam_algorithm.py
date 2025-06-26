@@ -266,9 +266,9 @@ class MainComputer(VisualizePaths, WebsiteHolder):
                        "L": ["P1", "L1", "X1", "R1", "P1", "L1", "X1", "R1", "P1"],
                        "C": ["L1", "X1", "R1", "P1", "R1", "X1", "L1", "P1", "R1", "X1", "L1", "P1"]}
 
-        moves = self.solve()
-        unload_type = self.detect_unload_type(moves[-1][-1])  # тип разгрузки, сторона с трубами
-        moves = self.way_to_commands(moves, "U")
+        moves_f = self.solve()
+        unload_type = self.detect_unload_type(moves_f[-1][-1])  # тип разгрузки, сторона с трубами
+        moves = self.way_to_commands(moves_f, "U")
 
         if unload_type[1] != moves[1]:
             moves[0].append(self.get_rotation_direction(moves[1], unload_type[1]))
@@ -280,6 +280,13 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
         self.robot.drive_through_roadmap(moves[0])
+
+        dop_cord = self.find_dop()
+        mydir = self.get_unload_type_dop()[1]
+        dop_way = self.create_way(moves_f[-1][-1], dop_cord)
+        dop_way = self.way_to_commands_single(dop_way, mydir, 1)
+        self.robot.drive_through_roadmap(dop_way)
+
 
     def insert(self, cells):
         # josko insert
@@ -417,14 +424,14 @@ class MainComputer(VisualizePaths, WebsiteHolder):
 
 if __name__ == "__main__":
     # mat = [[0 for _ in range(17)] for _ in range(17)]
-    mat = [[20, 20, 61, 61, 61, 34, 20, 20],
-           [20, 20, 10, 10, 10, 10, 10, 51],
-           [31, 10, 20, 20, 20, 33, 10, 20],
-           [33, 10, 10, 42, 10, 20, 10, 31],
-           [31, 10, 32, 20, 81, 20, 10, 10],
-           [10, 10, 10, 32, 20, 20, 34, 10],
-           [10, 41, 10, 10, 10, 10, 10, 10],
-           [10, 10, 10, 32, 20, 20, 20, 34]]
+    mat = [[10, 10, 10, 10, 10, 10, 41, 20],
+[10, 32, 20, 20, 34, 10, 10, 62],
+[10, 32, 20, 94, 10, 20, 71, 62],
+[10, 10, 20, 20, 20, 34, 10, 62],
+[10, 41, 32, 20, 20, 20, 10, 10],
+[10, 10, 10, 32, 34, 10, 10, 20],
+[10, 10, 20, 20, 34, 10, 10, 20],
+[20, 10, 32, 20, 52, 20, 10, 20],]
 
     mc = MainComputer(mat, serial)
 
@@ -433,22 +440,8 @@ if __name__ == "__main__":
 
     if mc.OS == "Linux":
         # mc.slam_parameters_init()
+        mc.qualification()
 
-
-        mc.start_website()
-        c = 1
-        while 1:
-            _ = input()
-            mc.robot.do(_)
-            frames = mc.robot.get_uncompressed_frames(1)
-            frame1 = fix_perspective(frames[0], 0)
-            cv2.imwrite("cam0hehe.png", frame1)
-            frame2 = fix_perspective(frames[1], 1)
-            frame,frame1, borders, cells = analyze_frame(frame2,frame1, mc.floor)
-            mc.robot.set_frame(frame)
-            mc.send_map(frame1)
-
-            print("written")
         # mc.robot.do("Beep")
         # mc.qualification()
 
@@ -479,52 +472,9 @@ if __name__ == "__main__":
         #     # mc.robot.set_frame(frame)
         #     pass
     else:
-        # m = 0
-        # se = ScanEmulator(fm.copy())
-        # mc.robot.Orientation = "U"
-        # mc._matrix[mc.robot.Position[0]][mc.robot.Position[1]] = 10
-        # mc._matrix = fm
-        # mc.update_matrix()
-        # mc.show()
-
-        # for i in range(4):
-        #     cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
-        #     # print(cells)
-        #     if borders: mc._matrix = edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation)
-        #     mc._matrix = mc.insert(cells)
-        #     mc.update_matrix()
-        #     mc.robot.do("Turn Right")
-        #     mc.show()
-        #     m+=1
-        #     # print(mc.robot.Orientation)
-        #
-        #
-        # while not mc.solve(mc.robot.Position):
-        #     cell_to_go, used_cells = coolest_route(mc)
-        #     way = mc.create_way(mc.robot.Position, cell_to_go)
-        #     roadmap = mc.way_to_commands_single(way, mc.robot.Orientation, False)[0]
-        #
-        #     if roadmap[0] == "R2":
-        #         roadmap.pop(0)
-        #         roadmap = roadmap[::-1]
-        #         roadmap.append("R1")
-        #         roadmap.append("R1")
-        #         roadmap = roadmap[::-1]
-        #     way_c = dummy_def(roadmap)
-        #     for i in way_c:
-        #         mc.robot.do(i)
-        #         cells, borders = se.reveal(mc.robot.Position, mc.robot.Orientation)
-        #         if borders: mc._matrix = list(edge_to_matrix(np.array(mc._matrix), borders[0], mc.robot.Position, mc.robot.Orientation))
-        #         mc._matrix = mc.insert(cells)
-        #
-        #         mc.update_matrix()
-        #         mc.visualize_wave(used_cells)
-        #         mc.put_frame(mc.robot.Position, (0,0, 65000))
-        #         m += 1
-        #         print(m)
-        #         mc.show()
 
         way = mc.solve()
+        # way = mc.solve()
         print(way)
         # w = mc.create_wave()
         # mc.visualize_wave(w)
