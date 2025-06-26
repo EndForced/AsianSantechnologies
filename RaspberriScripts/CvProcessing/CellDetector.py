@@ -291,15 +291,8 @@ def shuffle_slices(slices, slices2):
 
     return all_slices
 
-def analyze_frame(frame, frame1, floor):
-    # я пытался делать модульный код (вроде работает)
-    result_frame = frame.copy()
-    result_frame1 = frame1.copy()
 
-
-    slices = []
-    slices2 = []
-
+def extract_slices(frame, frame1, floor):
     if floor == 1:
         slices = [cv2.resize(extract_warped(frame, cam1floor1[i]), (200, 200)) for i in range(8)]
         slices2 = [cv2.resize(extract_warped(frame1, cam2floor1[i]), (200, 200)) for i in range(4)]
@@ -308,8 +301,16 @@ def analyze_frame(frame, frame1, floor):
         slices = [cv2.resize(extract_warped(frame, cam1floor2[i]), (200, 200)) for i in range(8)]
         slices2 = [cv2.resize(extract_warped(frame1, cam2floor2[i]), (200, 200)) for i in range(4)]
 
-    dict_of_slices = shuffle_slices(slices, slices2)
+    return slices, slices2
 
+def analyze_frame(frame, frame1, floor):
+    # я пытался делать модульный код (вроде работает)
+    result_frame = frame.copy()
+    result_frame1 = frame1.copy()
+
+
+    slices,slices2 = extract_slices(frame, frame1)
+    dict_of_slices = shuffle_slices(slices, slices2)
     borders, frame = check_for_borders(frame)
 
     cv2.rectangle(result_frame, (780 - 450, 260), (680, 330), (100, 0, 200), 2)
@@ -323,8 +324,7 @@ def analyze_frame(frame, frame1, floor):
     print(leads, "leads")
 
     ignore_mask = process_borders(dict_of_slices, borders, leads, floor)
-
-    ignore_mask1 = [ignore_mask[0],ignore_mask[1],ignore_mask[4], ignore_mask[5]]
+    ignore_mask1 = [ignore_mask[1],ignore_mask[2],ignore_mask[4], ignore_mask[5]]
 
     for i in range(4):
         if ignore_mask1[i]:
@@ -347,7 +347,7 @@ def analyze_frame(frame, frame1, floor):
                 result_frame = draw_on_image(result_frame, cam1floor2[i + 4], color=(0, 0, 255))
                 dict_of_slices[i] = slices[i + 4]
 
-    ignore_mask1 = [ignore_mask[2],ignore_mask[5]]
+    ignore_mask1 = [ignore_mask[0],ignore_mask[3]]
 
     for i in range(2):
         if ignore_mask1[i]:
