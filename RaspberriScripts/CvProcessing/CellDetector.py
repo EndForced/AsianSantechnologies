@@ -139,7 +139,6 @@ def extract_warped(image, points, output_size=500):
     M = cv2.getPerspectiveTransform(final_points_sorted, dst_points)
     return cv2.warpPerspective(image, M, (output_size, output_size))
 
-
 def check_for_borders(frame):
     found = []
     # front close
@@ -162,14 +161,12 @@ def check_for_borders(frame):
         found.append("ff")
     return found, frame
 
-
 def count_pixels(image, lower_hsv, upper_hsv):
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     lower = np.array(lower_hsv, dtype=np.uint8)
     upper = np.array(upper_hsv, dtype=np.uint8)
     mask = cv2.inRange(hsv_image, lower, upper)
     return cv2.countNonZero(mask), mask
-
 
 def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     pts = np.array(coordinates, dtype=np.int32)
@@ -178,7 +175,6 @@ def draw_on_image(img, coordinates, color=(0, 255, 0), thickness=2, fill=False):
     else:
         cv2.polylines(img, [pts], isClosed=True, color=color, thickness=thickness)
     return img
-
 
 def search_for_color(frame, color, min_area=50):
     if color not in COLOR_RANGES:
@@ -208,7 +204,6 @@ def search_for_color(frame, color, min_area=50):
                 x, y, w, h = x1, y1, w1, h1
 
     return x, y, w, h
-
 
 def tile_to_code(frame):
     if frame.shape[:2] != (200, 200):
@@ -249,7 +244,6 @@ def tile_to_code(frame):
 
     return elevation * 10
 
-
 def process_borders(slices, borders, leads, floor):
     ignore_mask = {i: False for i in range(6)}  # Инициализируем маску
 
@@ -275,7 +269,6 @@ def process_borders(slices, borders, leads, floor):
 
     print("ignore", ignore_mask)
     return ignore_mask
-
 
 def shuffle_slices(slices, slices2):
     all_slices = {}
@@ -331,6 +324,7 @@ def analyze_frame(frame, frame1, floor):
     ignore_mask1 = [ignore_mask[0],ignore_mask[1],ignore_mask[4], ignore_mask[5]]
 
     for i in range(4):
+        if i > 2: i = i+2
         if ignore_mask1[i]:
             dict_of_slices[i] = "unr"
             continue
@@ -353,7 +347,7 @@ def analyze_frame(frame, frame1, floor):
 
     ignore_mask1 = [ignore_mask[2],ignore_mask[5]]
 
-    for i in range(2):
+    for i in range(2,4):
         if ignore_mask1[i]:
             dict_of_slices[i] = "unr"
             continue
