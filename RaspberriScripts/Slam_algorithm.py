@@ -282,7 +282,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         self.robot.drive_through_roadmap(moves[0])
 
         dop_cord = self.find_dop()
-        mydir = self.get_unload_type_dop()[1]
+        mydir = self.get_unload_type_dop()
         dop_way = self.create_way(moves_f[-1][-1], dop_cord)
         dop_way = self.way_to_commands_single(dop_way, mydir, 1)
         self.robot.drive_through_roadmap(dop_way)
@@ -475,9 +475,13 @@ if __name__ == "__main__":
     else:
 
         way = mc.solve()
+        dop_cord = mc.find_dop()
+        mydir = mc.get_unload_type_dop()
+        dop_way = mc.create_way(way[-1][-1], dop_cord)
         # way = mc.solve()
         print(way)
         # w = mc.create_wave()
         # mc.visualize_wave(w)
         mc.draw_multiple_paths(way)
+        mc.draw_path(dop_way)
         mc.show()
