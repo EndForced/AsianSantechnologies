@@ -285,6 +285,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         mydir = self.get_unload_type_dop()
         my_cord = moves_f[-1][-1]
         u_t = self.get_unload_type()
+        print(my_cord, 1)
 
         if u_t[1] == "U":
             if u_t[0] == 'R':
@@ -318,6 +319,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
             if u_t[0] == 'L':
                 my_cord[0] += 2
 
+        print(my_cord, 2)
         dop_way = self.create_way(my_cord, dop_cord)
         print("dop_way", dop_way)
         dop_way = self.way_to_commands_single(dop_way, mydir, 1)
