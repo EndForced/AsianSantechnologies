@@ -279,7 +279,7 @@ class MainComputer(VisualizePaths, WebsiteHolder):
         # _ = input()
         self.robot.do("Direction 1")
         self.robot.do(f"Elevation {self.floor}")
-        # self.robot.drive_through_roadmap(moves[0])
+        self.robot.drive_through_roadmap(moves[0])
 
         dop_cord = self.find_dop()
         mydir = self.get_unload_type_dop()
