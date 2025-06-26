@@ -309,7 +309,7 @@ def analyze_frame(frame, frame1, floor):
     result_frame1 = frame1.copy()
 
 
-    slices,slices2 = extract_slices(frame, frame1)
+    slices,slices2 = extract_slices(frame, frame1, mc.floor)
     dict_of_slices = shuffle_slices(slices, slices2)
     borders, frame = check_for_borders(frame)
 
