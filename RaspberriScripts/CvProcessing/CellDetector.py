@@ -274,11 +274,11 @@ def shuffle_slices(slices, slices2):
     all_slices = {}
 
     all_slices[0] = slices2[0]
-    all_slices[1] = slices[1]
-    all_slices[2] = slices[2]
+    all_slices[1] = slices[0]
+    all_slices[2] = slices[1]
     all_slices[3] = slices2[1]
-    all_slices[4] = slices[3]
-    all_slices[5] = slices[4]
+    all_slices[4] = slices[2]
+    all_slices[5] = slices[3]
     all_slices[6] = slices2[2]
     all_slices[7] = slices[4]
     all_slices[8] = slices[5]
@@ -317,7 +317,7 @@ def analyze_frame(frame, frame1, floor):
         mini1 = dict_of_slices[i][120:200, 30:70]
         mini2 =dict_of_slices[i][120:200, 130:170]
         leads.append("black" if (np.mean(mini1) + np.mean(mini2)) / 2 < mean_const else "white")
-    print(leads)
+    print(leads, "leads")
 
     ignore_mask = process_borders(dict_of_slices, borders, leads, floor)
 
